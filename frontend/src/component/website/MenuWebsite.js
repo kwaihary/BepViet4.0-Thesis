@@ -16,15 +16,6 @@ function Menu() {
         setIsUserMenuOpen(!isUserMenuOpen);
         if (isFilterOpen) setIsFilterOpen(false); // Đóng filter nếu mở menu user
     };
-    //dữ liệu demo
-    useEffect(()=>{
-        const data= async()=>{
-            const data= await API.CallAPI(undefined,{PhuongThuc:2, url:'api/test'});
-            alert(JSON.stringify(data))
-        };
-        data();
-    })
-
     return (
         <>
             <nav className="bg-white shadow-sm fixed w-full z-50 top-0 h-16 border-b border-gray-200">

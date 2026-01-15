@@ -1,5 +1,53 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
+import * as API from '../../JS/API/API';
 function QuanLiNguoiDung() {
+    //bước 1 : hiện thống kê
+    const [loading,setloading] = useState(false);
+    const [DuLieuThongKe,setDuLieuThongKe] = useState([]);
+    useEffect(()=>{
+        const ThongKe=async()=>{
+            setloading(true);
+            try {
+                const DuLieu=await API.CallAPI(undefined,{PhuongThuc:2, url:`api/admin/ThongKeNguoiDung`})
+                if(DuLieu.status){
+                    setDuLieuThongKe(DuLieu.data);
+                    setloading(false);
+                }
+            } catch (error) {
+                console.error('lỗi hiển thị:'+ error)
+            } finally {
+                setloading(false)
+            }
+        }
+        ThongKe();
+    },[]);
+    //Bước 2 : lấy dữ liệu người dùng lên giao diện
+    const [page,setpage] = useState(1);
+    const [DuLieuUser,setDuLieuUser] = useState([]);
+    const [loding2,setloading2] = useState(false);
+    const [DuLieuTrang,setDuLietTrang] = useState({})
+    useEffect(()=>{
+        const LayDL= async()=>{
+            setloading2(false)
+            try {
+                 const data= await API.CallAPI(undefined,{PhuongThuc:2,url:`api/admin/layDLUS?page=${page}`});
+                 if(data.status){
+                    setDuLietTrang(data.data)
+                    setDuLieuUser(data.data.data)
+                    setloading2(false);
+                 }
+            } catch (error) {
+                console.error('lỗi hiển thị:'+ error)
+            } finally {
+                setloading2(false);
+            }
+        }
+        LayDL();
+    },[page])
+
+    //đã sửa phía trên
+
+    
     // --- STATE ---
     const [searchTerm, setSearchTerm] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
@@ -49,10 +97,7 @@ function QuanLiNguoiDung() {
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex text-gray-800">
-            {/* --- MAIN CONTENT --- */}
-            <main className="flex-1 p-8 overflow-y-auto h-screen">
-                
-                {/* Header */}
+            <main className="flex-1 h-screen">
                 <header className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">Quản lý người dùng</h1>
@@ -62,25 +107,33 @@ function QuanLiNguoiDung() {
                         <i className="fa-solid fa-plus"></i> Thêm mới
                     </button>
                 </header>
-
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    {
+                        loading ? (
+                            <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+                                <span className="text-indigo-600 font-bold"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</span>
+                            </div>
+                        ):(
+                            <>
+                                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                         <p className="text-gray-500 text-xs font-bold uppercase">Tổng người dùng</p>
-                        <h3 className="text-2xl font-bold text-gray-800 mt-1">1,240</h3>
+                        <h3 className="text-2xl font-bold text-gray-800 mt-1">{DuLieuThongKe.Tong}</h3>
                     </div>
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                         <p className="text-gray-500 text-xs font-bold uppercase">Người dùng mới (Tháng)</p>
-                        <h3 className="text-2xl font-bold text-green-600 mt-1">+125</h3>
+                        <h3 className="text-2xl font-bold text-green-600 mt-1">+{DuLieuThongKe.NguoiMoi}</h3>
                     </div>
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                         <p className="text-gray-500 text-xs font-bold uppercase">Đang hoạt động</p>
-                        <h3 className="text-2xl font-bold text-indigo-600 mt-1">1,100</h3>
+                        <h3 className="text-2xl font-bold text-indigo-600 mt-1">{DuLieuThongKe.TongHoatDong}</h3>
                     </div>
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                         <p className="text-gray-500 text-xs font-bold uppercase">Bị khóa</p>
-                        <h3 className="text-2xl font-bold text-red-500 mt-1">15</h3>
+                        <h3 className="text-2xl font-bold text-red-500 mt-1">{DuLieuThongKe.TongKhongHoatDong}</h3>
                     </div>
+                            </>
+                        )
+                    }
                 </div>
 
                 {/* Main Table Section */}
@@ -131,37 +184,41 @@ function QuanLiNguoiDung() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {filteredUsers.map((user) => (
+                                {
+                                    loding2 ? (
+                                        <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+                                            <span className="text-indigo-600 font-bold"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</span>
+                                        </div>
+                                    ):(
+                                        <>
+                                        {DuLieuUser.map((user) => (
                                     <tr key={user.id} className="hover:bg-indigo-50/30 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <img src={user.avatar} alt="" className="w-10 h-10 rounded-full border border-gray-200" />
                                                 <div>
                                                     <p className="font-bold text-gray-800 text-sm">{user.name}</p>
-                                                    <p className="text-xs text-gray-500">{user.email}</p>
+                                                    <p className="text-xs text-gray-500">{user.phone}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            {user.role === 'admin' && <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-bold border border-purple-200">Admin</span>}
-                                            {user.role === 'moderator' && <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold border border-blue-200">Mod</span>}
-                                            {user.role === 'user' && <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium border border-gray-200">User</span>}
+                                            {user.rule === 1 && <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-bold border border-purple-200">Admin</span>}
+                                            {user.rule === 0 && <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium border border-gray-200">Người dùng</span>}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                {user.status === 'active' && (
+                                                {user.status === 1 && (
                                                     <><div className="w-2 h-2 rounded-full bg-green-500"></div><span className="text-sm text-gray-600">Hoạt động</span></>
                                                 )}
-                                                {user.status === 'banned' && (
-                                                    <><div className="w-2 h-2 rounded-full bg-red-500"></div><span className="text-sm text-red-600 font-medium">Đã khóa</span></>
-                                                )}
-                                                {user.status === 'pending' && (
+                                    
+                                                {user.status === 0 && (
                                                     <><div className="w-2 h-2 rounded-full bg-yellow-500"></div><span className="text-sm text-gray-600">Chờ duyệt</span></>
                                                 )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-500">
-                                            {user.joinDate}
+                                            {new Date(user.created_at).toLocaleDateString("vi-VN")}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
@@ -181,20 +238,22 @@ function QuanLiNguoiDung() {
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                ))
+                            }
+                                        </>
+                                    )
+                                }
                             </tbody>
                         </table>
                     </div>
                     
                     {/* Pagination */}
                     <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
-                        <span className="text-xs text-gray-500">Hiển thị 1-5 trên tổng số 1,240</span>
+                        Hiển thị {DuLieuTrang.from}-{DuLieuTrang.to} trên tổng số {DuLieuTrang.total}
                         <div className="flex gap-1">
-                            <button className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100 disabled:opacity-50">Trước</button>
-                            <button className="px-3 py-1 rounded bg-indigo-600 border border-indigo-600 text-white text-xs">1</button>
-                            <button className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100">2</button>
-                            <button className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100">3</button>
-                            <button className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100">Tiếp</button>
+                            <button onClick={()=>{setpage(p=>p-1)}} disabled={page===1} className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100 disabled:opacity-50">Trước</button>
+                            <span className="px-3 py-1 rounded bg-indigo-600 border border-indigo-600 text-white text-xs">{page}</span>
+                            <button onClick={()=>{setpage(p=>p+1)}} disabled={page===DuLieuTrang.total} className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100">Tiếp</button>
                         </div>
                     </div>
                 </div>

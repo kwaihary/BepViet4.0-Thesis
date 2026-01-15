@@ -27,7 +27,11 @@
         + TieuDe: Tieeu đề sẽ hiện ở đầu trang
     II. ĐÓNG MODAL : đã được định nghĩa k cần gọi hàm 
 =========================
-5. Cách sử dụng API.js
+5. 
+    sẽ định nghĩa 3 nhánh phía client
+        + api/admin/...
+        + api/user/...
+        + api/website/...
 ========================
 
 
@@ -76,3 +80,10 @@
                             <span><i className="fa-solid fa-comment"></i> 900</span>
                         </div>
                     </div>
+===========================================
+trạng thái loading sẽ được định nghĩa :
+    {isLoading && (
+                            <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+                                <span className="text-indigo-600 font-bold"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</span>
+                            </div>
+                        )}
