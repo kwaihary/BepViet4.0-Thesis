@@ -1,6 +1,6 @@
 ======================================
 1. khi tải file về lần đầu chạy 2 lệnh sau
-+ fontend : npm install
++ frontend : npm install
 + backend : composer install
 ======================================
 2 
