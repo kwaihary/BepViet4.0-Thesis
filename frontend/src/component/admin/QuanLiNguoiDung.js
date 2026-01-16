@@ -8,8 +8,13 @@ function QuanLiNguoiDung() {
         const ThongKe=async()=>{
             setloading(true);
             try {
+<<<<<<< Updated upstream
                 const DuLieu=await API.CallAPI(undefined,{PhuongThuc:2, url:`api/admin/ThongKeNguoiDung`})
                 if(DuLieu.status){
+=======
+                const DuLieu = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/ThongKeNguoiDung` })
+                if (DuLieu.status) {
+>>>>>>> Stashed changes
                     setDuLieuThongKe(DuLieu.data);
                     setloading(false);
                 }
@@ -30,6 +35,7 @@ function QuanLiNguoiDung() {
         const LayDL= async()=>{
             setloading2(false)
             try {
+<<<<<<< Updated upstream
                  const data= await API.CallAPI(undefined,{PhuongThuc:2,url:`api/admin/layDLUS?page=${page}`});
                  if(data.status){
                     setDuLietTrang(data.data)
@@ -40,6 +46,17 @@ function QuanLiNguoiDung() {
                 console.error('lỗi hiển thị:'+ error)
             } finally {
                 setloading2(false);
+=======
+                const data = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/layDLUS?page=${page}` });
+                if (data.status) {
+                    setDuLietTrang(data.data);
+                    setDuLieuUser(data.data.data);
+                }
+            } catch (error) { 
+                console.error('Lỗi lấy user:', error); 
+            } finally { 
+                setloading2(false); 
+>>>>>>> Stashed changes
             }
         }
         LayDL();
@@ -70,6 +87,28 @@ function QuanLiNguoiDung() {
         const matchesRole = roleFilter === "all" || user.role === roleFilter;
         return matchesSearch && matchesRole;
     });
+<<<<<<< Updated upstream
+=======
+    const KhoaTK=async(id)=>{
+        const XacNhan= await ThongBao.ThongBao_XacNhanTT('Bạn có chắc chắn muốn khóa tài khoản này không?')
+        if(!XacNhan) return;
+        if(!id){
+            ThongBao.ThongBao_CanhBao('Vui lòng kiểm tra lại dữ liệu!');
+            return;
+        }
+        const formdata= fun.objectToFormData({id:id});
+        try {
+            setloading(true);
+            const ketqua= await API.CallAPI(formdata,{PhuongThuc:1,url:'admin/CapNhat_taikhoan'});
+            alert(JSON.stringify(ketqua))
+        } catch (error) {
+            console.error('Lỗi kết quả:'+ error)
+        } finally {
+            setloading(false)
+        }
+    }
+    //Đã sửa đến đây
+>>>>>>> Stashed changes
 
     // Mở modal sửa
     const openEditModal = (user) => {
