@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-
-
+use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
@@ -36,6 +35,15 @@ class UserController extends Controller
             ]
         ]);
     }
+<<<<<<< Updated upstream
         
     
+=======
+    public function QuanLiTaiKhoan(Request $request){
+        return Response()->json([
+            'status' => true,
+            'message' => "Thành công đến server nhé"
+        ]);
+    }
+>>>>>>> Stashed changes
 }
