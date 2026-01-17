@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import * as API from '../../JS/API/API';
-import UserDetailModal from "./ChiTietTaiKhoan";
+import * as ThongBao from '../../JS/FUNCTION/ThongBao';
+import * as fun from '../../JS/FUNCTION/function';
 
 function QuanLiNguoiDung() {
 
@@ -16,13 +17,12 @@ function QuanLiNguoiDung() {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     useEffect(() => {
         const ThongKe = async () => {
             setLoadingStats(true);
             try {
                 const ketqua = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/ThongKeNguoiDung` });
+                alert(JSON.stringify(ketqua))
                 if (ketqua.status) {
                     setDuLieuThongKe(ketqua.data);
                 }
@@ -60,39 +60,41 @@ function QuanLiNguoiDung() {
                               phone.includes(searchTerm);
       const matchesRule = roleFilter === "all" || Number(user.rule) === Number(roleFilter);
         return matchesSearch && matchesRule;
-    });
+    })
+    const ThayDoiTrangThai = async (trangthai, id) => {
+        let ketQua;
+        switch (trangthai) {
+            case 2:
+                ketQua = await ThongBao.ThongBao_XacNhanTT('Bạn có chắn chắn muốn kích hoạt tài khoản này?');
+                break;
+            case 0:
+                ketQua =  await ThongBao.ThongBao_XacNhanTT('Bạn có chắc chắn khóa tài khoản này chứ');
+                break;
+            default:
+                ketQua = false;
+                break;
+        }
+        if(!ketQua) return ;
+        if(!id){
+            ThongBao.ThongBao_CanhBao('Dữ liệu id người dùng không toond tại!');
+            return;
+        }
+        const fromdata= await fun.objectToFormData({id:id,giatri:5});
+        const CapNhat= await API.CallAPI(fromdata,{PhuongThuc:1,url :'admin/CapNhatTrangThai'});
+        if(CapNhat.validate)
+        alert(JSON.stringify(CapNhat))
 
-    // --- CÁC HÀM XỬ LÝ ---
-    const openEditModal = (user) => {
-        setSelectedUser({ ...user });
-        setIsEditModalOpen(true);
-    };
 
-    const handleSaveUser = () => {
-        // Cập nhật Optimistic (Giả lập cập nhật ngay lập tức)
-        setUsers(users.map(u => u.id === selectedUser.id ? selectedUser : u));
-        setIsEditModalOpen(false);
-        alert(`Đã cập nhật: ${selectedUser.name}`);
-        // TODO: Gọi API update user ở đây
-    };
 
-    const toggleStatus = (id) => {
-        setUsers(users.map(user => {
-            if (user.id === id) {
-                const newStatus = user.status === "active" ? "banned" : "active";
-                return { ...user, status: newStatus };
-            }
-            return user;
-        }));
-        // TODO: Gọi API khóa tài khoản ở đây
-    };
 
+    
+};
+  
     return (
         
         <div className="min-h-screen bg-gray-50 font-sans flex text-gray-800">
             
             <main className="flex-1 p-8 h-screen overflow-y-auto">
-                  <UserDetailModal/>
                 <header className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">Quản lý người dùng</h1>
@@ -170,7 +172,11 @@ function QuanLiNguoiDung() {
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {loadingTable ? (
-                                    <tr><td colSpan="5" className="text-center py-8">Đang tải dữ liệu...</td></tr>
+                                    <tr>
+                                         <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+                                            <span className="text-indigo-600 font-bold"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</span>
+                                        </div>
+                                    </tr>
                                 ) : filteredUsers.length > 0 ? (
                                     filteredUsers.map((user) => (
                                         <tr key={user.id} className="hover:bg-indigo-50/30 transition-colors">
@@ -207,12 +213,32 @@ function QuanLiNguoiDung() {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button onClick={() => openEditModal(user)} className="w-8 h-8 rounded hover:bg-indigo-100 text-gray-400 hover:text-indigo-600 transition-colors">
-                                                        <i className="fa-solid fa-pen-to-square"></i>
-                                                    </button>
-                                                    <button onClick={() => toggleStatus(user.id)} className="w-8 h-8 rounded hover:bg-red-100 text-gray-400 hover:text-red-600 transition-colors">
-                                                        <i className={`fa-solid ${user.status === 'banned' ? 'fa-unlock' : 'fa-lock'}`}></i>
-                                                    </button>
+                                                    {
+                                                        user.status===1 && (
+                                                            <button onClick={()=>{ThayDoiTrangThai(2, user.id)}} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                                                                <i className="fa-solid fa-check"></i>
+                                                                <span>Xác nhận</span>
+                                                            </button>
+                                                        )
+                                                    }
+                                                    {
+                                                        user.status===0 && (
+                                                            <button onClick={()=>{ThayDoiTrangThai(2 , user.id)}} title="Mở khóa người dùng này" class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                                </svg>
+                                                            </button>
+                                                        )
+                                                    }
+                                                    {
+                                                        user.status===2 && (
+                                                            <button onClick={()=>{ThayDoiTrangThai(0, user.id)}} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                                                                <i className="fa-solid fa-ban"></i>
+                                                                <span>khóa</span>
+                                                            </button>
+                                                        )
+                                                    }
+                                                  
                                                 </div>
                                             </td>
                                         </tr>
@@ -254,39 +280,6 @@ function QuanLiNguoiDung() {
                     </div>
                 </div>
             </main>
-
-            {/* --- EDIT USER MODAL (Giữ nguyên, chỉ đảm bảo bind đúng state) --- */}
-            {isEditModalOpen && selectedUser && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setIsEditModalOpen(false)}></div>
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg z-10 animate-fade-in-up overflow-hidden">
-                        {/* Header Modal */}
-                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h3 className="font-bold text-gray-800">Chỉnh sửa người dùng</h3>
-                            <button onClick={() => setIsEditModalOpen(false)}><i className="fa-solid fa-xmark text-gray-400 hover:text-gray-600"></i></button>
-                        </div>
-                        
-                        {/* Body Modal */}
-                        <div className="p-6 space-y-4">
-                             {/* Form inputs giống cũ... */}
-                             <div className="grid grid-cols-1 gap-4">
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tên hiển thị</label>
-                                    <input type="text" value={selectedUser.name || ''} onChange={(e)=>setSelectedUser({...selectedUser, name: e.target.value})} className="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:border-indigo-500"/>
-                                </div>
-                                {/* Thêm các trường khác tương tự */}
-                             </div>
-                        </div>
-
-                        {/* Footer Modal */}
-                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                            <button onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-lg text-sm">Hủy</button>
-                            <button onClick={handleSaveUser} className="px-4 py-2 bg-indigo-600 text-white font-medium hover:bg-indigo-700 rounded-lg shadow-sm text-sm">Lưu thay đổi</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-          
         </div>
 
     );

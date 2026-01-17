@@ -36,9 +36,22 @@ class UserController extends Controller
         ]);
     }
     public function QuanLiTaiKhoan(Request $request){
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:users,id',
+            'giatri' => 'required|in:0,2', 
+        ], [
+            'id.required' => 'ID người dùng là bắt buộc.',
+            'id.integer'  => 'ID phải là số nguyên.',
+            'id.exists'   => 'ID không tồn tại trong hệ thống.',
+            'giatri.required' => 'Giá trị trạng thái là bắt buộc.',
+            'giatri.in'       => 'Giá trị trạng thái chỉ được phép là 0, 1 hoặc 2.',
+        ]);
+         $idnd = $validated['id'];
+         $nd   = $validated['giatri'];
         return Response()->json([
             'status' => true,
-            'message' => "Thành công đến server nhé"
+            'message' => "Thành công đến server nhé",
+            
         ]);
     }
 }

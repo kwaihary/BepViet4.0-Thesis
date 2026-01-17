@@ -8,4 +8,4 @@ use App\Http\Controllers\UserController;
 Route::get('/admin/layDLUS', [UserController::class, 'layDL']);
 Route::get('/admin/ThongKeNguoiDung',[UserController::class,'ThongKe']);
 // II. ĐỊNH NGHĨA ROUTE POST
-Route::post('/admin/CapNhat_taikhoan',[UserController::class,'QuanLiTaiKhoan']);
+Route::post('admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
