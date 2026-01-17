@@ -48,10 +48,17 @@ class UserController extends Controller
         ]);
          $idnd = $validated['id'];
          $nd   = $validated['giatri'];
-        return Response()->json([
-            'status' => true,
-            'message' => "Thành công đến server nhé",
-            
-        ]);
+        $kq = User::where('id', $idnd)->update(['status' => $nd]);
+        if ($kq > 0) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Bạn đã cập nhật trạng thái thành công!'
+            ]);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật trạng thái thất bại."
+            ]);
+        }
     }
 }

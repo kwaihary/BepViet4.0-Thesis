@@ -13,97 +13,98 @@ function QuanLiNguoiDung() {
         TongHoatDong: 0,
         TongKhongHoatDong: 0
     });
+    const [validateErrors, setValidateErrors] = useState({});
     const [users, setUsers] = useState([]); 
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
+    const [TongTrang,setTongTrang] = useState(1);
     useEffect(() => {
         const ThongKe = async () => {
             setLoadingStats(true);
             try {
                 const ketqua = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/ThongKeNguoiDung` });
-                alert(JSON.stringify(ketqua))
-                if (ketqua.status) {
-                    setDuLieuThongKe(ketqua.data);
-                }
-            } catch (error) {
-                console.error('Lỗi thống kê:', error);
-            } finally {
-                setLoadingStats(false);
-            }
+                if (ketqua.status) setDuLieuThongKe(ketqua.data);
+            } catch (error) { console.error(error); } finally { setLoadingStats(false); }
         }
         ThongKe();
     }, []);
+
     useEffect(() => {
         const LayDL = async () => {
             setLoadingTable(true);
             try {
                 const data = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/layDLUS?page=${page}` });
-                if (data.status) {
-                    setUsers(data.data.data || []); 
-                }
-            } catch (error) {
-                console.error('Lỗi lấy danh sách:', error);
-            } finally {
-                setLoadingTable(false);
-            }
+                if (data.status){
+                    setUsers(data.data.data || []);
+                    setTongTrang(data.data.last_page)
+                }  
+            } catch (error) { console.error(error); } finally { setLoadingTable(false); }
         }
         LayDL();
-    }, [page]); 
+    }, [page]);
+
     const listUserAnToan = Array.isArray(users) ? users : [];
-    const filteredUsers =listUserAnToan.filter(user => {
+    const filteredUsers = listUserAnToan.filter(user => {
         const phone = user.phone || "";
         const email = user.email || "";
         const name = user.name || "";
         const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                               email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                               phone.includes(searchTerm);
-      const matchesRule = roleFilter === "all" || Number(user.rule) === Number(roleFilter);
+        const matchesRule = roleFilter === "all" || Number(user.rule) === Number(roleFilter);
         return matchesSearch && matchesRule;
-    })
+    });
+
     const ThayDoiTrangThai = async (trangthai, id) => {
         let ketQua;
         switch (trangthai) {
-            case 2:
-                ketQua = await ThongBao.ThongBao_XacNhanTT('Bạn có chắn chắn muốn kích hoạt tài khoản này?');
-                break;
-            case 0:
-                ketQua =  await ThongBao.ThongBao_XacNhanTT('Bạn có chắc chắn khóa tài khoản này chứ');
-                break;
-            default:
-                ketQua = false;
-                break;
+            case 2: ketQua = await ThongBao.ThongBao_XacNhanTT('Bạn có chắn chắn muốn kích hoạt tài khoản này?'); break;
+            case 0: ketQua = await ThongBao.ThongBao_XacNhanTT('Bạn có chắc chắn khóa tài khoản này chứ?'); break;
+            default: ketQua = false; break;
         }
-        if(!ketQua) return ;
-        if(!id){
-            ThongBao.ThongBao_CanhBao('Dữ liệu id người dùng không toond tại!');
+        if(!ketQua) return;
+        if(!id){ ThongBao.ThongBao_CanhBao('Dữ liệu id người dùng không tồn tại!'); return; }
+        const fromdata= await fun.objectToFormData({id:id,giatri:trangthai});
+        const CapNhat= await API.CallAPI(fromdata,{PhuongThuc:1,url :'admin/CapNhatTrangThai'});
+        if(CapNhat.validate){
+             if (CapNhat.errors) { setValidateErrors(CapNhat.errors); return; }
+             ThongBao.ThongBao_CanhBao(CapNhat.message);
+             return;
+        }
+        if(CapNhat.status){
+            ThongBao.ThongBao_ThanhCong(CapNhat.message);
+            return;
+        }else{
+            ThongBao.ThongBao_CanhBao(CapNhat.message);
             return;
         }
-        const fromdata= await fun.objectToFormData({id:id,giatri:5});
-        const CapNhat= await API.CallAPI(fromdata,{PhuongThuc:1,url :'admin/CapNhatTrangThai'});
-        if(CapNhat.validate)
-        alert(JSON.stringify(CapNhat))
 
-
-
-
-    
-};
+    };
   
     return (
-        
-        <div className="min-h-screen bg-gray-50 font-sans flex text-gray-800">
-            
-            <main className="flex-1 p-8 h-screen overflow-y-auto">
+        <div className="h-screen bg-gray-50 font-sans flex text-gray-800">
+            <main className="flex-1 p-8 h-full overflow-y-auto no-scrollbar">
                 <header className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">Quản lý người dùng</h1>
                         <p className="text-gray-500 text-sm mt-1">Danh sách và phân quyền thành viên trong hệ thống.</p>
                     </div>
-                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2">
-                        <i className="fa-solid fa-plus"></i> Thêm mới
-                    </button>
                 </header>
+                {Object.keys(validateErrors).length > 0 && (
+                    <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                        <h4 className="text-red-700 font-bold mb-2">
+                            <i className="fa-solid fa-triangle-exclamation mr-2"></i> Dữ liệu không hợp lệ
+                        </h4>
+                        <ul className="list-disc list-inside space-y-1 text-sm text-red-600">
+                            {Object.entries(validateErrors).map(([field, messages]) =>
+                                messages.map((msg, index) => (
+                                    <li key={`${field}-${index}`}><span className="font-semibold">{field}:</span> {msg}</li>
+                                ))
+                            )}
+                        </ul>
+                    </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                     {loadingStats ? (
                         <div className="col-span-4 text-center py-4 text-gray-500">Đang tải thống kê...</div>
@@ -128,11 +129,7 @@ function QuanLiNguoiDung() {
                         </>
                     )}
                 </div>
-
-                {/* --- MAIN TABLE --- */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    
-                    {/* Filters */}
                     <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row gap-4 justify-between bg-gray-50/50">
                         <div className="relative w-full sm:w-72">
                             <input 
@@ -157,8 +154,6 @@ function QuanLiNguoiDung() {
                             </select>
                         </div>
                     </div>
-
-                    {/* Table Container - Đã thêm class no-scrollbar */}
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-gray-50 text-gray-500 text-xs uppercase font-bold tracking-wider">
@@ -173,9 +168,11 @@ function QuanLiNguoiDung() {
                             <tbody className="divide-y divide-gray-100">
                                 {loadingTable ? (
                                     <tr>
-                                         <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
-                                            <span className="text-indigo-600 font-bold"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</span>
-                                        </div>
+                                        <td colSpan="5" className="px-6 py-10 text-center">
+                                             <div className="flex items-center justify-center text-indigo-600 font-bold">
+                                                <i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...
+                                             </div>
+                                        </td>
                                     </tr>
                                 ) : filteredUsers.length > 0 ? (
                                     filteredUsers.map((user) => (
@@ -189,23 +186,20 @@ function QuanLiNguoiDung() {
                                                     />
                                                     <div>
                                                         <p className="font-bold text-gray-800 text-sm">{user.name}</p>
-                                                        {/* Ưu tiên hiển thị Email, nếu không có thì hiện Phone */}
                                                         <p className="text-xs text-gray-500">{user.email || user.phone || "Không có thông tin"}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                {/* API trả về rule, ánh xạ rule sang màu sắc */}
-                                                <span className={`px-2 py-1 rounded text-xs font-bold border 
-                                                    ${user.rule === 1 ? 'bg-purple-100 text-purple-700 border-purple-200' :'bg-gray-100 text-gray-600 border-gray-200'}`}>
-                                                    {user.rule ===1 ? 'admin' : 'Người dùng '}
+                                                <span className={`px-2 py-1 rounded text-xs font-bold border ${user.rule === 1 ? 'bg-purple-100 text-purple-700 border-purple-200' :'bg-gray-100 text-gray-600 border-gray-200'}`}>
+                                                    {user.rule === 1 ? 'Admin' : 'Người dùng'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
                                                     {user.status === 2 && <><div className="w-2 h-2 rounded-full bg-green-500"></div><span className="text-sm text-gray-600">Hoạt động</span></>}
                                                     {user.status === 0 && <><div className="w-2 h-2 rounded-full bg-red-500"></div><span className="text-sm text-red-600 font-medium">Đã khóa</span></>}
-                                                    {user.status ===  1 && <><div className="w-2 h-2 rounded-full bg-yellow-500"></div><span className="text-sm text-gray-600">Chờ duyệt</span></>}
+                                                    {user.status === 1 && <><div className="w-2 h-2 rounded-full bg-yellow-500"></div><span className="text-sm text-gray-600">Chờ duyệt</span></>}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500">
@@ -213,32 +207,23 @@ function QuanLiNguoiDung() {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    {
-                                                        user.status===1 && (
-                                                            <button onClick={()=>{ThayDoiTrangThai(2, user.id)}} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors">
-                                                                <i className="fa-solid fa-check"></i>
-                                                                <span>Xác nhận</span>
-                                                            </button>
-                                                        )
-                                                    }
-                                                    {
-                                                        user.status===0 && (
-                                                            <button onClick={()=>{ThayDoiTrangThai(2 , user.id)}} title="Mở khóa người dùng này" class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                                </svg>
-                                                            </button>
-                                                        )
-                                                    }
-                                                    {
-                                                        user.status===2 && (
-                                                            <button onClick={()=>{ThayDoiTrangThai(0, user.id)}} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-colors">
-                                                                <i className="fa-solid fa-ban"></i>
-                                                                <span>khóa</span>
-                                                            </button>
-                                                        )
-                                                    }
-                                                  
+                                                    {user.status===1 && (
+                                                        <button onClick={()=>{ThayDoiTrangThai(2, user.id)}} className="flex items-center gap-2 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg shadow-sm transition-colors">
+                                                            <i className="fa-solid fa-check"></i> <span>Xác nhận</span>
+                                                        </button>
+                                                    )}
+                                                    {user.status===0 && (
+                                                        <button onClick={()=>{ThayDoiTrangThai(2 , user.id)}} title="Mở khóa người dùng này" className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                            </svg>
+                                                        </button>
+                                                    )}
+                                                    {user.status===2 && (
+                                                        <button onClick={()=>{ThayDoiTrangThai(0, user.id)}} className="flex items-center gap-2 px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-600 text-xs font-medium rounded-lg shadow-sm transition-colors">
+                                                            <i className="fa-solid fa-ban"></i> <span>Khóa</span>
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -249,7 +234,6 @@ function QuanLiNguoiDung() {
                                             <div className="flex flex-col items-center justify-center text-gray-400">
                                                 <i className="fa-regular fa-folder-open text-4xl mb-3"></i>
                                                 <span className="text-base font-medium text-gray-600">Dữ liệu trống</span>
-                                                <span className="text-sm mt-1">Chưa có người dùng nào được tạo trong hệ thống.</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -257,31 +241,17 @@ function QuanLiNguoiDung() {
                             </tbody>
                         </table>
                     </div>
-                    
-                    {/* Pagination */}
                     <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
                         <span className="text-xs text-gray-500">Đang xem trang {page}</span>
                         <div className="flex gap-1">
-                            <button 
-                                disabled={page === 1}
-                                onClick={() => setPage(p => p - 1)}
-                                className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100 disabled:opacity-50"
-                            >
-                                Trước
-                            </button>
+                            <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100 disabled:opacity-50">Trước</button>
                             <span className="px-3 py-1 rounded bg-indigo-600 border border-indigo-600 text-white text-xs">{page}</span>
-                            <button 
-                                onClick={() => setPage(p => p + 1)}
-                                className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100"
-                            >
-                                Tiếp
-                            </button>
+                            <button onClick={() => setPage(p => p + 1)} disabled={page===TongTrang} className="px-3 py-1 rounded bg-white border border-gray-300 text-gray-600 text-xs hover:bg-gray-100">Tiếp</button>
                         </div>
                     </div>
                 </div>
             </main>
         </div>
-
     );
 }
 
