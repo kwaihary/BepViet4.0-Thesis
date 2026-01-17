@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category_recipe', function (Blueprint $table) {
-            $table->foreignId('recipe_id')->constrained('recipes')->onDelete('cascade');
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+        Schema::create('cookbooks', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('title'); // Tên bộ sưu tập
+            $table->boolean('is_public')->default(true); // Công khai hay riêng tư
             $table->timestamps();
         });
     }
-    
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('category_recipe');
+        Schema::dropIfExists('cookbooks');
     }
 };

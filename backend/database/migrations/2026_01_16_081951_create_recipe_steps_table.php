@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('recipe_steps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('recipe_id')->constrained('recipes')->onDelete('cascade');
-            
             $table->integer('step_order'); // Bước 1, Bước 2...
             $table->text('content'); // Nội dung hướng dẫn
             $table->string('image_url')->nullable(); // Ảnh minh họa cho bước này
-            
             $table->timestamps();
         });
     }
