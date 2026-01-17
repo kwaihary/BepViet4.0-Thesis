@@ -15,10 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('recipe_id')->constrained('recipes')->onDelete('cascade');
-            
             $table->date('date'); // Ngày ăn (2025-01-20)
             $table->enum('meal_type', ['breakfast', 'lunch', 'dinner']); // Bữa sáng/trưa/tối
-            
             $table->timestamps();
         });
     }
