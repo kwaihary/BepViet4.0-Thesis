@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Duyệt/Khóa Tài Khoản</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-10 flex flex-col gap-10 items-center justify-center">
+
+    <div class="space-x-4">
+        <button onclick="document.getElementById('modal-approve').classList.remove('hidden')" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">
+            Demo 1: Duyệt Tài Khoản
+        </button>
+        <button onclick="document.getElementById('modal-ban').classList.remove('hidden')" class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700">
+            Demo 2: Khóa Tài Khoản
+        </button>
+    </div>
+
+    <div id="modal-approve" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="this.parentElement.classList.add('hidden')"></div>
+
+        <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+            
+            <div class="bg-green-50 p-6 flex flex-col items-center border-b border-green-100">
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-3 text-2xl shadow-sm">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">Duyệt Thành Viên Mới?</h3>
+                <p class="text-gray-500 text-center text-sm mt-1">Hành động này sẽ cho phép tài khoản hoạt động chính thức trên hệ thống.</p>
+            </div>
+
+            <div class="p-6">
+                <div class="flex items-center gap-3 bg-gray-50 p-3 rounded border border-gray-200">
+                    <img src="https://ui-avatars.com/api/?name=Nguyen+Van+A" class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="font-bold text-sm text-gray-800">Nguyễn Văn A</p>
+                        <p class="text-xs text-gray-500">nguyenvana@email.com</p>
+                    </div>
+                    <span class="ml-auto px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded border border-yellow-200">Pending</span>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-4 flex gap-3 justify-end border-t border-gray-100">
+                <button onclick="document.getElementById('modal-approve').classList.add('hidden')" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded text-sm font-medium">
+                    Hủy bỏ
+                </button>
+                <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-bold shadow-md shadow-green-200">
+                    Xác nhận Duyệt
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="modal-ban" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="this.parentElement.classList.add('hidden')"></div>
+
+        <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+            
+            <div class="bg-red-50 p-6 flex items-start gap-4 border-b border-red-100">
+                <div class="w-12 h-12 flex-shrink-0 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Khóa tài khoản người dùng</h3>
+                    <p class="text-gray-500 text-sm mt-1">Người dùng này sẽ không thể đăng nhập hoặc thực hiện tác vụ cho đến khi được mở khóa.</p>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="flex items-center justify-between text-sm pb-4 border-b border-gray-100">
+                    <span class="text-gray-500">Tài khoản bị xử lý:</span>
+                    <span class="font-bold text-gray-800">Trần Thị B (ID: #5521)</span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Lý do khóa <span class="text-red-500">*</span></label>
+                    <textarea class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-200 focus:border-red-500 outline-none text-sm" rows="3" placeholder="Ví dụ: Vi phạm chính sách cộng đồng, Spam..."></textarea>
+                </div>
+                
+                <label class="flex items-start gap-2 cursor-pointer">
+                    <input type="checkbox" class="mt-1 w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                    <span class="text-xs text-gray-600">Gửi email thông báo cho người dùng về việc khóa tài khoản này.</span>
+                </label>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-4 flex gap-3 justify-end border-t border-gray-100">
+                <button onclick="document.getElementById('modal-ban').classList.add('hidden')" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded text-sm font-medium">
+                    Không, quay lại
+                </button>
+                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-bold shadow-md shadow-red-200">
+                    Khóa Tài Khoản Ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

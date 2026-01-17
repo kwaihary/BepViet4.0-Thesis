@@ -35,15 +35,10 @@ class UserController extends Controller
             ]
         ]);
     }
-<<<<<<< Updated upstream
-        
-    
-=======
     public function QuanLiTaiKhoan(Request $request){
         return Response()->json([
             'status' => true,
             'message' => "Thành công đến server nhé"
         ]);
     }
->>>>>>> Stashed changes
 }
