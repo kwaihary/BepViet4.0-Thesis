@@ -26,11 +26,13 @@ export function CallAPI(dulieu = null, yeucau) {
     let ajaxOptions = {
         url: DuongDan,
         type: yeucau.PhuongThuc === 1 ? "POST" : "GET",
-        xhrFields: { withCredentials: true }, // tương đương credentials: "include"
+        xhrFields: { withCredentials: true }, 
         processData: false,
         contentType: false,
         data: dulieu,
-        headers: {}
+        headers: {
+            "Accept": "application/json" 
+        }
     };
 
     if (yeucau.token) {
@@ -42,9 +44,12 @@ export function CallAPI(dulieu = null, yeucau) {
             return response;
         })
         .catch(function (xhr) {
-            return {
-                Status: false,
-                message: `Lỗi HTTP ${xhr.status}: ${xhr.responseText ? xhr.responseText.substring(0, 50) + "..." : "Không rõ"}`
-            };
+            if (xhr.status === 422) {
+                 return {
+                    validate: true,
+                    message: "Dữ liệu không hợp lệ",
+                    errors: xhr.responseJSON?.errors
+                };
+            }
         });
 }

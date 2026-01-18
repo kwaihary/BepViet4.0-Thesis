@@ -35,4 +35,30 @@ class UserController extends Controller
             ]
         ]);
     }
+    public function QuanLiTaiKhoan(Request $request){
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:users,id',
+            'giatri' => 'required|in:0,2', 
+        ], [
+            'id.required' => 'ID người dùng là bắt buộc.',
+            'id.integer'  => 'ID phải là số nguyên.',
+            'id.exists'   => 'ID không tồn tại trong hệ thống.',
+            'giatri.required' => 'Giá trị trạng thái là bắt buộc.',
+            'giatri.in'       => 'Giá trị trạng thái chỉ được phép là 0, 1 hoặc 2.',
+        ]);
+         $idnd = $validated['id'];
+         $nd   = $validated['giatri'];
+        $kq = User::where('id', $idnd)->update(['status' => $nd]);
+        if ($kq > 0) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Bạn đã cập nhật trạng thái thành công!'
+            ]);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật trạng thái thất bại."
+            ]);
+        }
+    }
 }

@@ -89,10 +89,9 @@ function DuLieuBaiDang() {
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex text-gray-800">
             
-
-
             {/* --- MAIN CONTENT --- */}
-            <main className="flex-1 p-8 overflow-y-auto h-screen">
+            {/* CẬP NHẬT 1: Thêm 'no-scrollbar' vào thẻ MAIN */}
+            <main className="flex-1 p-8 overflow-y-auto h-screen no-scrollbar">
                 
                 {/* Header */}
                 <header className="flex justify-between items-center mb-8">
@@ -177,7 +176,8 @@ function DuLieuBaiDang() {
                     </div>
 
                     {/* Content List (Grid/Table Hybrid) */}
-                    <div className="p-0">
+                    {/* CẬP NHẬT 2: Thêm 'no-scrollbar' và 'overflow-x-auto' vào thẻ div bao quanh table */}
+                    <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-gray-50 text-gray-500 text-xs uppercase font-bold tracking-wider border-b border-gray-100">
                                 <tr>
@@ -202,7 +202,7 @@ function DuLieuBaiDang() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                <img src={post.authorAvatar} className="w-6 h-6 rounded-full" />
+                                                <img src={post.authorAvatar} className="w-6 h-6 rounded-full" alt="" />
                                                 <span className="text-sm font-medium text-gray-700">{post.author}</span>
                                             </div>
                                         </td>
@@ -273,14 +273,15 @@ function DuLieuBaiDang() {
                         </div>
 
                         {/* Modal Body (Scrollable) */}
-                        <div className="overflow-y-auto flex-1 p-0 flex flex-col md:flex-row">
+                        {/* CẬP NHẬT 3: Thêm 'no-scrollbar' vào phần nội dung Modal */}
+                        <div className="overflow-y-auto flex-1 p-0 flex flex-col md:flex-row no-scrollbar">
                             {/* Left: Image & Meta */}
                             <div className="w-full md:w-1/3 bg-gray-50 p-6 border-r border-gray-100">
-                                <img src={selectedPost.image} className="w-full aspect-square object-cover rounded-xl shadow-sm mb-4" />
+                                <img src={selectedPost.image} className="w-full aspect-square object-cover rounded-xl shadow-sm mb-4" alt="" />
                                 
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-200">
-                                        <img src={selectedPost.authorAvatar} className="w-10 h-10 rounded-full" />
+                                        <img src={selectedPost.authorAvatar} className="w-10 h-10 rounded-full" alt="" />
                                         <div>
                                             <p className="text-xs text-gray-500">Người đăng</p>
                                             <p className="font-bold text-sm text-gray-800">{selectedPost.author}</p>
