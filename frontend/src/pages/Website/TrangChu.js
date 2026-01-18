@@ -48,7 +48,7 @@ function TrangChu() {
                                 <span>Trang cá nhân</span>
                             </Link>
                             <Link to="/cong-thuc" className={getLinkClass('/cong-thuc')}>
-                                <i className={`a-solid fa-bowl-food ${location.pathname === '/cong-thuc' ? 'text-white' : 'text-gray-400 group-hover:text-orange-500'}`}></i> 
+                                <i className={`fa-solid fa-utensils ${location.pathname === '/cong-thuc' ? 'text-white' : 'text-gray-400 group-hover:text-orange-500'}`}></i> 
                                 <span>Công thức nấu ăn</span>
                             </Link>
 
