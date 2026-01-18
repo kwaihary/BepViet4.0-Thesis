@@ -1,42 +1,62 @@
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-function BaiViet({data}){
-     const [openPostId, setOpenPostId] = useState(null);
-      const navigate = useNavigate();
-    // Hàm xử lý bật/tắt bình luận
-    const toggleComments = (postId) => {
-        if (openPostId === postId) {
-            setOpenPostId(null);
-        } else {
-            setOpenPostId(postId);
-        }
-    };
-    // --- 1. COMPONENT HIỂN THỊ 1 BÌNH LUẬN (HỖ TRỢ PHÂN CẤP) ---
+
+// --- 1. COMPONENT MODAL HIỂN THỊ DANH SÁCH USER (Mới) ---
+const UserListModal = ({ title, users, onClose }) => {
+    if (!users) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
+                {/* Header Modal */}
+                <div className="flex justify-between items-center p-4 border-b">
+                    <h3 className="font-bold text-lg text-gray-800">{title}</h3>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                        <i className="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                
+                {/* List Users */}
+                <div className="max-h-80 overflow-y-auto p-2">
+                    {users.length > 0 ? (
+                        users.map((user, index) => (
+                            <div key={index} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
+                                <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover border" />
+                                <div>
+                                    <p className="font-semibold text-sm text-gray-800">{user.name}</p>
+                                    {/* Giả lập nút theo dõi */}
+                                    <p className="text-xs text-blue-600 font-medium">Theo dõi</p>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-gray-500 py-4">Chưa có ai.</p>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- 2. COMPONENT BÌNH LUẬN (Giữ nguyên logic cũ) ---
 const CommentItem = ({ comment }) => {
     return (
         <div className="flex gap-3 mb-4">
-            {/* Avatar người comment */}
             <img 
                 src={comment.avatar} 
                 className="w-8 h-8 rounded-full object-cover shrink-0 mt-1" 
                 alt={comment.user} 
             />
-            
             <div className="flex-1">
-                {/* Nội dung comment */}
                 <div className="bg-gray-100 px-3 py-2 rounded-2xl rounded-tl-none inline-block">
                     <h5 className="font-bold text-sm text-gray-900">{comment.user}</h5>
                     <p className="text-gray-700 text-sm">{comment.content}</p>
                 </div>
-                
-                {/* Nút thao tác nhỏ bên dưới */}
                 <div className="flex gap-4 mt-1 ml-2 text-xs font-semibold text-gray-500 mb-2">
                     <span className="cursor-pointer hover:text-red-600">Thích</span>
                     <span className="cursor-pointer hover:text-red-600">Phản hồi</span>
                     <span>{comment.time}</span>
                 </div>
-
-                {/* --- ĐỆ QUY: Nếu có replies (comment con) thì hiển thị tiếp --- */}
                 {comment.replies && comment.replies.length > 0 && (
                     <div className="pl-4 border-l-2 border-gray-200 mt-2">
                         {comment.replies.map(reply => (
@@ -48,104 +68,170 @@ const CommentItem = ({ comment }) => {
         </div>
     );
 };
+
+// --- 3. MAIN COMPONENT ---
+function BaiViet({ data }) {
+    const [openPostId, setOpenPostId] = useState(null);
+    
+    // State quản lý Modal danh sách người dùng (Likes/Saves)
+    // modalData format: { title: "Người đã thích", users: [...] }
+    const [modalData, setModalData] = useState(null);
+    
+    const navigate = useNavigate();
+
+    // Toggle bình luận
+    const toggleComments = (postId) => {
+        setOpenPostId(openPostId === postId ? null : postId);
+    };
+
+    // Mở danh sách Like
+    const openLikeList = (post) => {
+        // Cần đảm bảo trong data post có trường likedBy (mảng user)
+        const users = post.likedBy || []; 
+        setModalData({ title: 'Những người đã thích', users: users });
+    };
+
+    // Mở danh sách Save (Yêu thích)
+    const openSaveList = (post) => {
+        // Cần đảm bảo trong data post có trường savedBy (mảng user)
+        const users = post.savedBy || [];
+        setModalData({ title: 'Đã thêm vào yêu thích', users: users });
+    };
+
+    // Đóng Modal
+    const closeModal = () => setModalData(null);
+
     return (
         <>
-           {/* --- RENDER DANH SÁCH BÀI VIẾT TỪ DATA --- */}
-                {data.map((post) => (
-                    <article key={post.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                        {/* Header bài viết */}
-                        <div className="p-4 flex justify-between items-center">
-                            <div className="flex items-center gap-3">
-                                <img src={post.authorAvatar} className="w-10 h-10 rounded-full border" alt="Author" />
-                                <div>
-                                    <h4 className="font-bold text-sm">{post.author}</h4>
-                                    <p className="text-xs text-gray-500">{post.time} <i className="fa-solid fa-earth-asia"></i></p>
-                                </div>
+            {/* --- RENDER DANH SÁCH BÀI VIẾT --- */}
+            {data.map((post) => (
+                <article key={post.id} className="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-gray-100">
+                    
+                    {/* Header */}
+                    <div className="p-4 flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <img src={post.authorAvatar} className="w-10 h-10 rounded-full border" alt="Author" />
+                            <div>
+                                <h4 className="font-bold text-sm hover:underline cursor-pointer">{post.author}</h4>
+                                <p className="text-xs text-gray-500">{post.time} <i className="fa-solid fa-earth-asia"></i></p>
                             </div>
-                            <button className="text-gray-400"><i className="fa-solid fa-ellipsis"></i></button>
                         </div>
-                        
-                        {/* Nội dung bài viết */}
-                        <div className="px-4 pb-3">
-                            <h3 className="font-bold text-lg mb-1">{post.title}</h3>
-                            <p className="text-sm text-gray-600 line-clamp-3">{post.content}</p>
-                        </div>
-                        
-                        <Link to="/chi-tiet-mon"> 
-                            <img 
-                                src={post.image} 
-                                alt="Food"
-                                className="w-full h-80 object-cover hover:opacity-95 transition" 
-                            />
-                        </Link>
+                        <button className="text-gray-400 hover:bg-gray-100 w-8 h-8 rounded-full transition"><i className="fa-solid fa-ellipsis"></i></button>
+                    </div>
 
-                        {/* Các nút tương tác */}
-                        <div className="p-4 border-t flex justify-between">
-                            <div className="flex gap-6">
-                                {/* Like Button */}
-                                <button className="flex items-center gap-2 text-gray-500 hover:text-red-600 transition">
-                                    <i className="fa-regular fa-heart text-xl"></i> {post.likes}
+                    {/* Content */}
+                    <div className="px-4 pb-3">
+                        <h3 className="font-bold text-lg mb-1">{post.title}</h3>
+                        <p className="text-sm text-gray-600 line-clamp-3">{post.content}</p>
+                    </div>
+
+                    {/* Image */}
+                    <Link to="/chi-tiet-mon" className="block overflow-hidden">
+                        <img 
+                            src={post.image} 
+                            alt="Food"
+                            className="w-full h-80 object-cover hover:scale-105 transition duration-500" 
+                        />
+                    </Link>
+
+                    {/* --- ACTION BAR (Tim, Comment, Save) --- */}
+                    <div className="px-4 py-3 border-t border-gray-100 flex justify-between items-center">
+                        <div className="flex gap-6">
+                            {/* Nút Like & Số lượng Like */}
+                            <div className="flex items-center gap-2">
+                                <button className="text-gray-500 hover:text-red-600 transition p-1">
+                                    <i className="fa-regular fa-heart text-2xl"></i>
                                 </button>
-                                
-                                {/* Comment Button */}
+                                {/* Bấm vào số lượng để xem danh sách */}
                                 <button 
-                                    onClick={() => toggleComments(post.id)}
-                                    className={`flex items-center gap-2 transition ${openPostId === post.id ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600'}`}
+                                    onClick={() => openLikeList(post)}
+                                    className="text-sm font-semibold text-gray-700 hover:underline"
                                 >
-                                    <i className={`${openPostId === post.id ? 'fa-solid' : 'fa-regular'} fa-comment text-xl`}></i> 
-                                    {post.commentCount}
+                                    {post.likes} lượt thích
                                 </button>
-
-                                {/* --- MỚI: BUTTON XEM CHI TIẾT --- */}
-                                <button 
-                                    onClick={() => navigate('/chi-tiet-mon')}
-                                    className="flex items-center gap-2 text-gray-500 hover:text-green-600 transition"
-                                    title="Xem chi tiết"
-                                >
-                                    <i className="fa-regular fa-eye text-xl"></i>
-                                    <span className="hidden sm:inline">Xem</span>
-                                </button>
-                                {/* -------------------------------- */}
-
                             </div>
-                            <button className="text-gray-500 hover:text-orange-600">
-                                <i className="fa-regular fa-bookmark text-xl"></i>
+
+                            {/* Nút Comment */}
+                            <button 
+                                onClick={() => toggleComments(post.id)}
+                                className={`flex items-center gap-2 transition ${openPostId === post.id ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600'}`}
+                            >
+                                <i className={`${openPostId === post.id ? 'fa-solid' : 'fa-regular'} fa-comment text-2xl`}></i>
+                                <span className="text-sm font-semibold">{post.commentCount}</span>
                             </button>
                         </div>
 
-                        {/* --- KHU VỰC HIỂN THỊ BÌNH LUẬN --- */}
-                        {openPostId === post.id && (
-                            <div className="bg-gray-50 p-4 border-t border-gray-100 animate-fade-in-down">
-                                {/* Ô nhập bình luận */}
-                                <div className="flex gap-3 mb-6">
-                                    <img src="https://i.pravatar.cc/150?img=32" className="w-8 h-8 rounded-full" alt="Me" />
-                                    <div className="flex-1 relative">
-                                        <input 
-                                            type="text" 
-                                            placeholder="Viết bình luận..." 
-                                            className="w-full bg-white border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 pr-10" 
-                                        />
-                                        <button className="absolute right-2 top-1.5 text-blue-500 hover:bg-blue-50 p-1 rounded-full">
-                                            <i className="fa-solid fa-paper-plane"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                        {/* Nút Bookmark (Save) & Số lượng Save */}
+                        <div className="flex items-center gap-2">
+                            {/* Bấm vào số lượng để xem danh sách */}
+                             <button 
+                                onClick={() => openSaveList(post)}
+                                className="text-sm font-semibold text-gray-700 hover:underline"
+                            >
+                                {post.saves || 0} đã lưu
+                            </button>
+                            <button 
+                                className="text-gray-500 hover:text-orange-500 transition p-1"
+                                title="Lưu vào bộ sưu tập"
+                            >
+                                <i className="fa-regular fa-bookmark text-2xl"></i>
+                            </button>
+                        </div>
+                    </div>
 
-                                {/* Danh sách bình luận */}
-                                <div className="space-y-2">
-                                    {post.comments && post.comments.length > 0 ? (
-                                        post.comments.map(cmt => (
-                                            <CommentItem key={cmt.id} comment={cmt} />
-                                        ))
-                                    ) : (
-                                        <p className="text-center text-gray-400 text-sm italic py-2">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
-                                    )}
+                    {/* Button Xem Chi Tiết (Full Width) */}
+                    <div className="px-4 pb-2">
+                        <button 
+                            onClick={() => navigate('/chi-tiet-mon')}
+                            className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 text-sm font-medium rounded-lg transition"
+                        >
+                            Xem chi tiết công thức <i className="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    {/* --- COMMENT SECTION --- */}
+                    {openPostId === post.id && (
+                        <div className="bg-gray-50 p-4 border-t border-gray-200 animate-fade-in-down">
+                            {/* Input Comment */}
+                            <div className="flex gap-3 mb-6">
+                                <img src="https://i.pravatar.cc/150?img=32" className="w-8 h-8 rounded-full" alt="Me" />
+                                <div className="flex-1 relative">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Viết bình luận..." 
+                                        className="w-full bg-white border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500 pr-10 shadow-sm" 
+                                    />
+                                    <button className="absolute right-2 top-1.5 text-blue-500 hover:bg-blue-50 p-1 rounded-full transition">
+                                        <i className="fa-solid fa-paper-plane"></i>
+                                    </button>
                                 </div>
                             </div>
-                        )}
-                    </article>
-                ))}
+
+                            {/* Comment List */}
+                            <div className="space-y-2">
+                                {post.comments && post.comments.length > 0 ? (
+                                    post.comments.map(cmt => (
+                                        <CommentItem key={cmt.id} comment={cmt} />
+                                    ))
+                                ) : (
+                                    <p className="text-center text-gray-400 text-sm italic py-2">Chưa có bình luận nào.</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </article>
+            ))}
+
+            {/* --- RENDER MODAL (Nằm ngoài vòng lặp map) --- */}
+            {modalData && (
+                <UserListModal 
+                    title={modalData.title} 
+                    users={modalData.users} 
+                    onClose={closeModal} 
+                />
+            )}
         </>
-    )
-};
+    );
+}
+
 export default BaiViet;
