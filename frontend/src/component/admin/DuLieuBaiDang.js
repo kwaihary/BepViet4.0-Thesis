@@ -1,6 +1,16 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
+import * as API from '../../JS/API/API';
+import * as fun from '../../JS/FUNCTION/function';
+import * as ThongBao from '../../JS/FUNCTION/function';
 
 function DuLieuBaiDang() {
+    const []
+    useEffect(()=>{
+        const data= async()=>{
+            const dulieu = await API.CallAPI(undefined,{PhuongThuc:2,url:'admin/'})
+        }
+    },[])
+    //Đã sửa ở trên 
     // --- STATE ---
     const [activeTab, setActiveTab] = useState("pending"); // pending, approved, rejected
     const [selectedPost, setSelectedPost] = useState(null); // Bài viết đang xem chi tiết

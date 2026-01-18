@@ -1,4 +1,5 @@
 import $ from "jquery";
+
 /**
  * 
  * @param {*} dulieu : Dữ liệu gửi lên server (FormData)
@@ -14,6 +15,7 @@ export function CallAPI(dulieu = null, yeucau) {
     const URL = 'http://127.0.0.1:8000/api/';
     const DuongDan = URL + yeucau.url;
 
+    // Nếu có file đính kèm thì append vào FormData
     if (yeucau.fileArray) {
         if (dulieu === null) {
             dulieu = new FormData();
@@ -26,15 +28,16 @@ export function CallAPI(dulieu = null, yeucau) {
     let ajaxOptions = {
         url: DuongDan,
         type: yeucau.PhuongThuc === 1 ? "POST" : "GET",
-        xhrFields: { withCredentials: true }, 
+        xhrFields: { withCredentials: true },
         processData: false,
         contentType: false,
         data: dulieu,
         headers: {
-            "Accept": "application/json" 
+            "Accept": "application/json"
         }
     };
 
+    // Nếu có token thì thêm vào header
     if (yeucau.token) {
         ajaxOptions.headers["Authorization"] = `Bearer ${yeucau.token}`;
     }
@@ -44,12 +47,21 @@ export function CallAPI(dulieu = null, yeucau) {
             return response;
         })
         .catch(function (xhr) {
+            // Trường hợp validate lỗi (422)
             if (xhr.status === 422) {
-                 return {
+                return {
                     validate: true,
                     message: "Dữ liệu không hợp lệ",
                     errors: xhr.responseJSON?.errors
                 };
             }
+
+            // Các lỗi khác
+            return {
+                status: false,
+                message: `Lỗi HTTP ${xhr.status}: ${xhr.responseText ? xhr.responseText.substring(0, 50) + "..." : "Không rõ"}`
+            };
         });
 }
+
+
