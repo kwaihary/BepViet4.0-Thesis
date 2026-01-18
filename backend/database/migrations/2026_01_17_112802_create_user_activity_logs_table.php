@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_activity_logs', function (Blueprint $table) {
-            // ID trong file sql là chuỗi 'log_001', nên thầy để string
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('action'); // view, search, click...
