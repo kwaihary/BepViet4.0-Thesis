@@ -4,21 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-class MealPlan extends Model
+
+class Report extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id',
+        'user_id', 
         'recipe_id', 
-        'date', 
-        'meal_type'
+        'reason', 
+        'status'
     ];
 
-    // mealplan của ai
+    // Ai report
     public function user(){
         return $this->belongsTo(User::class);
     }
-    // công thức thuộc mealplan nào
+
+    // Recipe bị báo cáo
     public function recipe(){
         return $this->belongsTo(Recipe::class);
     }

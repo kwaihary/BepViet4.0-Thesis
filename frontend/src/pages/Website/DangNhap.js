@@ -7,7 +7,7 @@ function DangNhap() {
     // Tạo state để theo dõi tab đang mở ('login' hoặc 'register')
     const [activeTab, setActiveTab] = useState('login');
     const [login,setlogin] =useState ({
-            sdt: '',
+            phone: '',
             password: '',
     });
     const Login=async()=>{
