@@ -43,7 +43,7 @@ export function CallAPI(dulieu = null, yeucau) {
         })
         .catch(function (xhr) {
             return {
-                Status: false,
+                status: false,
                 message: `Lỗi HTTP ${xhr.status}: ${xhr.responseText ? xhr.responseText.substring(0, 50) + "..." : "Không rõ"}`
             };
         });

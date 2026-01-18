@@ -36,6 +36,17 @@ class UserController extends Controller
             ]
         ]);
     }
-        
+    public function login(Request $request){
+        $request->validate([
+            'sdt' => 'required|integer|max:10',
+            'password' => 'required|min:6',
+        ],[
+            'sdt.required'=>"Vui lòng nhập số điện thoại!",
+            'sdt.integer'=>'số điện thoại không được là ký tự chữ',
+            'sdt.max'=>'số điện thoại phải là 10 chữ số',
+            'password.required' =>'Vui lòng nhập mật khẩu',
+            'password.min' => 'Mật khẩu phải ít nhất 6 ký tự '
+        ]);
+    }
     
 }

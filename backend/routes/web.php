@@ -13,3 +13,4 @@ Route::get('/api/test', function () {
 Route::get('/api/admin/layDLUS', [UserController::class, 'layDL']);
 Route::get('/api/admin/ThongKeNguoiDung',[UserController::class,'ThongKe']);
 // II. ĐỊNH NGHĨA ROUTE POST
+Route::post('/api/admin/dangnhap',[UserController::class,'login']);

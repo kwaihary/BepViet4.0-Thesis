@@ -1,10 +1,32 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import * as API from '../../JS/API/API';
+import * as fun from '../../JS/FUNCTION/function';
 
 function DangNhap() {
     // Tạo state để theo dõi tab đang mở ('login' hoặc 'register')
     const [activeTab, setActiveTab] = useState('login');
+    const [login,setlogin] =useState ({
+            sdt: '',
+            password: '',
+    });
+    const Login=async()=>{
+        const kiemtra= fun.KiemTraRong(login);
+        if(!kiemtra.Status){
+            alert('Vui lòng nhập dữ liệu');
+            return;
+        }
+        const formdata=fun.objectToFormData(login);
+        try {
+            const ketqua= await API.CallAPI(formdata,{PhuongThuc:1,url:'api/admin/dangnhap'});
+            alert(JSON.stringify(ketqua))
+        } catch (error) {
+            
+        }
 
+    }
+
+    
     return (
         <>
             <div className="bg-gray-50 font-sans h-screen flex items-center justify-center p-4">
@@ -60,19 +82,29 @@ function DangNhap() {
 
                             {/* --- FORM ĐĂNG NHẬP --- */}
                             {/* Chỉ hiện khi activeTab là 'login' */}
-                            <form className={`space-y-5 animate-fade-in ${activeTab === 'login' ? 'block' : 'hidden'}`}>
+                
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Email hoặc Số điện thoại</label>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
                                     <div className="relative">
                                         <i className="fa-regular fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
-                                        <input type="text" placeholder="user@example.com" className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 focus:border-red-500 outline-none transition" />
+                                        <input type="text" onChange={(e) =>
+                                            setlogin(prev => ({
+                                            ...prev,
+                                            sdt: e.target.value 
+                                         }))
+} placeholder="09......" className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 focus:border-red-500 outline-none transition" />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
                                     <div className="relative">
                                         <i className="fa-solid fa-lock absolute left-3 top-3.5 text-gray-400"></i>
-                                        <input type="password" placeholder="••••••••" className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
+                                        <input type="password" placeholder="password" onChange={(e) =>
+                                                setlogin(prev => ({
+                                                ...prev,
+                                                password: e.target.value
+                                            }))
+} className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
                                     </div>
                                     <div className="flex justify-between items-center mt-2">
                                         <label className="flex items-center text-sm text-gray-600 cursor-pointer">
@@ -81,10 +113,10 @@ function DangNhap() {
                                         <a href="#" className="text-sm font-bold text-red-600 hover:underline">Quên mật khẩu?</a>
                                     </div>
                                 </div>
-                                <button type="button" className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition shadow-lg shadow-red-200">
+                                <button onClick={Login} type="button" className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition shadow-lg shadow-red-200">
                                     Đăng nhập ngay
                                 </button>
-                            </form>
+                
 
                             {/* --- FORM ĐĂNG KÝ --- */}
                             {/* Chỉ hiện khi activeTab là 'register' */}
@@ -94,8 +126,8 @@ function DangNhap() {
                                     <input type="text" placeholder="Nguyễn Văn A" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
-                                    <input type="email" placeholder="email@domain.com" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
+                                    <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
+                                    <input type="email" placeholder="09......" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
