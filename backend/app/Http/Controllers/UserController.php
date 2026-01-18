@@ -62,7 +62,7 @@ class UserController extends Controller
         }
     }
 
-    public function Login(){
+    public function Login(Request $request){
         $request->validate([
             'phone'=>'required|max:10',
             'password'=>'required|min:6',
