@@ -44,6 +44,10 @@ export function CallAPI(dulieu = null, yeucau) {
             return response;
         })
         .catch(function (xhr) {
+            return {
+                status: false,
+                message: `Lỗi HTTP ${xhr.status}: ${xhr.responseText ? xhr.responseText.substring(0, 50) + "..." : "Không rõ"}`
+            };
             if (xhr.status === 422) {
                  return {
                     validate: true,
