@@ -4,66 +4,6 @@ import * as ThongBao from '../../JS/FUNCTION/ThongBao';
 import * as fun from '../../JS/FUNCTION/function';
 
 function QuanLiNguoiDung() {
-<<<<<<< HEAD
-=======
-    //bước 1 : hiện thống kê
-    const [loading,setloading] = useState(false);
-    const [DuLieuThongKe,setDuLieuThongKe] = useState([]);
-    useEffect(()=>{
-        const ThongKe=async()=>{
-            setloading(true);
-            try {
-                const DuLieu=await API.CallAPI(undefined,{PhuongThuc:2, url:`api/admin/ThongKeNguoiDung`})
-                if(DuLieu.status){
-                const DuLieu = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/ThongKeNguoiDung` })
-                if (DuLieu.status) {
-                    setDuLieuThongKe(DuLieu.data);
-                    setloading(false);
-                }
-                }
-            } catch (error) {
-                console.error('lỗi hiển thị:'+ error)
-            } finally {
-                setloading(false)
-            }
-        }
-        ThongKe();
-    },[]);
-    //Bước 2 : lấy dữ liệu người dùng lên giao diện
-    const [page,setpage] = useState(1);
-    const [DuLieuUser,setDuLieuUser] = useState([]);
-    const [loding2,setloading2] = useState(false);
-    const [DuLieuTrang,setDuLietTrang] = useState({})
-    useEffect(()=>{
-        const LayDL= async()=>{
-            setloading2(false)
-            try {
-                 const data= await API.CallAPI(undefined,{PhuongThuc:2,url:`api/admin/layDLUS?page=${page}`});
-                 if(data.status){
-                    setDuLietTrang(data.data)
-                    setDuLieuUser(data.data.data)
-                    setloading2(false);
-                 }
-            } catch (error) {
-                console.error('lỗi hiển thị:'+ error)
-            } finally {
-                try{
-                setloading2(false);
-                const data = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/layDLUS?page=${page}` });
-                if (data.status) {
-                    setDuLietTrang(data.data);
-                    setDuLieuUser(data.data.data);
-                }
-            } catch (error) { 
-                console.error('Lỗi lấy user:', error); 
-            } finally { 
-                setloading2(false); 
-            }
-        }
-    }
-        LayDL();
-    },[page])
->>>>>>> 04ae227d5f0f931ec0149139682f8bcb24a6267c
 
     const [loadingStats, setLoadingStats] = useState(false);
     const [loadingTable, setLoadingTable] = useState(false);
@@ -116,7 +56,6 @@ function QuanLiNguoiDung() {
         return matchesSearch && matchesRule;
     });
 
-<<<<<<< HEAD
     const ThayDoiTrangThai = async (trangthai, id) => {
         let ketQua;
         switch (trangthai) {
@@ -140,27 +79,6 @@ function QuanLiNguoiDung() {
             ThongBao.ThongBao_CanhBao(CapNhat.message);
             return;
         }
-=======
-    const KhoaTK=async(id)=>{
-        const XacNhan= await ThongBao.ThongBao_XacNhanTT('Bạn có chắc chắn muốn khóa tài khoản này không?')
-        if(!XacNhan) return;
-        if(!id){
-            ThongBao.ThongBao_CanhBao('Vui lòng kiểm tra lại dữ liệu!');
-            return;
-        }
-        const formdata= fun.objectToFormData({id:id});
-        try {
-            setloading(true);
-            const ketqua= await API.CallAPI(formdata,{PhuongThuc:1,url:'admin/CapNhat_taikhoan'});
-            alert(JSON.stringify(ketqua))
-        } catch (error) {
-            console.error('Lỗi kết quả:'+ error)
-        } finally {
-            setloading(false)
-        }
-    }
-    //Đã sửa đến đây
->>>>>>> 04ae227d5f0f931ec0149139682f8bcb24a6267c
 
     };
   
