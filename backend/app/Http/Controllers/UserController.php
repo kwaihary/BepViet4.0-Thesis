@@ -35,19 +35,6 @@ class UserController extends Controller
             ]
         ]);
     }
-    public function login(Request $request){
-        $request->validate([
-            'phone' => 'required|integer|max:10',
-            'password' => 'required|min:6',
-        ],[
-            'phone.required' => "Vui lòng nhập số điện thoại!",
-            'phone.integer'=> "Số điện thoại phải là ký tự số",
-            'phone.max'=> "Số điện thoại phải là 10 chữ số",
-            'password.required'=> "Vui lòng nhập mật khẩu!",
-            'password.min'=> "Mật khẩu ít nhất 6 ký tự!",
-        ]);
-    }
-
     public function QuanLiTaiKhoan(Request $request){
         $validated = $request->validate([
             'id' => 'required|integer|exists:users,id',
@@ -73,12 +60,5 @@ class UserController extends Controller
                 'message' => "Cập nhật trạng thái thất bại."
             ]);
         }
-    }
-
-    public function QuanLiTaiKhoan(Request $request){
-        return Response()->json([
-            'status' =>"true",
-            'message'=> "Thành công đến serve nhé <3 "
-        ]);
     }
 }
