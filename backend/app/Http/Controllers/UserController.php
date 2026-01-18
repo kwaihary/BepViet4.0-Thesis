@@ -61,4 +61,24 @@ class UserController extends Controller
             ]);
         }
     }
+
+    public function Login(Request $request){
+        $request->validate([
+            'phone'=>'required|max:10',
+            'password'=>'required|min:6',
+        ],[
+            'phone.required'=>'Vui lòng nhập số điện thoại',
+            'phone.integer'=>'Số điện thoại không được là ký tự chữ',
+            'phone.max'=>'Số điện thoại phải là 20 chữ số',
+            'password.required'=>'Vui lòng nhập mật khẩu',
+            'password.min' => 'Mật khẩu phải ít nhất 6 ký tự'
+        ]);
+    }
+
+    public function AccountManagement(Request $request){
+        return Response()->json([
+            'status'=>true,
+            'message' => 'Thành công đến server nhé!'
+        ]);
+    }
 }
