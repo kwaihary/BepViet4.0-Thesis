@@ -11,7 +11,7 @@ import $ from "jquery";
  * @returns Promise
  */
 export function CallAPI(dulieu = null, yeucau) {
-    const URL = 'http://127.0.0.1:8000/';
+    const URL = 'http://127.0.0.1:8000/api/';
     const DuongDan = URL + yeucau.url;
 
     if (yeucau.fileArray) {
