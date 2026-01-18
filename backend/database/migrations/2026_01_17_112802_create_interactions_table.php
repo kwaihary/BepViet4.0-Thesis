@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('recipe_id')->constrained('recipes')->onDelete('cascade');
-            $table->enum('type', ['like', 'rate']); // Loại tương tác
+            $table->enum('type', ['like']); // Loại tương tác
             $table->integer('rating_value')->nullable(); // Số sao (1-5), nếu like thì null
             $table->timestamps();
         });
