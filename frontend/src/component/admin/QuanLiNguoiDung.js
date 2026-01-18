@@ -35,6 +35,7 @@ function QuanLiNguoiDung() {
             setLoadingTable(true);
             try {
                 const data = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/layDLUS?page=${page}` });
+                alert(JSON.stringify(data));
                 if (data.status){
                     setUsers(data.data.data || []);
                     setTongTrang(data.data.last_page)

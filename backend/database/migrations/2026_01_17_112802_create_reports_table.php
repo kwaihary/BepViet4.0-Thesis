@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('reporter_id')->constrained('users')->onDelete('cascade'); // Người báo cáo
             // Báo cáo cái gì? (Lưu ID của đối tượng bị báo cáo)
             $table->integer('target_id');
-            $table->enum('reason', ['spam', 'fake new', 'offensive']); // Lý do: Spam, Lừa đảo...
+            $table->enum('reason', ['Spam', 'Tin giả', 'Phản cảm']); // Lý do: Spam, Lừa đảo...
             $table->integer('status')->default(0); // Trạng thái: 0 = Chưa xử lý, 1 = Đang xử lý, 2 = Đã xử lý
             $table->timestamps();
         });
