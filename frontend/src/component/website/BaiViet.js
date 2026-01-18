@@ -203,7 +203,7 @@ function BaiViet({ data }) {
                     <div className="px-4 py-3 border-t border-gray-100 flex justify-between items-center">
                         <div className="flex gap-6">
                             <div className="flex items-center gap-2">
-                                <button className="text-gray-500 hover:text-red-600 transition p-1"><i className="fa-regular fa-heart text-2xl"></i></button>
+                                <button className="text-gray-500 hover:text-red-600 transition p-1"><i class="fa-regular fa-thumbs-up"></i></button>
                                 <button onClick={() => openLikeList(post)} className="text-sm font-semibold text-gray-700 hover:underline">
                                     {post.likes} lượt thích
                                 </button>

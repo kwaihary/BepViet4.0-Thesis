@@ -20,7 +20,7 @@ class UserController extends Controller
     }
     public function ThongKe(){
         $totalUsers  = User::count();             
-        $totalActive    = User::where('status', 1)->count();
+        $totalActive    = User::where('status', 2)->count();
         $totalInactive  = User::where('status', 0)->count();
         $NguoiMoi = User::whereMonth('created_at', Carbon::now()->month)
                            ->whereYear('created_at', Carbon::now()->year)

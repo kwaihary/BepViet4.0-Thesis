@@ -38,7 +38,15 @@
     + 1 : Chờ xác nhận
     + 2 : tài khoản hoạt động
     + 0 : tài khoản bị khóa
-
+============================
+định dạng ngày/tháng/năm : new Date(ThongTinPhieu.NgayNhap).toLocaleDateString("vi-VN")
+=============================================
+định dạng giờ : vd :11:00 AM
+ new Date(ThongTinPhieu.NgayNhap).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    })
  <a href="dangbai.html" className="aspect-square bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:bg-red-50 hover:border-red-400 hover:text-red-500 transition cursor-pointer md:rounded-lg">
                         <i className="fa-solid fa-plus text-3xl mb-2"></i>
                         <span className="text-xs font-bold hidden md:inline">Thêm món mới</span>
