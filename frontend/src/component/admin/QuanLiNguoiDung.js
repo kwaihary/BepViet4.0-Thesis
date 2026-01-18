@@ -8,15 +8,13 @@ function QuanLiNguoiDung() {
         const ThongKe=async()=>{
             setloading(true);
             try {
-<<<<<<< Updated upstream
                 const DuLieu=await API.CallAPI(undefined,{PhuongThuc:2, url:`api/admin/ThongKeNguoiDung`})
                 if(DuLieu.status){
-=======
                 const DuLieu = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/ThongKeNguoiDung` })
                 if (DuLieu.status) {
->>>>>>> Stashed changes
                     setDuLieuThongKe(DuLieu.data);
                     setloading(false);
+                }
                 }
             } catch (error) {
                 console.error('lỗi hiển thị:'+ error)
@@ -35,7 +33,6 @@ function QuanLiNguoiDung() {
         const LayDL= async()=>{
             setloading2(false)
             try {
-<<<<<<< Updated upstream
                  const data= await API.CallAPI(undefined,{PhuongThuc:2,url:`api/admin/layDLUS?page=${page}`});
                  if(data.status){
                     setDuLietTrang(data.data)
@@ -45,8 +42,8 @@ function QuanLiNguoiDung() {
             } catch (error) {
                 console.error('lỗi hiển thị:'+ error)
             } finally {
+                try{
                 setloading2(false);
-=======
                 const data = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/layDLUS?page=${page}` });
                 if (data.status) {
                     setDuLietTrang(data.data);
@@ -56,9 +53,9 @@ function QuanLiNguoiDung() {
                 console.error('Lỗi lấy user:', error); 
             } finally { 
                 setloading2(false); 
->>>>>>> Stashed changes
             }
         }
+    }
         LayDL();
     },[page])
 
@@ -87,8 +84,7 @@ function QuanLiNguoiDung() {
         const matchesRole = roleFilter === "all" || user.role === roleFilter;
         return matchesSearch && matchesRole;
     });
-<<<<<<< Updated upstream
-=======
+
     const KhoaTK=async(id)=>{
         const XacNhan= await ThongBao.ThongBao_XacNhanTT('Bạn có chắc chắn muốn khóa tài khoản này không?')
         if(!XacNhan) return;
@@ -108,7 +104,6 @@ function QuanLiNguoiDung() {
         }
     }
     //Đã sửa đến đây
->>>>>>> Stashed changes
 
     // Mở modal sửa
     const openEditModal = (user) => {
