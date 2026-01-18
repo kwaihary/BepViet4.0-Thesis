@@ -180,17 +180,11 @@ function Menu() {
 
                                     {/* Các Links điều hướng */}
                                     <div className="flex flex-col">
-                                        <Link to="/HoSo" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
+                                        <Link to="/HoSo-NguoiDung" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
                                             <i className="fa-regular fa-id-badge w-5"></i> Hồ sơ cá nhân
                                         </Link>
-                                        <Link to="/Cookbook" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
+                                        <Link to="/CookbookCuaToi" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
                                             <i className="fa-solid fa-book-open w-5"></i> Cookbook của tôi
-                                        </Link>
-                                        <Link to="/MonDaLuu" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
-                                            <i className="fa-regular fa-bookmark w-5"></i> Món đã lưu
-                                        </Link>
-                                         <Link to="/CaiDat" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
-                                            <i className="fa-solid fa-gear w-5"></i> Cài đặt tài khoản
                                         </Link>
                                     </div>
 
