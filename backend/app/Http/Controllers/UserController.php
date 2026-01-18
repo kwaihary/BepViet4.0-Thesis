@@ -11,7 +11,7 @@ class UserController extends Controller
     public function layDL(Request $request)
     {
         $perPage = 10;
-        $users = User::orderBy('id', 'desc')
+        $users = User::orderBy('id', 'asc') 
             ->paginate($perPage);
          return response()->json([
             'status' => true,
