@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('image_url');
             $table->string('video_url');
             $table->integer('cook_time');
-            $table->enum('difficulty', ['easy', 'medium', 'hard']);
-            $table->enum('status', ['pending', 'approved', ]);
+            $table->enum('difficulty', ['Dễ', 'Trung bình', 'Khó']);
+            $table->enum('status', ['Đang chờ', 'Đã duyệt', 'Đã xóa'])->default('Đang chờ');
             $table->integer('view_count');
             $table->timestamps();
         });
