@@ -30,6 +30,7 @@ function ChiTietXuLiViPham({DuLieu}) {
         }
         layDL();
     },[DuLieu])
+    
     if(loading){
          <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
              <span className="text-indigo-600 font-bold"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</span>

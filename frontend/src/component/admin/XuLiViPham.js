@@ -4,15 +4,23 @@ import { useModalContext } from '../../context/QuanLiModal';
 
 function XuLiViPham() {
     const { OpenMoDal } = useModalContext();
+
     // --- STATE QUẢN LÝ ---
     const [loading, setloading] = useState(false);
     const [ThongKe, setThongKe] = useState({});
 
-    // State cho bảng dữ liệu
+    // State dữ liệu bảng
     const [loading2, setloading2] = useState(false);
-    const [DuLieuBaoCao, setDuLieu] = useState([]); // Mảng chứa danh sách báo cáo
+    const [DuLieuGoc, setDuLieuGoc] = useState([]); // Dữ liệu gốc từ API
+    const [DuLieuHienThi, setDuLieuHienThi] = useState([]); // Dữ liệu hiển thị (đã lọc)
+    
+    // State phân trang
     const [page, setpage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1); // Thêm state lưu tổng số trang
+    const [totalPages, setTotalPages] = useState(1);
+
+    // State bộ lọc Client
+    const [filterStatus, setFilterStatus] = useState('all'); // Trạng thái lọc
+    const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
 
     // --- BƯỚC 1: LẤY DỮ LIỆU THỐNG KÊ ---
     useEffect(() => {
@@ -32,14 +40,16 @@ function XuLiViPham() {
         LayDL_TK();
     }, []);
 
-    // --- BƯỚC 2: LẤY DỮ LIỆU BÁO CÁO ---
+    // --- BƯỚC 2: LẤY DỮ LIỆU BÁO CÁO (SERVER) ---
     useEffect(() => {
         const layDL = async () => {
             setloading2(true)
             try {
                 const data = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/laydl_baocao?page=${page}` });
                 if (data.status) {
-                    setDuLieu(data.data.data || []); 
+                    const fetchedData = data.data.data || [];
+                    setDuLieuGoc(fetchedData);
+                    setDuLieuHienThi(fetchedData); // Mặc định hiển thị hết khi mới tải
                     setTotalPages(data.data.last_page || 1); 
                 }
             } catch (error) {
@@ -51,11 +61,46 @@ function XuLiViPham() {
         layDL();
     }, [page])
 
+    // --- BƯỚC 3: XỬ LÝ LỌC & TÌM KIẾM (CLIENT SIDE) ---
+    useEffect(() => {
+        let ketQua = [...DuLieuGoc]; // Copy mảng gốc
+
+        // 1. Lọc theo Select (Trạng thái)
+        if (filterStatus !== 'all') {
+            ketQua = ketQua.filter(item => item.status.toString() === filterStatus);
+        }
+
+        // 2. Lọc theo Input (Tìm kiếm)
+        if (searchTerm.trim() !== '') {
+            const keyword = searchTerm.toLowerCase();
+            ketQua = ketQua.filter(item => 
+                (item.TieuDe && item.TieuDe.toLowerCase().includes(keyword)) ||
+                (item.NguoiBaoCao && item.NguoiBaoCao.toLowerCase().includes(keyword))
+            );
+        }
+
+        setDuLieuHienThi(ketQua); // Cập nhật dữ liệu ra bảng
+    }, [filterStatus, searchTerm, DuLieuGoc]);
+
+
+    // --- HÀM RENDER UI TRẠNG THÁI ---
+    const renderStatusBadge = (status) => {
+        const s = parseInt(status);
+        switch (s) {
+            case 1:
+                return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200"><i className="fa-solid fa-trash-can text-[10px]"></i> Đã xóa bài</span>;
+            case 2:
+                return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200"><i className="fa-solid fa-ban text-[10px]"></i> Đã bỏ qua</span>;
+            default:
+                return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 border border-yellow-200"><i className="fa-regular fa-clock text-[10px]"></i> Đang chờ xử lý</span>;
+        }
+    };
+
     // --- GIAO DIỆN ---
     return (
         <div className="min-h-screen font-sans p-3 text-gray-800">
             <main className="">
-                {/* --- SECTION THỐNG KÊ --- */}
+                {/* --- SECTION THỐNG KÊ (ĐẦY ĐỦ) --- */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     {loading ? (
                         <div className="col-span-3 text-center py-4 text-gray-500">Đang tải thống kê...</div>
@@ -99,17 +144,28 @@ function XuLiViPham() {
                 {/* --- TABLE & ACTIONS --- */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[400px] flex flex-col">
                     
-                    {/* Toolbar */}
+                    {/* Toolbar: Lọc và Tìm kiếm */}
                     <div className="border-b border-gray-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-gray-50/50">
                         <div className="flex gap-3">
-                            <select className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-indigo-400 text-gray-600">
+                            <select 
+                                value={filterStatus}
+                                onChange={(e) => setFilterStatus(e.target.value)}
+                                className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-indigo-400 text-gray-600 cursor-pointer"
+                            >
                                 <option value="all">Tất cả trạng thái</option>
-                                <option value="1">Đã xử lí</option>
-                                <option value="0">Chưa xử lí</option>
+                                <option value="0">Đang chờ xử lý</option>
+                                <option value="1">Đã xóa bài</option>
+                                <option value="2">Đã bỏ qua</option>
                             </select>
                         </div>
                         <div className="sm:ml-auto relative">
-                            <input type="text" placeholder="Tìm tên, ID bài viết..." className="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 w-full sm:w-64 transition-all shadow-sm" />
+                            <input 
+                                type="text" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Tìm tên, ID bài viết..." 
+                                className="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 w-full sm:w-64 transition-all shadow-sm" 
+                            />
                             <i className="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
                         </div>
                     </div>
@@ -122,6 +178,7 @@ function XuLiViPham() {
                                     <th className="px-6 py-4">Đối tượng vi phạm</th>
                                     <th className="px-6 py-4">Lý do</th>
                                     <th className="px-6 py-4">Người báo cáo</th>
+                                    <th className="px-6 py-4 text-center">Trạng thái</th>
                                     <th className="px-6 py-4 text-center">Thao tác</th>
                                 </tr>
                             </thead>
@@ -135,23 +192,22 @@ function XuLiViPham() {
                                         </td>
                                     </tr>
                                 ) : (
-                                    DuLieuBaoCao && Array.isArray(DuLieuBaoCao) && DuLieuBaoCao.length > 0 ? (
-                                        DuLieuBaoCao.map((BaoCao, index) => (
+                                    DuLieuHienThi && Array.isArray(DuLieuHienThi) && DuLieuHienThi.length > 0 ? (
+                                        DuLieuHienThi.map((BaoCao, index) => (
                                             <tr key={index} className="hover:bg-red-50/30 transition-colors group">
                                                 {/* Cột 1: Thông tin bài viết */}
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-col">
                                                         <span className="font-bold text-gray-800 text-sm line-clamp-1 group-hover:text-red-600 transition-colors">
-                                                            {/* Thay 'title' bằng tên trường thật trong DB */}
                                                             {BaoCao.TieuDe}
                                                         </span>
                                                         <div className="flex items-center gap-2 mt-1">
                                                             <span className="text-xs text-gray-400">
                                                                 {new Date(BaoCao.created_at).toLocaleDateString("vi-VN") + ' Lúc ' +  new Date(BaoCao.created_at).toLocaleTimeString("en-US", {
-                                                                                                                                        hour: "2-digit",
-                                                                                                                                        minute: "2-digit",
-                                                                                                                                        hour12: true
-                                                                                                                                    }) }
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                    hour12: true
+                                                                }) }
                                                             </span>
                                                         </div>
                                                     </div>
@@ -168,13 +224,17 @@ function XuLiViPham() {
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold uppercase">
-                                                            {/* sau này sẽ đổi thành avartar*/ }
-                                                            {(BaoCao.name)}
+                                                            {(BaoCao.name ? BaoCao.name.charAt(0) : 'U')}
                                                         </div>
                                                         <span className="text-sm text-gray-700">
                                                             {BaoCao.NguoiBaoCao}
                                                         </span>
                                                     </div>
+                                                </td>
+                                                
+                                       
+                                                <td className="px-6 py-4 text-center">
+                                                     {renderStatusBadge(BaoCao.status)}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
                                                     <button onClick={()=>{OpenMoDal({DuLieu:BaoCao},{TenTrang:'XuLiViPham'})}}
@@ -189,7 +249,9 @@ function XuLiViPham() {
                                             <td colSpan="5" className="py-12 text-center">
                                                 <div className="flex flex-col items-center justify-center text-gray-400">
                                                     <i className="fa-regular fa-folder-open text-4xl mb-3"></i>
-                                                    <span className="text-base font-medium text-gray-600">Dữ liệu trống</span>
+                                                    <span className="text-base font-medium text-gray-600">
+                                                        {DuLieuGoc.length === 0 ? "Dữ liệu trống" : "Không tìm thấy kết quả phù hợp"}
+                                                    </span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -198,8 +260,6 @@ function XuLiViPham() {
                             </tbody>
                         </table>
                     </div>
-
-                    {/* Pagination */}
                     <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between bg-gray-50">
                         <span className="text-sm text-gray-500">
                             Trang <span className="font-bold text-gray-800">{page}</span> trên tổng số <span className="font-bold text-gray-800">{totalPages}</span>

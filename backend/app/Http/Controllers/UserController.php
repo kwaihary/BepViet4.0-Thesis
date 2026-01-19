@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
-    public function layDL(Request $request)
+    public function layDL()
     {
         $perPage = 10;
         $users = User::orderBy('id', 'asc') 
