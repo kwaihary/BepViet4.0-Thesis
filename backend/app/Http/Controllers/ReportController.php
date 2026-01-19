@@ -26,13 +26,21 @@ class ReportController extends Controller
     }
     public function layDL(){
         $perPage = 10;
-        $reports = Report::select('reports.*', 'users.name')
-            ->join('users', 'reports.reporter_id', '=', 'users.id')
-            ->orderBy('reports.id', 'asc')
-            ->paginate($perPage);
-         return response()->json([
+        $reports = Report::select(
+            'reports.*',
+            'users.name as NguoiBaoCao',
+            'recipes.description as TieuDe',
+            'recipes.image_url as HinhAnh'
+        )
+        ->join('users', 'reports.reporter_id', '=', 'users.id')
+        ->join('recipes', 'reports.target_id', '=', 'recipes.id')
+        ->orderBy('reports.id', 'asc')
+        ->paginate($perPage);
+        return response()->json([
             'status' => true,
             'data' => $reports
         ]);
     }
+
+
 }

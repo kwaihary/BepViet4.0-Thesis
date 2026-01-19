@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('video_url');
             $table->integer('cook_time');
             $table->enum('difficulty', ['easy', 'medium', 'hard']);
-            $table->enum('status', ['pending', 'approved']);
+            $table->enum('status', ['pending', 'approved', ]);
             $table->integer('view_count');
             $table->timestamps();
         });

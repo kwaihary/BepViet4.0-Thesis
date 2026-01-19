@@ -3,161 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bếp Việt 4.0 - Món Đã Lưu</title>
+    <title>Admin Report Modal - Tailwind CSS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#10B981', // Màu xanh lá chủ đạo (Emerald)
-                        secondary: '#F59E0B', // Màu cam điểm nhấn
-                        bg: '#F3F4F6'
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="bg-gray-200 font-sans antialiased h-screen w-full relative">
 
-    <div class="bg-white shadow-sm sticky top-0 z-10">
-        <div class="container mx-auto px-4 py-4">
-            <h1 class="text-2xl font-bold text-gray-800 mb-4">
-                <i class="fa-solid fa-bookmark text-primary mr-2"></i>Kho Lưu Trữ Của Tôi
-            </h1>
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+        
+        <div class="bg-white w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden transform transition-all">
             
-            <div class="flex space-x-6 border-b border-gray-200">
-                <button class="pb-3 border-b-2 border-primary text-primary font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-utensils"></i> Tất cả món ăn
-                    <span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">12</span>
-                </button>
-                <button class="pb-3 border-b-2 border-transparent text-gray-500 hover:text-primary hover:border-gray-300 transition flex items-center gap-2">
-                    <i class="fa-solid fa-book-open"></i> Bộ sưu tập (Cookbooks)
-                    <span class="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">3</span>
+            <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Chi tiết báo cáo vi phạm</h3>
+                    <p class="text-xs text-gray-500 mt-1">Mã báo cáo: <span class="font-mono">#RP-2024-882</span></p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
+
+            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                
+                <div>
+                    <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Bài viết bị báo cáo</span>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h4 class="font-semibold text-gray-800 text-base mb-1">Cách chăm sóc mèo Anh lông ngắn tại nhà</h4>
+                        <p class="text-sm text-gray-500 mb-2">ID Bài viết: <span class="font-mono">#POST-9921</span></p>
+                        <a href="#" class="text-blue-600 text-sm hover:underline hover:text-blue-700 inline-flex items-center gap-1 font-medium">
+                            Xem bài viết gốc
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div>
+                        <span class="block text-xs font-bold text-red-500 uppercase tracking-wider mb-2">👤 Người đăng (Bị cáo)</span>
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-red-500 shadow-sm ring-1 ring-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold">A</div>
+                                <div>
+                                    <p class="font-bold text-gray-800">Nguyễn Văn A</p>
+                                    <p class="text-xs text-gray-500">ID: #USER-001</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-100 text-xs text-red-600 font-medium flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                Lịch sử: 2 lần vi phạm
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="block text-xs font-bold text-green-600 uppercase tracking-wider mb-2">📢 Người báo cáo</span>
+                        <div class="bg-white p-4 rounded-lg border-l-4 border-green-500 shadow-sm ring-1 ring-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold">B</div>
+                                <div>
+                                    <p class="font-bold text-gray-800">Trần Thị B</p>
+                                    <p class="text-xs text-gray-500">ID: #USER-888</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-100 text-xs text-green-600 font-medium flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Thành viên uy tín
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Lý do báo cáo</span>
+                    <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg text-sm italic relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-200 absolute right-2 top-2 -z-0" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.8954 13.1216 16 12.017 16H9.01697C7.9124 16 7.01697 16.8954 7.01697 18L7.01697 21H14.017ZM21.017 6.00002C21.017 5.61931 20.916 5.25303 20.7363 4.93305L16.2736 12H21.0028C20.9419 12.5716 20.7107 13.107 20.3294 13.549L13.8856 21.0184C13.2504 21.7547 12.1157 21.8596 11.3503 21.2537C11.1396 21.0869 10.9754 20.8732 10.875 20.631L9.27402 16.7686C9.13063 16.4227 9.3879 16.0827 9.75239 15.9555L14.8983 14.1587L11.7163 12H5.01697C3.9124 12 3.01697 11.1046 3.01697 10V6.00002C3.01697 4.89545 3.9124 4.00002 5.01697 4.00002H19.017C20.1216 4.00002 21.017 4.89545 21.017 6.00002Z"></path></svg>
+                        <span class="relative z-10">"Bài viết chứa nội dung quảng cáo lừa đảo, spam link affiliate quá nhiều và sử dụng hình ảnh không đúng sự thật."</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
+                <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-all">
+                    Bỏ qua báo cáo
+                </button>
+                <button class="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-all shadow-sm">
+                    Gửi cảnh cáo
+                </button>
+                <button class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all shadow-sm flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    Xóa & Khóa user
+                </button>
+            </div>
+
         </div>
     </div>
 
-    <main class="container mx-auto px-4 py-6">
-
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-            <div class="relative w-full md:w-1/3">
-                <input type="text" placeholder="Tìm món đã lưu (ví dụ: Phở, Canh chua)..." 
-                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
-            </div>
-
-            <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-                <select class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:border-primary focus:outline-none cursor-pointer">
-                    <option>Độ khó: Tất cả</option>
-                    <option>Dễ</option>
-                    <option>Trung bình</option>
-                    <option>Khó</option>
-                </select>
-                <select class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:border-primary focus:outline-none cursor-pointer">
-                    <option>Vùng miền: Tất cả</option>
-                    <option>Miền Bắc</option>
-                    <option>Miền Trung</option>
-                    <option>Miền Nam</option>
-                </select>
-                <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-green-600 transition shadow-sm whitespace-nowrap">
-                    <i class="fa-solid fa-filter mr-1"></i> Lọc
-                </button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300 group border border-gray-100">
-                <div class="relative h-48 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
-                         alt="Món ăn" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    
-                    <div class="absolute top-3 left-3 flex gap-1">
-                        <span class="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">Món Mặn</span>
-                        <span class="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">Miền Nam</span>
-                    </div>
-
-                    <button class="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md text-red-500 hover:bg-gray-100 transition" title="Bỏ lưu">
-                        <i class="fa-solid fa-heart text-lg"></i>
-                    </button>
-                </div>
-
-                <div class="p-4">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-lg text-gray-800 mb-1 line-clamp-1 hover:text-primary cursor-pointer">Thịt Kho Tàu Trứng Cút</h3>
-                    </div>
-                    
-                    <div class="flex items-center text-sm text-gray-500 mb-3">
-                        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-5 h-5 rounded-full mr-2" alt="Author">
-                        <span>bởi <strong class="text-gray-700">Cô Ba Bình Dương</strong></span>
-                    </div>
-
-                    <div class="flex justify-between items-center text-xs text-gray-600 bg-gray-50 p-2 rounded-lg mb-4">
-                        <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 45p</span>
-                        <span class="flex items-center gap-1"><i class="fa-solid fa-fire text-orange-500"></i> Dễ</span>
-                        <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-400"></i> 4.8</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2 mt-2">
-                        <button class="flex items-center justify-center gap-1 px-3 py-2 border border-primary text-primary text-sm rounded-lg hover:bg-primary hover:text-white transition font-medium">
-                            <i class="fa-solid fa-calendar-plus"></i> Lên Lịch
-                        </button>
-                        <button class="flex items-center justify-center gap-1 px-3 py-2 bg-primary text-white text-sm rounded-lg hover:bg-green-700 transition font-medium shadow-sm hover:shadow-md">
-                            <i class="fa-solid fa-cart-plus"></i> Đi chợ
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300 group border border-gray-100">
-                <div class="relative h-48 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
-                         alt="Món ăn" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    <div class="absolute top-3 left-3 flex gap-1">
-                        <span class="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">Món Chay</span>
-                    </div>
-                    <button class="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md text-red-500 hover:bg-gray-100 transition">
-                        <i class="fa-solid fa-heart text-lg"></i>
-                    </button>
-                </div>
-                <div class="p-4">
-                    <h3 class="font-bold text-lg text-gray-800 mb-1 line-clamp-1 hover:text-primary cursor-pointer">Salad Trộn Dầu Giấm</h3>
-                    <div class="flex items-center text-sm text-gray-500 mb-3">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-5 h-5 rounded-full mr-2" alt="Author">
-                        <span>bởi <strong class="text-gray-700">Chef Tùng</strong></span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs text-gray-600 bg-gray-50 p-2 rounded-lg mb-4">
-                        <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 15p</span>
-                        <span class="flex items-center gap-1"><i class="fa-solid fa-fire text-green-500"></i> Rất dễ</span>
-                        <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-400"></i> 5.0</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-2">
-                        <button class="flex items-center justify-center gap-1 px-3 py-2 border border-primary text-primary text-sm rounded-lg hover:bg-primary hover:text-white transition font-medium">
-                            <i class="fa-solid fa-calendar-plus"></i> Lên Lịch
-                        </button>
-                        <button class="flex items-center justify-center gap-1 px-3 py-2 bg-primary text-white text-sm rounded-lg hover:bg-green-700 transition font-medium shadow-sm">
-                            <i class="fa-solid fa-cart-plus"></i> Đi chợ
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center p-6 text-gray-400 hover:border-primary hover:text-primary cursor-pointer transition h-full min-h-[350px]">
-                <div class="bg-white p-4 rounded-full shadow-sm mb-3">
-                     <i class="fa-solid fa-compass text-3xl"></i>
-                </div>
-                <h3 class="font-semibold text-lg">Khám phá thêm</h3>
-                <p class="text-sm text-center mt-2">Bạn chưa biết nấu gì? Hãy để AI gợi ý món ngon cho bạn.</p>
-                <button class="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium shadow-sm hover:shadow">
-                    Thử tính năng AI ngay
-                </button>
-            </div>
-
-        </div>
-    </main>
 </body>
 </html>

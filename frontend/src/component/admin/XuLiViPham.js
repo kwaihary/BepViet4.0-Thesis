@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import * as API from '../../JS/API/API'
+import { useModalContext } from '../../context/QuanLiModal';
 
 function XuLiViPham() {
+    const { OpenMoDal } = useModalContext();
     // --- STATE QUẢN LÝ ---
     const [loading, setloading] = useState(false);
     const [ThongKe, setThongKe] = useState({});
@@ -11,10 +13,6 @@ function XuLiViPham() {
     const [DuLieuBaoCao, setDuLieu] = useState([]); // Mảng chứa danh sách báo cáo
     const [page, setpage] = useState(1);
     const [totalPages, setTotalPages] = useState(1); // Thêm state lưu tổng số trang
-
-    // State cho Modal
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedReport, setSelectedReport] = useState(null); // (Tùy chọn) Lưu báo cáo đang xem
 
     // --- BƯỚC 1: LẤY DỮ LIỆU THỐNG KÊ ---
     useEffect(() => {
@@ -34,16 +32,13 @@ function XuLiViPham() {
         LayDL_TK();
     }, []);
 
-    // --- BƯỚC 2: LẤY DỮ LIỆU BÁO CÁO (Đã sửa lỗi logic) ---
+    // --- BƯỚC 2: LẤY DỮ LIỆU BÁO CÁO ---
     useEffect(() => {
         const layDL = async () => {
             setloading2(true)
             try {
                 const data = await API.CallAPI(undefined, { PhuongThuc: 2, url: `admin/laydl_baocao?page=${page}` });
-                // console.log(data); // Bật lên để check tên trường dữ liệu nếu cần
-                
                 if (data.status) {
-                    // SỬA LỖI QUAN TRỌNG: Tách riêng dữ liệu mảng và số trang
                     setDuLieu(data.data.data || []); 
                     setTotalPages(data.data.last_page || 1); 
                 }
@@ -148,7 +143,7 @@ function XuLiViPham() {
                                                     <div className="flex flex-col">
                                                         <span className="font-bold text-gray-800 text-sm line-clamp-1 group-hover:text-red-600 transition-colors">
                                                             {/* Thay 'title' bằng tên trường thật trong DB */}
-                                                            {BaoCao.title || BaoCao.ten_bai_viet || "Nội dung vi phạm"}
+                                                            {BaoCao.TieuDe}
                                                         </span>
                                                         <div className="flex items-center gap-2 mt-1">
                                                             <span className="text-xs text-gray-400">
@@ -174,22 +169,17 @@ function XuLiViPham() {
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold uppercase">
                                                             {/* sau này sẽ đổi thành avartar*/ }
-                                                            {(BaoCao.name).charAt(0)}
+                                                            {(BaoCao.name)}
                                                         </div>
                                                         <span className="text-sm text-gray-700">
-                                                            {BaoCao.name}
+                                                            {BaoCao.NguoiBaoCao}
                                                         </span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <button 
-                                                        onClick={() => {
-                                                            setSelectedReport(BaoCao); // Lưu data để hiển thị popup nếu cần
-                                                            setIsModalOpen(true);
-                                                        }} 
-                                                        className="bg-white border border-gray-300 text-gray-600 hover:bg-red-600 hover:text-white hover:border-red-600 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all shadow-sm active:scale-95"
-                                                    >
-                                                        Xem chi tiết
+                                                    <button onClick={()=>{OpenMoDal({DuLieu:BaoCao},{TenTrang:'XuLiViPham'})}}
+                                                            className="bg-white border border-gray-300 text-gray-600 hover:bg-red-600 hover:text-white hover:border-red-600 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all shadow-sm active:scale-95">
+                                                            Xem chi tiết
                                                     </button>
                                                 </td>
                                             </tr>
@@ -240,81 +230,6 @@ function XuLiViPham() {
                     </div>
                 </div>
             </main>
-
-            {/* --- MODAL (Giao diện tĩnh như yêu cầu) --- */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    {/* Backdrop */}
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)}></div>
-
-                    {/* Modal Content */}
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden relative z-10 animate-fade-in-up flex flex-col max-h-[90vh]">
-                        {/* Header */}
-                        <div className="bg-white px-6 py-4 border-b border-gray-100 flex justify-between items-center shrink-0">
-                            <div>
-                                <h3 className="font-bold text-lg text-gray-800">Xử lý báo cáo <span className="text-red-600">#{selectedReport?.id || '---'}</span></h3>
-                                <p className="text-xs text-gray-500">Người báo cáo: {selectedReport?.reporter_name || '...'} </p>
-                            </div>
-                            <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 rounded-full bg-gray-50 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 transition-colors">
-                                <i className="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-
-                        {/* Body */}
-                        <div className="p-6 overflow-y-auto">
-                            {/* User info card */}
-                            <div className="flex items-center gap-4 mb-6 p-4 bg-red-50/50 rounded-xl border border-red-100">
-                                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-500 border border-red-100 font-bold text-xl shadow-sm">
-                                    N
-                                </div>
-                                <div>
-                                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Người bị báo cáo</p>
-                                    <p className="font-bold text-gray-800 text-lg">Nguyễn Văn A</p>
-                                </div>
-                                <div className="ml-auto text-right">
-                                    <div className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded">
-                                        <i className="fa-solid fa-triangle-exclamation mr-1"></i> Vi phạm
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Report Details */}
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                                        Nội dung vi phạm <span className="font-normal text-gray-500">({selectedReport?.type || '...'})</span>
-                                    </label>
-                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-800 relative">
-                                        <i className="fa-solid fa-quote-left text-3xl text-gray-200 absolute top-2 left-2 -z-0"></i>
-                                        <p className="relative z-10 italic">"{selectedReport?.title || selectedReport?.ten_bai_viet || '...'}"</p>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Lý do báo cáo</label>
-                                    <div className="flex items-start gap-3">
-                                        <i className="fa-solid fa-circle-info text-red-500 mt-1"></i>
-                                        <p className="text-gray-700">{selectedReport?.reason || selectedReport?.ly_do || '...'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Footer / Actions */}
-                        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
-                            <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-lg text-gray-600 font-bold hover:bg-gray-200 transition-colors text-sm">
-                                Bỏ qua
-                            </button>
-                            <button className="px-5 py-2.5 rounded-lg bg-orange-100 text-orange-700 font-bold hover:bg-orange-200 transition-colors border border-orange-200 text-sm">
-                                <i className="fa-solid fa-eraser mr-2"></i> Gỡ nội dung
-                            </button>
-                            <button className="px-5 py-2.5 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 shadow-md hover:shadow-lg transition-all transform active:scale-95 text-sm">
-                                <i className="fa-solid fa-gavel mr-2"></i> Khóa tài khoản
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

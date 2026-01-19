@@ -1,10 +1,13 @@
 import React, { createContext, useContext, useState } from "react";
 import ChinhSua from "../component/website/ChinhSuaThongTinNguoiDung";
+import ChiTietXuLiViPham from "../component/admin/ChiTietXuLiViPham";
+
 
 const MoDalContext = createContext();
 
 const MODAL_REGISTRY = {
     'ChuaSuaThongTin' : ChinhSua,
+    'XuLiViPham' : ChiTietXuLiViPham
 };
 
 export function AppProvider({ children }) {
