@@ -1,22 +1,15 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Danh mục - Bếp Việt 4.0</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); body { font-family: 'Inter', sans-serif; }</style>
-</head>
-<body class="bg-gray-50 text-gray-800">
-
-    <div class="p-6 max-w-7xl mx-auto">
+import { useModalContext } from '../../context/QuanLiModal';
+function DanhMuc(){
+    const { OpenMoDal } = useModalContext();
+    return (
+        <>
+          <div class="p-6 max-w-7xl mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-center mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">Danh mục Ẩm thực</h1>
                 <p class="text-sm text-gray-500 mt-1">Quản lý phân loại: Khu vực, Loại món ăn, Chế độ ăn</p>
             </div>
-            <button onclick="toggleModal('categoryModal')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow transition flex items-center gap-2">
+            <button onClick={()=>{OpenMoDal(undefined,{TenTrang:'ThemDanhMuc'})}} class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow transition flex items-center gap-2">
                 <i class="fas fa-plus"></i> Thêm Danh mục
             </button>
         </div>
@@ -26,7 +19,7 @@
             <div class="p-4 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between bg-gray-50/50">
                 <div class="relative w-full md:w-96">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fas fa-search"></i></span>
-                    <input type="text" class="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Tìm kiếm tên hoặc slug...">
+                    <input type="text" class="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Tìm kiếm tên hoặc slug..."/>
                 </div>
                 
                 <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white">
@@ -111,61 +104,8 @@
         </div>
     </div>
 
-    <div id="categoryModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="toggleModal('categoryModal')"></div>
-
-        <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                
-                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                    
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-gray-100">
-                        <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-title">Thông tin Danh mục</h3>
-                    </div>
-
-                    <div class="px-4 py-5 sm:p-6 space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Tên Danh mục <span class="text-red-500">*</span></label>
-                            <input type="text" id="catName" oninput="generateSlug()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2 text-sm" placeholder="Ví dụ: Món Huế">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Slug (URL)</label>
-                            <input type="text" id="catSlug" readonly class="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 text-gray-500 shadow-sm border p-2 text-sm font-mono cursor-not-allowed">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Phân loại <span class="text-red-500">*</span></label>
-                            <select id="catType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2 bg-white text-sm">
-                                <option value="khu vực">Khu vực (Vùng miền)</option>
-                                <option value="loại món ăn">Loại món ăn</option>
-                                <option value="chế độ ăn">Chế độ ăn (Diet)</option>
-                            </select>
-                        </div>
-                        
-                        </div>
-
-                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 border-t border-gray-100">
-                        <button type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">Lưu thay đổi</button>
-                        <button type="button" onclick="toggleModal('categoryModal')" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Hủy</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function toggleModal(modalID){
-            const modal = document.getElementById(modalID);
-            modal.classList.toggle('hidden');
-        }
-
-        function generateSlug() {
-            let title = document.getElementById('catName').value;
-            let slug = title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                            .replace(/[đĐ]/g, 'd').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-');
-            document.getElementById('catSlug').value = slug;
-        }
-    </script>
-</body>
-</html>
+   
+        </>
+    )
+};
+export default DanhMuc

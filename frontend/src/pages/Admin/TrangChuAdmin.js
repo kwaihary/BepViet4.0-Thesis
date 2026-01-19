@@ -5,6 +5,7 @@ import QuanLiNguoiDung from "../../component/admin/QuanLiNguoiDung";
 import DuLieuBaiDang from "../../component/admin/DuLieuBaiDang";
 import TongQuan from "../../component/admin/TongQuan";
 import HoSoAdmin from '../../component/admin/HoSoAdmin';
+import DanhMuc from '../../component/admin/QuanLiDanhMuc';
 
 function TrangChuAD() {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -40,6 +41,9 @@ function TrangChuAD() {
                         </Link>
                         <Link to="/admin/DuLieuBaiViet" className={`flex items-center gap-3 px-6 py-3 transition ${isActive('/admin/DuLieuBaiViet')}`}>
                             <i className="fa-solid fa-database w-5"></i> Dữ liệu bài đăng
+                        </Link>
+                          <Link to="/admin/danhmuc" className={`flex items-center gap-3 px-6 py-3 transition ${isActive('/admin/danhmuc')}`}>
+                            <i className="fas fa-layer-group"></i> Quản lí danh mục
                         </Link>
                     </nav>
 
@@ -118,6 +122,7 @@ function TrangChuAD() {
                             <Route path='/DuLieuBaiViet' element={<DuLieuBaiDang />} />
                             <Route path='/' index element={<TongQuan />} />
                             <Route path='/HSAD' element={<HoSoAdmin/>} />
+                            <Route path='/danhmuc' element={<DanhMuc/>} />
                         </Routes>
                     </div>
                 </main>

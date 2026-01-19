@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->index();
             // Enum: Chỉ cho phép chọn 1 trong 3 loại này
-            $table->enum('type', ['region', 'dish_type', 'diet']); 
-            $table->string('image_url')->nullable();
+            $table->enum('type', ['khu vực', 'loaị món ăn ', 'Chế độ ăn']);
             $table->timestamps();
         });
     }
