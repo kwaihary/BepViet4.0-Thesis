@@ -14,3 +14,6 @@ Route::get('/admin/ThongKeViPham', [ReportController::class,'ThongKe']);
 Route::get('/admin/laydl_nguoidung_dangbai',[PostController::class, 'ThongTin_nguoidung_dangbai']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
+Route::post('admin/BoQua_ViPham',[PostController::class, 'BoQua_ViPham']);
+Route::post('admin/xoa_vipham', [PostController::class, 'Xoa_BaiViet'] );
+Route::post('admin/mo_khoa_vipham', [PostController::class, 'mo_khoa_vipham']);
