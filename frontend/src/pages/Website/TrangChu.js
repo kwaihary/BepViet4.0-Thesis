@@ -47,6 +47,10 @@ function TrangChu() {
                                 <i className={`fa-solid fa-user w-6 text-center text-lg ${location.pathname === '/HoSo-NguoiDung' ? 'text-white' : 'text-gray-400 group-hover:text-orange-500'}`}></i> 
                                 <span>Trang cá nhân</span>
                             </Link>
+                            <Link to="/cong-thuc" className={getLinkClass('/cong-thuc')}>
+                                <i className={`fa-solid fa-utensils ${location.pathname === '/cong-thuc' ? 'text-white' : 'text-gray-400 group-hover:text-orange-500'}`}></i> 
+                                <span>Công thức nấu ăn</span>
+                            </Link>
 
                             <Link to="/CookbookCuaToi" className={getLinkClass('/CookbookCuaToi')}>
                                 <i className={`fa-solid fa-book-open w-6 text-center text-lg ${location.pathname === '/CookbookCuaToi' ? 'text-white' : 'text-gray-400 group-hover:text-orange-500'}`}></i> 

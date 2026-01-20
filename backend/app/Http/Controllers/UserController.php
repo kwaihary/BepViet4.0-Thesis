@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
-    public function layDL(Request $request)
+    public function layDL()
     {
         $perPage = 10;
-        $users = User::orderBy('id', 'desc')
+        $users = User::orderBy('id', 'asc') 
             ->paginate($perPage);
          return response()->json([
             'status' => true,
@@ -20,7 +20,7 @@ class UserController extends Controller
     }
     public function ThongKe(){
         $totalUsers  = User::count();             
-        $totalActive    = User::where('status', 1)->count();
+        $totalActive    = User::where('status', 2)->count();
         $totalInactive  = User::where('status', 0)->count();
         $NguoiMoi = User::whereMonth('created_at', Carbon::now()->month)
                            ->whereYear('created_at', Carbon::now()->year)
@@ -62,7 +62,7 @@ class UserController extends Controller
         }
     }
 
-    public function Login(){
+    public function Login(Request $request){
         $request->validate([
             'phone'=>'required|max:10',
             'password'=>'required|min:6',

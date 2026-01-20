@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import * as API from '../../JS/API/API';
+// import * as fun from '../../JS/FUNCTION/function'; // Comment nếu không dùng để tránh warning
+// import * as ThongBao from '../../JS/FUNCTION/function'; // Comment nếu không dùng
 
 function DuLieuBaiDang() {
     // --- STATE ---
+    const [page, setpage] = useState(1);
     const [activeTab, setActiveTab] = useState("pending"); // pending, approved, rejected
     const [selectedPost, setSelectedPost] = useState(null); // Bài viết đang xem chi tiết
     const [filterCategory, setFilterCategory] = useState("all");
@@ -60,22 +64,55 @@ function DuLieuBaiDang() {
             description: "",
             ingredients: [],
             steps: []
-        }
+        },
+        // Thêm dữ liệu giả để test phân trang nếu cần
+        {
+             id: 5,
+             title: "Bún bò Huế (Test Pagination)",
+             author: "Huế Thương",
+             authorAvatar: "https://ui-avatars.com/api/?name=HT&background=random",
+             category: "Món nước",
+             image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&q=80&w=300",
+             submittedDate: "Today",
+             status: "pending",
+             description: "Test phân trang item 5",
+             ingredients: [],
+             steps: []
+         }
     ]);
 
+    // --- API & EFFECT ---
+    useEffect(() => {
+        const data = async () => {
+            // const dulieu = await API.CallAPI(undefined,{PhuongThuc:2,url:'admin/'})
+        }
+        data();
+    }, [])
+
+    // Effect: Reset về trang 1 khi đổi tab hoặc đổi filter category
+    useEffect(() => {
+        setpage(1);
+    }, [activeTab, filterCategory]);
+
     // --- LOGIC ---
-    // Filter
+    // 1. Filter
     const filteredPosts = posts.filter(post => {
         const matchTab = post.status === activeTab;
         const matchCategory = filterCategory === "all" || post.category === filterCategory;
         return matchTab && matchCategory;
     });
 
-    // Handle Actions
+    // 2. Pagination Logic (MỚI)
+    const itemsPerPage = 3; // Số lượng bài viết trên mỗi trang (Đặt là 3 để test với ít dữ liệu)
+    const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
+    const indexOfLastPost = page * itemsPerPage;
+    const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+    const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+    // 3. Handle Actions
     const handleApprove = (id) => {
         setPosts(posts.map(p => p.id === id ? { ...p, status: "approved" } : p));
         if (selectedPost?.id === id) setSelectedPost(null);
-        // Show notification/toast here
     };
 
     const handleReject = (id) => {
@@ -86,13 +123,18 @@ function DuLieuBaiDang() {
         }
     };
 
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setpage(newPage);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex text-gray-800">
-            
+
             {/* --- MAIN CONTENT --- */}
-            {/* CẬP NHẬT 1: Thêm 'no-scrollbar' vào thẻ MAIN */}
             <main className="flex-1 p-8 overflow-y-auto h-screen no-scrollbar">
-                
+
                 {/* Header */}
                 <header className="flex justify-between items-center mb-8">
                     <div>
@@ -136,21 +178,21 @@ function DuLieuBaiDang() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px]">
-                    
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px] flex flex-col">
+
                     {/* Toolbar */}
                     <div className="border-b border-gray-200 px-6 py-4 flex flex-col sm:flex-row gap-4 justify-between bg-gray-50/50">
                         {/* Tabs */}
                         <div className="flex bg-gray-200 p-1 rounded-lg self-start">
-                            <button 
+                            <button
                                 onClick={() => setActiveTab("pending")}
                                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'pending' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
                             >Chờ duyệt</button>
-                            <button 
+                            <button
                                 onClick={() => setActiveTab("approved")}
                                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'approved' ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
                             >Đã đăng</button>
-                            <button 
+                            <button
                                 onClick={() => setActiveTab("rejected")}
                                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'rejected' ? 'bg-white text-red-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
                             >Từ chối</button>
@@ -158,7 +200,7 @@ function DuLieuBaiDang() {
 
                         {/* Filter Categories */}
                         <div className="flex gap-2">
-                             <select 
+                            <select
                                 value={filterCategory}
                                 onChange={(e) => setFilterCategory(e.target.value)}
                                 className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-emerald-500 text-gray-700"
@@ -169,15 +211,14 @@ function DuLieuBaiDang() {
                                 <option value="Tráng miệng">Tráng miệng</option>
                             </select>
                             <div className="relative">
-                                <input type="text" placeholder="Tìm tên bài viết..." className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-emerald-500 w-64"/>
+                                <input type="text" placeholder="Tìm tên bài viết..." className="pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-emerald-500 w-64" />
                                 <i className="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
                             </div>
                         </div>
                     </div>
 
-                    {/* Content List (Grid/Table Hybrid) */}
-                    {/* CẬP NHẬT 2: Thêm 'no-scrollbar' và 'overflow-x-auto' vào thẻ div bao quanh table */}
-                    <div className="overflow-x-auto no-scrollbar">
+                    {/* Content List */}
+                    <div className="overflow-x-auto no-scrollbar flex-1">
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-gray-50 text-gray-500 text-xs uppercase font-bold tracking-wider border-b border-gray-100">
                                 <tr>
@@ -189,7 +230,8 @@ function DuLieuBaiDang() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {filteredPosts.map((post) => (
+                                {/* SỬA: Thay filteredPosts.map bằng currentPosts.map */}
+                                {currentPosts.map((post) => (
                                     <tr key={post.id} className="hover:bg-emerald-50/20 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex gap-4 items-start">
@@ -217,19 +259,19 @@ function DuLieuBaiDang() {
                                         <td className="px-6 py-4 text-center">
                                             {activeTab === 'pending' ? (
                                                 <div className="flex justify-center gap-2">
-                                                    <button 
+                                                    <button
                                                         onClick={() => setSelectedPost(post)}
                                                         className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition-colors" title="Xem chi tiết"
                                                     >
                                                         <i className="fa-solid fa-eye text-sm"></i>
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         onClick={() => handleApprove(post.id)}
                                                         className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-colors" title="Duyệt nhanh"
                                                     >
                                                         <i className="fa-solid fa-check text-sm"></i>
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         onClick={() => handleReject(post.id)}
                                                         className="w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-colors" title="Từ chối"
                                                     >
@@ -252,6 +294,50 @@ function DuLieuBaiDang() {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* --- FOOTER: PHÂN TRANG (Pagination) --- */}
+                    {filteredPosts.length > 0 && (
+                        <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between bg-gray-50">
+                            <p className="text-xs text-gray-500">
+                                Hiển thị <span className="font-bold">{indexOfFirstPost + 1}</span> đến <span className="font-bold">{Math.min(indexOfLastPost, filteredPosts.length)}</span> của <span className="font-bold">{filteredPosts.length}</span> kết quả
+                            </p>
+                            
+                            <div className="flex items-center gap-1">
+                                {/* Nút Previous */}
+                                <button 
+                                    onClick={() => handlePageChange(page - 1)}
+                                    disabled={page === 1}
+                                    className={`w-8 h-8 rounded-md flex items-center justify-center text-sm ${page === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200'}`}
+                                >
+                                    <i className="fa-solid fa-chevron-left"></i>
+                                </button>
+
+                                {/* Các số trang */}
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => handlePageChange(pageNum)}
+                                        className={`w-8 h-8 rounded-md text-sm font-medium transition-all ${
+                                            page === pageNum 
+                                            ? 'bg-emerald-600 text-white shadow-md' 
+                                            : 'text-gray-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200'
+                                        }`}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                ))}
+
+                                {/* Nút Next */}
+                                <button 
+                                    onClick={() => handlePageChange(page + 1)}
+                                    disabled={page === totalPages}
+                                    className={`w-8 h-8 rounded-md flex items-center justify-center text-sm ${page === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200'}`}
+                                >
+                                    <i className="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
 
@@ -259,7 +345,7 @@ function DuLieuBaiDang() {
             {selectedPost && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setSelectedPost(null)}></div>
-                    
+
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] z-10 overflow-hidden flex flex-col animate-fade-in-up">
                         {/* Modal Header */}
                         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
@@ -273,12 +359,11 @@ function DuLieuBaiDang() {
                         </div>
 
                         {/* Modal Body (Scrollable) */}
-                        {/* CẬP NHẬT 3: Thêm 'no-scrollbar' vào phần nội dung Modal */}
                         <div className="overflow-y-auto flex-1 p-0 flex flex-col md:flex-row no-scrollbar">
                             {/* Left: Image & Meta */}
                             <div className="w-full md:w-1/3 bg-gray-50 p-6 border-r border-gray-100">
                                 <img src={selectedPost.image} className="w-full aspect-square object-cover rounded-xl shadow-sm mb-4" alt="" />
-                                
+
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-200">
                                         <img src={selectedPost.authorAvatar} className="w-10 h-10 rounded-full" alt="" />
@@ -287,7 +372,7 @@ function DuLieuBaiDang() {
                                             <p className="font-bold text-sm text-gray-800">{selectedPost.author}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div>
                                         <p className="text-xs font-bold text-gray-500 uppercase mb-1">Mô tả ngắn</p>
                                         <p className="text-sm text-gray-600 italic">"{selectedPost.description}"</p>
@@ -303,7 +388,7 @@ function DuLieuBaiDang() {
                             {/* Right: Content */}
                             <div className="w-full md:w-2/3 p-6">
                                 <h1 className="text-2xl font-bold text-gray-900 mb-6">{selectedPost.title}</h1>
-                                
+
                                 {/* Ingredients */}
                                 <div className="mb-6">
                                     <h3 className="font-bold text-gray-800 text-lg mb-3 flex items-center gap-2">
@@ -335,7 +420,7 @@ function DuLieuBaiDang() {
                                                 <p className="text-sm text-gray-700 leading-relaxed">{step}</p>
                                             </div>
                                         ))}
-                                         {(!selectedPost.steps || selectedPost.steps.length === 0) && <p className="text-gray-400 text-sm italic">Không có dữ liệu</p>}
+                                        {(!selectedPost.steps || selectedPost.steps.length === 0) && <p className="text-gray-400 text-sm italic">Không có dữ liệu</p>}
                                     </div>
                                 </div>
                             </div>
@@ -344,13 +429,13 @@ function DuLieuBaiDang() {
                         {/* Modal Footer (Actions) */}
                         {selectedPost.status === 'pending' && (
                             <div className="p-4 border-t border-gray-100 bg-white flex justify-end gap-3 shrink-0">
-                                <button 
+                                <button
                                     onClick={() => handleReject(selectedPost.id)}
                                     className="px-6 py-2 rounded-lg bg-gray-100 text-gray-700 font-bold hover:bg-red-50 hover:text-red-600 transition-colors border border-gray-200"
                                 >
                                     Từ chối
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => handleApprove(selectedPost.id)}
                                     className="px-6 py-2 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-700 shadow-md transition-colors flex items-center gap-2"
                                 >

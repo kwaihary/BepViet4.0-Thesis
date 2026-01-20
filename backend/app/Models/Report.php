@@ -14,7 +14,7 @@ class Report extends Model
         'reason', 
         'status'
     ];
-
+    public $timestamps = false;
     // Ai report
     public function user(){
         return $this->belongsTo(User::class);
