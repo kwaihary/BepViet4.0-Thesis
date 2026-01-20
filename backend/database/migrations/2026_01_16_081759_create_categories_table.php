@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('slug')->index();
             // Enum: Chỉ cho phép chọn 1 trong 3 loại này
             $table->enum('type', ['khu vực', 'loaị món ăn ', 'Chế độ ăn']);
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }

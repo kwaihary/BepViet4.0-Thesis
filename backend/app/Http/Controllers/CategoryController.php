@@ -39,4 +39,11 @@ class CategoryController extends Controller
             ]);
         }
     }
+    public function laydl_danhmuc(){
+        $categories = Category::select('id', 'name', 'slug', 'type' ,'status')->paginate(10);
+        return response()->json([
+            'status'=>true,
+            'data'=>$categories
+        ]);
+    }
 }
