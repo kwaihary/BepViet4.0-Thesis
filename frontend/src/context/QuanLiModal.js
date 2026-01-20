@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 import ChinhSua from "../component/website/ChinhSuaThongTinNguoiDung";
 import ChiTietXuLiViPham from "../component/admin/ChiTietXuLiViPham";
 import ThemDanhMuc from "../component/admin/ThemDanhMuc";
+import ChiTietBaiDang from "../component/admin/ChiTietBaiDang";
 
 const MoDalContext = createContext();
 
@@ -9,6 +10,7 @@ const MODAL_REGISTRY = {
     'ChuaSuaThongTin' : ChinhSua,
     'XuLiViPham' : ChiTietXuLiViPham,
     'ThemDanhMuc' : ThemDanhMuc,
+    'ChiTietBaiDang' : ChiTietBaiDang
 };
 
 export function AppProvider({ children }) {

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Report;
 use App\Models\Recipe;
 use Symfony\Component\HttpFoundation\Response;
+use Carbon\Carbon;
 
 class PostController extends Controller
 {   
@@ -120,5 +121,43 @@ class PostController extends Controller
                     'message' => 'mở khóa tài bài viết thất bại!'
             ]);
         }
+    }
+    public function laydl_thongke_bd(){
+         $XuLi_HomNay = Recipe::where('status', 'Đã duyệt') ->whereDate('updated_at', Carbon::today())->count();
+         $Cho_Duyet = Recipe::where('status', 'Đang chờ')->count();
+         $da_xoa=Recipe::where('status','Đã xóa') -> count();
+         return response()->json([
+            'status'=>true,
+            'data' => [
+                'xuli_homnay'=>$XuLi_HomNay,
+                'Cho_duyet' =>$Cho_Duyet,
+                'da_xoa'=>$da_xoa
+            ]
+         ]);
+    }
+    public function dl_bv(){
+        $recipes = Recipe::select([
+            'id', 
+            'title', 
+            'slug', 
+            'description', 
+            'image_url', 
+            'status', 
+            'created_at', 
+            'user_id' 
+        ])
+        ->with([
+            'author:id,name',     
+            'categories:id,name' 
+        ])
+        ->orderBy('created_at', 'desc') 
+        ->paginate(10);
+        return response()->json([
+            'status' =>true,
+            'data' => $recipes
+        ]);
+        
+
+
     }
 }
