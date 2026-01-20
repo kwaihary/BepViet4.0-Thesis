@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash; // Quan trọng: Phải có dòng này
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cookie;
 
 class UserController extends Controller
 {
@@ -44,46 +45,30 @@ class UserController extends Controller
         ], 201);
     }
 
-  public function Login(Request $request) {
-    $request->validate([
-        'phone' => 'required',
-        'password' => 'required',
-    ],[
-        'phone.required' => 'Số điện thoại này đã được đăng ký.',
-        'password.required' => 'Mật khẩu phải có ít nhất 6 ký tự.'
-    ]);
+public function login(Request $request) {
+    // Lấy dữ liệu từ request
+    $phone = $request->phone;
+    $password = $request->password;
 
-    $user = User::where('phone', $request->phone)->first();
+    // Sử dụng hàm Auth::attempt của Laravel để kiểm tra
+    if (Auth::attempt(['phone' => $phone, 'password' => $password])) {
+        $user = Auth::user();
+        $token = $user->createToken('UserToken')->plainTextToken;
 
-    // 1. Kiểm tra tài khoản tồn tại và mật khẩu
-    if (!$user || !Hash::check($request->password, $user->password)) {
         return response()->json([
-            'status' => false,
-            'message' => 'Số điện thoại hoặc mật khẩu không đúng'
-        ], 401);
+            'status' => true,
+            'message' => 'Đăng nhập thành công'
+        ])->withCookie(cookie('token', $token, 60, null, null, false, true));
     }
 
-    // 2. Logic phân quyền: Nếu rule = 1 (Admin) thì không cho vào trang này
-  if ($user->rule == 1) {
     return response()->json([
         'status' => false,
-        'message' => 'Số điện thoại hoặc mật khẩu không đúng'
-    ], 403);
+        'message' => 'Tài khoản hoặc mật khẩu không đúng'
+    ], 401);
 }
 
-    // 3. Cho phép User (rule = 0) đăng nhập
-    return response()->json([
-        'status' => true,
-        'message' => 'Đăng nhập thành công',
-        'data' => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'phone' => $user->phone,
-            'rule' => $user->rule
-        ],
-        'token' => 'token_cua_ban_o_day'
-    ]);
-}
+
+
     public function layDL() {
         $users = User::orderBy('id', 'asc')->paginate(10);
         return response()->json(['status' => true, 'data' => $users]);
@@ -100,5 +85,4 @@ class UserController extends Controller
             ]
         ]);
     }
-    
 }

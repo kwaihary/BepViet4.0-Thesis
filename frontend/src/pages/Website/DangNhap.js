@@ -22,32 +22,36 @@ function DangNhap() {
         password: '',
         confirm_password: ''
     });
+const handleLogin = async () => {
+    setError("");
+    const check = fun.KiemTraRong(login);
+    if (!check.Status) {
+        setError("Vui lòng nhập đầy đủ thông tin!");
+        return;
+    }
 
-    // --- HÀM ĐĂNG NHẬP ---
-    const handleLogin = async () => {
-        setError(""); 
+    try {
+        const formdata = fun.objectToFormData(login);
+        const response = await fetch('http://127.0.0.1:8000/api/user/login', {
+            method: 'POST',
+            body: formdata,
+            credentials: 'include', // Cookie sẽ được trình duyệt tự quản lý
+        });
 
-        const check = fun.KiemTraRong(login);
-        if (!check.Status) {
-            setError("Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
-            return;
+        const ketqua = await response.json();
+        
+        if (ketqua.status === true) {
+            // ĐÃ BỎ: localStorage.setItem('user', ...)
+            // Sau khi đăng nhập thành công, điều hướng thẳng về trang chủ
+            navigate('/');
+            // Tại trang chủ, bạn sẽ gọi 1 API khác để lấy profile user từ Cookie
+        } else {
+            setError(ketqua.message);
         }
-
-        try {
-            const formdata = fun.objectToFormData(login);
-            const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/login' });
-            
-            if (ketqua.status === true) {
-                localStorage.setItem('token', ketqua.token);
-                localStorage.setItem('user', JSON.stringify(ketqua.data));
-                navigate('/');
-            } else {
-                setError(ketqua.message); 
-            }
-        } catch (error) {
-            setError("Không thể kết nối đến server");
-        }
-    };
+    } catch (error) {
+        setError("Không thể kết nối đến server");
+    }
+};
 
     // --- HÀM ĐĂNG KÝ ---
     const handleRegister = async (e) => {
