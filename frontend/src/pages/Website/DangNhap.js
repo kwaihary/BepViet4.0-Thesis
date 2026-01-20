@@ -54,7 +54,7 @@ function DangNhap() {
         e.preventDefault();
         setError(""); // Xóa lỗi cũ
         
-    const duLieuDangKy = {
+const duLieuDangKy = {
         name: register.name,
         phone: register.phone,
         password: register.password,
