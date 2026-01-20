@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+
 
 class CategoryController extends Controller
 {
@@ -10,7 +13,7 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:categories,slug',
-            'type' => 'required|in:khu vực,loại món ăn,chế độ ăn',
+            'type' => 'required|in:khu vực,loaị món ăn,Chế độ ăn',
         ], [
             'name.required' => 'Tên danh mục là bắt buộc.',
             'name.string'   => 'Tên danh mục phải là chuỗi ký tự.',
@@ -71,5 +74,43 @@ class CategoryController extends Controller
                 'message' => 'Cập nhật trạng thái danh mục thất bại!'
             ]);
         }
+    }
+    public function CapNhatDM(Request $request){
+         $validated = $request->validate([
+             'id'  => 'required|integer|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'slug')->ignore($request->id),
+            ],
+            'type' => 'required|in:khu vực,loaị món ăn,Chế độ ăn',
+        ], [
+            'id.required'   => 'ID là bắt buộc.',
+            'id.integer'    => 'ID phải là số nguyên.',
+            'id.exists'     => 'ID không tồn tại trong hệ thống.',
+            'name.required' => 'Tên danh mục là bắt buộc.',
+            'name.string'   => 'Tên danh mục phải là chuỗi ký tự.',
+            'name.max'      => 'Tên danh mục không được vượt quá 255 ký tự.',
+            'slug.required' => 'Slug là bắt buộc.',
+            'slug.string'   => 'Slug phải là chuỗi ký tự.',
+            'slug.max'      => 'Slug không được vượt quá 255 ký tự.',
+            'slug.unique'   => 'Slug đã tồn tại trong hệ thống.',
+            'type.required' => 'Loại danh mục là bắt buộc.',
+            'type.in'       => 'Loại danh mục chỉ được phép là: khu vực, loại món ăn hoặc chế độ ăn.',
+        ]);
+         $kq=Category::where('id', $validated['id'])->update(['name'=>$validated['name'], 'slug'=>$validated['slug'], 'type'=>$validated['type']]);
+         if($kq){
+             return response()->json([
+                'status'=>true,
+                'message' => 'Cập nhật danh mục thành công!'
+            ]);
+         }else{
+             return response()->json([
+                'status'=>false,
+                'message' => 'Cập nhật danh mục thành công!'
+            ]);
+         }
     }
 }
