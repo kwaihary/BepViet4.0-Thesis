@@ -63,5 +63,3 @@ export function CallAPI(dulieu = null, yeucau) {
             };
         });
 }
-
-
