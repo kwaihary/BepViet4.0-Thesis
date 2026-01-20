@@ -13,7 +13,10 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:categories,slug',
-            'type' => 'required|in:khu vực,loaị món ăn,Chế độ ăn',
+            'type' => [
+                'required',
+                 Rule::in(['Vùng miền', 'Loại món ăn', 'Chế độ ăn']), 
+            ],
         ], [
             'name.required' => 'Tên danh mục là bắt buộc.',
             'name.string'   => 'Tên danh mục phải là chuỗi ký tự.',
@@ -85,7 +88,10 @@ class CategoryController extends Controller
                 'max:255',
                 Rule::unique('categories', 'slug')->ignore($request->id),
             ],
-            'type' => 'required|in:khu vực,loaị món ăn,Chế độ ăn',
+            'type' => [
+                'required',
+                 Rule::in(['Vùng miền', 'Loại món ăn', 'Chế độ ăn']), 
+            ],
         ], [
             'id.required'   => 'ID là bắt buộc.',
             'id.integer'    => 'ID phải là số nguyên.',
