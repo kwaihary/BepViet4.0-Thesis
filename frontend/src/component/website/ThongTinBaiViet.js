@@ -1,65 +1,39 @@
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // 1. Phải import
+import axios from "axios";
 import BaiViet from './BaiViet';
 
-
 function ThongTinBaiViet() {
-    const navigate = useNavigate();
-    // thông tin trả về từ sever sẽ như vậy nhé
-    const posts = [
-        {
-            id: 1,
-            author: "Đầu Bếp Hùng",
-            authorAvatar: "https://i.pravatar.cc/150?img=12",
-            time: "2 giờ trước",
-            title: "Phở Bò Tái Lăn Hà Nội",
-            content: "Bí quyết để thịt bò mềm ngọt mà không bị dai chính là cách tẩm ướp và xào lửa lớn...",
-            image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0",
-            likes: "1.2k",
-            commentCount: 45,
-            comments: [
-                {
-                    id: 101,
-                    user: "Nguyễn Văn A",
-                    avatar: "https://i.pravatar.cc/150?img=11",
-                    content: "Nhìn ngon quá anh ơi, cho em xin công thức ướp thịt với ạ!",
-                    time: "10 phút trước",
-                    replies: [
-                        {
-                            id: 102,
-                            user: "Đầu Bếp Hùng",
-                            avatar: "https://i.pravatar.cc/150?img=12",
-                            content: "Ok em, anh ướp gừng, tỏi, nước mắm và chút dầu hào nhé.",
-                            time: "5 phút trước",
-                            replies: [] 
-                        }
-                    ]
-                },
-                {
-                    id: 103,
-                    user: "Tran Thi C",
-                    avatar: "https://i.pravatar.cc/150?img=5",
-                    content: "Món này ăn sáng thì tuyệt vời.",
-                    time: "1 giờ trước",
-                    replies: []
+    const navigate = useNavigate(); // 2. Phải khai báo biến navigate ở đây
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Hàm lấy dữ liệu từ DB (thông qua API)
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const response = await axios.get("http://127.0.0.1:8000/api/get-all-posts");
+                
+                // Log ra để xem cấu trúc thực tế là gì
+                console.log("Response từ Laravel:", response.data);
+
+                // Nếu bạn trả về return response()->json(['status'=>true, 'data'=>$recipes])
+                // Thì dữ liệu nằm ở response.data.data
+                if (response.data && response.data.data) {
+                    setPosts(response.data.data);
+                } else {
+                    // Trường hợp trả về thẳng mảng
+                    setPosts(response.data);
                 }
-            ]
-        },
-        {
-            id: 2,
-            author: "Lan Healthy",
-            authorAvatar: "https://i.pravatar.cc/150?img=5",
-            time: "5 giờ trước",
-            title: "Salad Ức Gà Sốt Chanh Leo",
-            content: "Bữa tối nhẹ nhàng 300kcal cho ai đang diet nhé!",
-            image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-            likes: "890",
-            commentCount: 32,
-            comments: []
-        }
-    ];
-
-    
-
+                
+                setLoading(false);
+            } catch (error) {
+                console.error("Lỗi kết nối:", error);
+                setLoading(false);
+            }
+        };
+        fetchPosts();
+    }, []);
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
@@ -71,7 +45,7 @@ function ThongTinBaiViet() {
                     <div className="flex gap-3 mb-3">
                         <img src="https://i.pravatar.cc/150?img=32" className="w-10 h-10 rounded-full" alt="Avatar" />
                         <button 
-                            onClick={() => navigate('/dang-bai')}
+                            onClick={() => navigate('/dang-bai')} // Lỗi Line 51 đã được sửa
                             className="flex-1 bg-gray-100 rounded-full px-4 text-left text-gray-500 hover:bg-gray-200 transition"
                         >
                             Bạn vừa nấu món gì ngon thế?
@@ -86,7 +60,12 @@ function ThongTinBaiViet() {
                         </button>
                     </div>
                 </div>
-                <BaiViet data={posts}/>
+
+                {loading ? (
+                    <div className="text-center py-10">Đang tải bài viết...</div>
+                ) : (
+                    <BaiViet data={posts}/>
+                )}
             </div>
 
             {/* --- CỘT PHẢI: GỢI Ý --- */}
@@ -101,7 +80,10 @@ function ThongTinBaiViet() {
                                 <span className="text-xs text-gray-500">450 Kcal</span>
                             </div>
                         </div>
-                        <button onClick={() => navigate('/AI')} className="w-full py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-bold text-sm shadow-md hover:opacity-90">
+                        <button 
+                            onClick={() => navigate('/AI')} // Lỗi Line 83 đã được sửa
+                            className="w-full py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-bold text-sm shadow-md hover:opacity-90"
+                        >
                             <i className="fa-solid fa-robot"></i> Hỏi AI xem ăn gì?
                         </button>
                     </div>
@@ -109,6 +91,6 @@ function ThongTinBaiViet() {
             </aside>
         </div>
     );
-};
+}
 
 export default ThongTinBaiViet;
