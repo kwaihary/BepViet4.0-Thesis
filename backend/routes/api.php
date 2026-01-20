@@ -9,3 +9,4 @@ Route::get('/admin/layDLUS', [UserController::class, 'layDL']);
 Route::get('/admin/ThongKeNguoiDung',[UserController::class,'ThongKe']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
+Route::post('admin/DangNhap',[UserController::class,'login']);

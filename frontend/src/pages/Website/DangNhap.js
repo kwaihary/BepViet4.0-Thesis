@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as API from '../../JS/API/API';
 import * as fun from '../../JS/FUNCTION/function';
+import { useNavigate } from 'react-router-dom';
+
 
 function DangNhap() {
     // Tạo state để theo dõi tab đang mở ('login' hoặc 'register')
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('login');
     const [login,setlogin] =useState ({
             phone: '',
@@ -18,11 +21,20 @@ function DangNhap() {
         }
         const formdata=fun.objectToFormData(login);
         try {
-            const ketqua= await API.CallAPI(formdata,{PhuongThuc:1,url:'api/admin/dangnhap'});
+            const ketqua= await API.CallAPI(formdata,{PhuongThuc:1,url:'admin/dangnhap'});
             alert(JSON.stringify(ketqua))
         } catch (error) {
             
         }
+        if (kiemtra.status === true) {
+    localStorage.setItem('token', kiemtra.token);
+    localStorage.setItem('user', JSON.stringify(kiemtra.data));
+    navigate('/'); 
+} else {
+    alert(kiemtra.message || 'Đăng nhập thất bại');
+}
+
+
 
     }
 
@@ -90,7 +102,7 @@ function DangNhap() {
                                         <input type="text" onChange={(e) =>
                                             setlogin(prev => ({
                                             ...prev,
-                                            sdt: e.target.value 
+                                            phone: e.target.value 
                                          }))
 } placeholder="09......" className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 focus:border-red-500 outline-none transition" />
                                     </div>

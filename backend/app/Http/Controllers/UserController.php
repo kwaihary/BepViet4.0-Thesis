@@ -73,6 +73,24 @@ class UserController extends Controller
             'password.required'=>'Vui lòng nhập mật khẩu',
             'password.min' => 'Mật khẩu phải ít nhất 6 ký tự'
         ]);
+         $user = User::where('phone', $request->phone)->first();
+         if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => 'false',
+                'message' => 'Sai số điện thoại hoặc mật khẩu'
+            ], 401);
+        }
+
+        return response()->json([
+            'status'=> 'true',
+            'message' => 'Đăng nhập thành công',
+            'user' => $user,
+            'data'=>[
+                'id'=>$user->id,
+                'name'=>$user->name,
+                'phone'=>$user->phone
+            ]
+        ], 200);
     }
 
     public function AccountManagement(Request $request){
