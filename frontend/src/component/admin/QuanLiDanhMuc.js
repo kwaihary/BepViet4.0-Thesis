@@ -11,7 +11,14 @@ function DanhMuc() {
     const [tuKhoa, setTuKhoa] = useState(""); 
     const [phanLoai, setPhanLoai] = useState(""); 
 
-   
+    const thongKe = {
+        tongSo: DanhMuc.length,
+        vungMien: DanhMuc.filter(x => x.type === 'Vùng miền').length,
+        loaiMon: DanhMuc.filter(x => x.type === 'Loại món ăn').length,
+        cheDo: DanhMuc.filter(x => x.type === 'Chế độ ăn').length
+    };
+
+
     useEffect(() => {
         const laydl = async () => {
             setloading(true);
@@ -30,6 +37,7 @@ function DanhMuc() {
         };
         laydl();
     }, [page]); 
+
     const danhSachHienThi = DanhMuc.filter(dm => {
         const matchName = dm.name ? dm.name.toLowerCase().includes(tuKhoa.toLowerCase()) : false;
         const matchSlug = dm.slug ? dm.slug.toLowerCase().includes(tuKhoa.toLowerCase()) : false;
@@ -42,6 +50,7 @@ function DanhMuc() {
     return (
         <>
             <div className="p-6 max-w-7xl mx-auto">
+             
                 <div className="flex flex-col md:flex-row justify-between items-center mb-6">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Danh mục Ẩm thực</h1>
@@ -52,6 +61,52 @@ function DanhMuc() {
                     </button>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                   
+                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-medium text-gray-500 uppercase">Hiển thị</p>
+                            <h3 className="text-2xl font-bold text-gray-800 mt-1">{thongKe.tongSo}</h3>
+                        </div>
+                        <div className="p-3 bg-indigo-50 rounded-full text-indigo-600">
+                            <i className="fa-solid fa-list-ul text-xl"></i>
+                        </div>
+                    </div>
+
+               
+                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-medium text-gray-500 uppercase">Vùng miền</p>
+                            <h3 className="text-2xl font-bold text-green-600 mt-1">{thongKe.vungMien}</h3>
+                        </div>
+                        <div className="p-3 bg-green-50 rounded-full text-green-600">
+                            <i className="fa-solid fa-map-location-dot text-xl"></i>
+                        </div>
+                    </div>
+
+                 
+                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-medium text-gray-500 uppercase">Loại món</p>
+                            <h3 className="text-2xl font-bold text-orange-600 mt-1">{thongKe.loaiMon}</h3>
+                        </div>
+                        <div className="p-3 bg-orange-50 rounded-full text-orange-600">
+                            <i className="fa-solid fa-utensils text-xl"></i>
+                        </div>
+                    </div>
+
+                 
+                     <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-medium text-gray-500 uppercase">Chế độ ăn</p>
+                            <h3 className="text-2xl font-bold text-blue-600 mt-1">{thongKe.cheDo}</h3>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-full text-blue-600">
+                            <i className="fa-solid fa-heart-pulse text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+              
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div className="p-4 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between bg-gray-50/50">
                         <div className="relative w-full md:w-96">
@@ -107,7 +162,11 @@ function DanhMuc() {
                                                 <td className="px-6 py-4 font-semibold text-gray-900">{dm.name}</td>
                                                 <td className="px-6 py-4 text-gray-500 font-mono text-xs">{dm.slug}</td>
                                                 <td className="px-6 py-4">
-                                                    <span className="px-2.5 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                    <span className={`px-2.5 py-1 rounded text-xs font-medium border
+                                                        ${dm.type === 'Vùng miền' ? 'bg-green-100 text-green-800 border-green-200' : ''}
+                                                        ${dm.type === 'Loại món ăn' ? 'bg-orange-100 text-orange-800 border-orange-200' : ''}
+                                                        ${dm.type === 'Chế độ ăn' ? 'bg-blue-100 text-blue-800 border-blue-200' : ''}
+                                                    `}>
                                                         {dm.type}
                                                     </span>
                                                 </td>
