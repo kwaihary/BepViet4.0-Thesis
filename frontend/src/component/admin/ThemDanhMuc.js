@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import * as fun from '../../JS/FUNCTION/function';
 import * as API from '../../JS/API/API';
 
-const ThemDanhMuc = () => {
+const ThemDanhMuc = ({DuLieu , url}) => {
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
     const [type, setType] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setloading] = useState(false);
     const [ThanhCong,setthanhCong] = useState('');
-    const [ThatBai,setThatBai] = useState('')
+    const [ThatBai,setThatBai] = useState('');
+    useEffect(()=>{
+       if(DuLieu){
+            setName(DuLieu.DuLieu.name);
+            setSlug(DuLieu.DuLieu.slug);
+            setType(DuLieu.DuLieu.type);
+       }
+    },[DuLieu])
 
     const generateSlug = (text) => {
         return text.toString().toLowerCase()
@@ -40,8 +47,8 @@ const ThemDanhMuc = () => {
         setErrors({}); 
         
         try {
-            const formdata = fun.objectToFormData({ name: name, slug: slug, type: type });
-            const data = await API.CallAPI(formdata, { PhuongThuc: 1,url: 'admin/ThemDanhMuc',});
+            const formdata = fun.objectToFormData({id:DuLieu.DuLieu.id || null, name: name, slug: slug, type: type });
+            const data = await API.CallAPI(formdata, { PhuongThuc: 1,url: url});
             if (data.validate === true && data.errors) {
                 const serverErrors = {};
                 Object.keys(data.errors).forEach((key) => {
@@ -81,7 +88,7 @@ const ThemDanhMuc = () => {
     return (
         <>
             <div className="">
-                <div className="px-4 py-5 sm:p-6 space-y-4">\
+                <div className="px-4 py-5 sm:p-6 space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
                             Tên Danh mục <span className="text-red-500">*</span>
@@ -121,8 +128,8 @@ const ThemDanhMuc = () => {
                         > 
                             <option value="">--Chọn loại--</option>
                             <option value="khu vực">Khu vực (Vùng miền)</option>
-                            <option value="loại món ăn">Loại món ăn</option>
-                            <option value="chế độ ăn">Chế độ ăn (Diet)</option>
+                            <option value="loaị món ăn">Loại món ăn</option>
+                            <option value="Chế độ ăn">Chế độ ăn (Diet)</option>
                         </select>
                         {errors.type && <p className="text-red-500 text-xs mt-1 italic">{errors.type}</p>}
                     </div>

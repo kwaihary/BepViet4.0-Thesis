@@ -70,7 +70,7 @@ function DanhMuc() {
                         <h1 className="text-2xl font-bold text-gray-900">Danh mục Ẩm thực</h1>
                         <p className="text-sm text-gray-500 mt-1">Quản lý phân loại: Khu vực, Loại món ăn, Chế độ ăn</p>
                     </div>
-                    <button onClick={() => { OpenMoDal(undefined, { TenTrang: 'ThemDanhMuc' }) }} className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow transition flex items-center gap-2">
+                    <button onClick={() => { OpenMoDal(undefined, { TenTrang: 'ThemDanhMuc' , url :'admin/ThemDanhMuc' }) }} className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow transition flex items-center gap-2">
                         <i className="fas fa-plus"></i> Thêm Danh mục
                     </button>
                 </div>
@@ -155,7 +155,7 @@ function DanhMuc() {
                                                  </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex justify-end gap-3">
-                                                   <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors">
+                                                   <button onClick={()=>{OpenMoDal({DuLieu:dm }, {url :'admin/CapNhatDM', TenTrang:'ThemDanhMuc'})}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors">
                                                         <i className="fa-solid fa-pen-to-square"></i>
                                                         <span>Sửa</span>
                                                     </button>
