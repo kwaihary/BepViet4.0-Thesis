@@ -30,9 +30,11 @@ class UserController extends Controller
 
         $user = User::create([
             'name'     => $request->name,
+            'display_name'=> $request->name,
             'phone'    => $request->phone,
             'password' => Hash::make($request->password),
             'status'   => 2, 
+            'rule'=>0
         ]);
 
         return response()->json([
@@ -46,6 +48,9 @@ class UserController extends Controller
     $request->validate([
         'phone' => 'required',
         'password' => 'required',
+    ],[
+        'phone.required' => 'Số điện thoại này đã được đăng ký.',
+        'password.required' => 'Mật khẩu phải có ít nhất 6 ký tự.'
     ]);
 
     $user = User::where('phone', $request->phone)->first();
@@ -95,4 +100,5 @@ class UserController extends Controller
             ]
         ]);
     }
+    
 }

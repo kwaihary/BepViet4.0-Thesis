@@ -7,6 +7,7 @@ function DangNhap() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('login');
     const [error, setError] = useState("");
+    
     // State cho đăng nhập
     const [login, setLogin] = useState({
         phone: '',
@@ -16,39 +17,58 @@ function DangNhap() {
     // State cho đăng ký
     const [register, setRegister] = useState({
         name: '',
+        display_name:'',
         phone: '',
         password: '',
+        confirm_password: ''
     });
 
- const handleLogin = async () => {
-    setError(""); // Xóa lỗi cũ trước khi bấm
-    
-    // ... code kiểm tra rỗng ...
+    // --- HÀM ĐĂNG NHẬP ---
+    const handleLogin = async () => {
+        setError(""); 
 
-    try {
-        const formdata = fun.objectToFormData(login);
-        const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/login' });
-        
-        if (ketqua.status === true) {
-            localStorage.setItem('token', ketqua.token);
-            localStorage.setItem('user', JSON.stringify(ketqua.data));
-            navigate('/');
-        } else {
-            // SỬA TẠI ĐÂY: Chỉ lấy ketqua.message
-            // Nếu bạn ghi setError(ketqua) nó sẽ hiện cả cụm {"status":false...}
-            setError(ketqua.message); 
+        const check = fun.KiemTraRong(login);
+        if (!check.Status) {
+            setError("Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
+            return;
         }
-    } catch (error) {
-        setError("Không thể kết nối đến server");
-    }
-};
+
+        try {
+            const formdata = fun.objectToFormData(login);
+            const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/login' });
+            
+            if (ketqua.status === true) {
+                localStorage.setItem('token', ketqua.token);
+                localStorage.setItem('user', JSON.stringify(ketqua.data));
+                navigate('/');
+            } else {
+                setError(ketqua.message); 
+            }
+        } catch (error) {
+            setError("Không thể kết nối đến server");
+        }
+    };
 
     // --- HÀM ĐĂNG KÝ ---
     const handleRegister = async (e) => {
         e.preventDefault();
-        const kiemtra = fun.KiemTraRong(register);
-        if (!kiemtra.Status) {
-            alert('Vui lòng điền đầy đủ thông tin đăng ký');
+        setError(""); // Xóa lỗi cũ
+        
+    const duLieuDangKy = {
+        name: register.name,
+        phone: register.phone,
+        password: register.password,
+        confirm_password: register.confirm_password
+    };
+
+    const check = fun.KiemTraRong(duLieuDangKy);
+    if (!check.Status) {
+        setError("Vui lòng điền đầy đủ các thông tin đăng ký!");
+        return;
+    }
+        // 2. Kiểm tra khớp mật khẩu (QUAN TRỌNG)
+        if (register.password !== register.confirm_password) {
+            setError("Mật khẩu xác nhận không trùng khớp!");
             return;
         }
 
@@ -56,13 +76,13 @@ function DangNhap() {
         try {
             const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/register' });
             if (ketqua.status === true) {
-                alert('Đăng ký thành công! Hãy đăng nhập.');
+                alert("Đăng ký thành công!");
                 setActiveTab('login');
             } else {
-                alert(ketqua.message);
+                setError(ketqua.message);
             }
         } catch (error) {
-            alert('Lỗi khi đăng ký');
+            setError("Lỗi hệ thống khi đăng ký");
         }
     };
 
@@ -87,22 +107,22 @@ function DangNhap() {
                     <div className="max-w-md mx-auto">
                         {/* TAB BUTTONS */}
                         <div className="flex border-b border-gray-200 mb-8">
-                            <button onClick={() => setActiveTab('login')} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'login' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Nhập</button>
-                            <button onClick={() => setActiveTab('register')} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'register' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Ký</button>
+                            <button onClick={() => {setActiveTab('login'); setError("");}} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'login' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Nhập</button>
+                            <button onClick={() => {setActiveTab('register'); setError("");}} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'register' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Ký</button>
                         </div>
 
-                        {/* HIỂN THỊ FORM THEO TAB */}
+                        {/* BOX HIỂN THỊ LỖI DÙNG CHUNG CHO CẢ 2 TAB */}
+                        {error && (
+                            <div className="bg-red-50 border-l-4 border-red-500 p-3 mb-4 transition-all">
+                                <div className="flex items-center">
+                                    <i className="fa-solid fa-circle-exclamation text-red-500 mr-2"></i>
+                                    <p className="text-sm text-red-700 font-bold">{error}</p>
+                                </div>
+                            </div>
+                        )}
+
                         {activeTab === 'login' ? (
                             <div className="space-y-5">
-                                {error && (
-    <div className="bg-red-50 border-l-4 border-red-500 p-3 mb-4">
-        <div className="flex items-center">
-            <i className="fa-solid fa-circle-exclamation text-red-500 mr-2"></i>
-            <p className="text-sm text-red-700 font-medium text-lg">{error}</p>
-        </div>
-    </div>
-)}
-
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
                                     <input type="text" onChange={(e) => setLogin({...login, phone: e.target.value})} placeholder="09......" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
@@ -111,14 +131,7 @@ function DangNhap() {
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
                                     <input type="password" onChange={(e) => setLogin({...login, password: e.target.value})} placeholder="..." className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
                                 </div>
-                                {/* Hiển thị thông báo lỗi màu đỏ */}
-
-<button 
-    onClick={handleLogin} 
-    className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition"
->
-    Đăng nhập ngay
-</button>
+                                <button onClick={handleLogin} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Đăng nhập ngay</button>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -134,7 +147,16 @@ function DangNhap() {
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
                                     <input type="password" onChange={(e) => setRegister({...register, password: e.target.value})} className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" />
                                 </div>
-                                <button onClick={handleRegister} className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition">Tạo tài khoản mới</button>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1">Nhập lại mật khẩu</label>
+                                    <input 
+                                        type="password" 
+                                        onChange={(e) => setRegister({...register, confirm_password: e.target.value})} 
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" 
+                                        placeholder="Xác nhận mật khẩu"
+                                    />
+                                </div>
+                                <button onClick={handleRegister} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition">Tạo tài khoản mới</button>
                             </div>
                         )}
                     </div>
