@@ -45,6 +45,10 @@
     + 1 : đã xóa bài viết
     + 2 : bỏ qua bài viết đó
 ============================
+8. 
+trạng thái category 
+    + 1 : hoạt động
+    + 0 : ngừng hoạt động
 định dạng ngày/tháng/năm : new Date(ThongTinPhieu.NgayNhap).toLocaleDateString("vi-VN")
 =============================================
 định dạng giờ : vd :11:00 AM

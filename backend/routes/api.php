@@ -20,3 +20,4 @@ Route::post('admin/BoQua_ViPham',[PostController::class, 'BoQua_ViPham']);
 Route::post('admin/xoa_vipham', [PostController::class, 'Xoa_BaiViet'] );
 Route::post('admin/mo_khoa_vipham', [PostController::class, 'mo_khoa_vipham']);
 Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
+Route::post('admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
