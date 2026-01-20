@@ -7,6 +7,9 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
 
+
+//ĐỊNH NGHĨA DEMO 
+Route::get('admin/lay_dl', [UserController::class,'demo']);
 // I. ĐỊNH NGHĨA ROUTE GET
 Route::get('/admin/layDLUS', [UserController::class, 'layDL']);
 Route::get('/admin/laydl_baocao', [ReportController::class, 'layDL']);
@@ -24,3 +27,8 @@ Route::post('/admin/mo_khoa_vipham', [PostController::class, 'mo_khoa_vipham']);
 Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
 Route::post('/admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
 Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
+
+
+Route::post('user/login', [UserController::class, 'Login']);
+Route::post('user/register', [UserController::class, 'Register']);
+
