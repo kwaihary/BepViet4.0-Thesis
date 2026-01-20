@@ -30,7 +30,7 @@ function DanhMuc() {
         laydl();
     }, [page]);
     const CapNhat = async(dulieu)=>{
-        const XacNhan= await ThongBao.ThongBao_XacNhanTT('Bạn có chắc chắn muốn xóa danh mục này không?');
+        const XacNhan= await ThongBao.ThongBao_XacNhanTT(dulieu.ThongBao);
         if(!XacNhan) return;
         setloading(true);
         try {
@@ -161,12 +161,12 @@ function DanhMuc() {
                                                     </button>
                                                     {
                                                         dm.status===1 ? (
-                                                             <button onClick={()=>{CapNhat({tt:0 , id : dm.id})}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
+                                                             <button onClick={()=>{CapNhat({tt:0 , id : dm.id , ThongBao: 'Bạn có chắc chắn muốn xóa danh mục này không?'})}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
                                                                 <i className="fa-solid fa-trash-can"></i>
                                                                 <span>Xóa</span>
                                                             </button>
                                                         ):(
-                                                            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
+                                                            <button onClick={()=>{CapNhat({tt:1 , id : dm.id , ThongBao: 'Bạn có chắc chắn muốn mở lại danh mục này không?'})}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
                                                                 <i className="fa-solid fa-rotate-left"></i>
                                                                 <span>Hoạt động lại</span>
                                                             </button>
