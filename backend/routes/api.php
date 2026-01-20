@@ -23,3 +23,5 @@ Route::post('admin/mo_khoa_vipham', [PostController::class, 'mo_khoa_vipham']);
 Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
 Route::post('admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
 Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
+Route::post('user/login', [UserController::class, 'Login']);
+Route::post('user/register', [UserController::class, 'Register']);
