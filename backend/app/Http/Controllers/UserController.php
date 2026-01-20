@@ -62,7 +62,7 @@ class UserController extends Controller
   if ($user->rule == 1) {
     return response()->json([
         'status' => false,
-        'message' => 'Không thể đăng nhập với vai trò admin'
+        'message' => 'Số điện thoại hoặc mật khẩu không đúng'
     ], 403);
 }
 

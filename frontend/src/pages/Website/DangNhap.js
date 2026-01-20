@@ -94,6 +94,15 @@ function DangNhap() {
                         {/* HIỂN THỊ FORM THEO TAB */}
                         {activeTab === 'login' ? (
                             <div className="space-y-5">
+                                {error && (
+    <div className="bg-red-50 border-l-4 border-red-500 p-3 mb-4">
+        <div className="flex items-center">
+            <i className="fa-solid fa-circle-exclamation text-red-500 mr-2"></i>
+            <p className="text-sm text-red-700 font-medium text-lg">{error}</p>
+        </div>
+    </div>
+)}
+
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
                                     <input type="text" onChange={(e) => setLogin({...login, phone: e.target.value})} placeholder="09......" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
@@ -103,14 +112,6 @@ function DangNhap() {
                                     <input type="password" onChange={(e) => setLogin({...login, password: e.target.value})} placeholder="..." className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
                                 </div>
                                 {/* Hiển thị thông báo lỗi màu đỏ */}
-{error && (
-    <div className="bg-red-50 border-l-4 border-red-500 p-3 mb-4">
-        <div className="flex items-center">
-            <i className="fa-solid fa-circle-exclamation text-red-500 mr-2"></i>
-            <p className="text-sm text-red-700 font-medium">{error}</p>
-        </div>
-    </div>
-)}
 
 <button 
     onClick={handleLogin} 
