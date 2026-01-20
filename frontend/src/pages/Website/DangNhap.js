@@ -6,7 +6,7 @@ import * as fun from '../../JS/FUNCTION/function';
 function DangNhap() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('login');
-    
+    const [error, setError] = useState("");
     // State cho đăng nhập
     const [login, setLogin] = useState({
         phone: '',
@@ -20,30 +20,28 @@ function DangNhap() {
         password: '',
     });
 
-    // --- HÀM ĐĂNG NHẬP ---
-    const handleLogin = async () => {
-        const kiemtra = fun.KiemTraRong(login);
-        if (!kiemtra.Status) {
-            alert('Vui lòng nhập đầy đủ thông tin đăng nhập');
-            return;
-        }
-        
+ const handleLogin = async () => {
+    setError(""); // Xóa lỗi cũ trước khi bấm
+    
+    // ... code kiểm tra rỗng ...
+
+    try {
         const formdata = fun.objectToFormData(login);
-        try {
-            const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/login' });
-            if (ketqua && ketqua.status === true) {
-                localStorage.setItem('token', ketqua.token || 'secret');
-                localStorage.setItem('user', JSON.stringify(ketqua.data));
-                alert('Đăng nhập thành công!');
-                navigate('/');
-            } else {
-                alert(ketqua.message || 'Đăng nhập thất bại');
-            }
-        } catch (error) {
-            console.error(error);
-            alert('Lỗi kết nối đến máy chủ');
+        const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/login' });
+        
+        if (ketqua.status === true) {
+            localStorage.setItem('token', ketqua.token);
+            localStorage.setItem('user', JSON.stringify(ketqua.data));
+            navigate('/');
+        } else {
+            // SỬA TẠI ĐÂY: Chỉ lấy ketqua.message
+            // Nếu bạn ghi setError(ketqua) nó sẽ hiện cả cụm {"status":false...}
+            setError(ketqua.message); 
         }
-    }; // Kết thúc hàm handleLogin ở đây
+    } catch (error) {
+        setError("Không thể kết nối đến server");
+    }
+};
 
     // --- HÀM ĐĂNG KÝ ---
     const handleRegister = async (e) => {
@@ -104,7 +102,22 @@ function DangNhap() {
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
                                     <input type="password" onChange={(e) => setLogin({...login, password: e.target.value})} placeholder="..." className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
                                 </div>
-                                <button onClick={handleLogin} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Đăng nhập ngay</button>
+                                {/* Hiển thị thông báo lỗi màu đỏ */}
+{error && (
+    <div className="bg-red-50 border-l-4 border-red-500 p-3 mb-4">
+        <div className="flex items-center">
+            <i className="fa-solid fa-circle-exclamation text-red-500 mr-2"></i>
+            <p className="text-sm text-red-700 font-medium">{error}</p>
+        </div>
+    </div>
+)}
+
+<button 
+    onClick={handleLogin} 
+    className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition"
+>
+    Đăng nhập ngay
+</button>
                             </div>
                         ) : (
                             <div className="space-y-4">
