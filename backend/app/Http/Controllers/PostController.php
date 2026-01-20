@@ -136,28 +136,34 @@ class PostController extends Controller
          ]);
     }
     public function dl_bv(){
-        $recipes = Recipe::select([
-            'id', 
-            'title', 
-            'slug', 
-            'description', 
-            'image_url', 
-            'status', 
-            'created_at', 
-            'user_id' 
-        ])
-        ->with([
-            'author:id,name',     
-            'categories:id,name' 
-        ])
-        ->orderBy('created_at', 'desc') 
-        ->paginate(10);
+        $recipes = Recipe::select(['id', 'title', 'slug', 'cook_time', 'description', 'image_url', 'status', 'created_at',  'user_id' ])
+            ->with(['author:id,name,avatar', 'categories:id,name' ])
+            ->orderBy('created_at', 'desc') 
+            ->paginate(10);
         return response()->json([
             'status' =>true,
             'data' => $recipes
         ]);
-        
-
-
+    }
+    public function TTBaiViet(Request $request){
+         $id = $request->query('id');
+         $recipe = Recipe::findOrFail($id);
+         $ingredients = $recipe->ingredients()->select('note', 'quantity')->get();
+         return response()->json([
+            'status' => true,
+            'data' => $ingredients
+         ]);
+    }
+    public function TTBaiViet_BuocLam(Request $request){
+         $id = $request->query('id');
+         $recipe = Recipe::findOrFail($id);
+         $steps = $recipe->steps()
+            ->select('step_order', 'content', 'image_url')
+            ->orderBy('step_order', 'asc')
+            ->get();
+        return response()->json([
+            'status' => true,
+            'data' => $steps
+        ]);
     }
 }

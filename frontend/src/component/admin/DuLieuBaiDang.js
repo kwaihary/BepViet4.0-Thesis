@@ -156,11 +156,8 @@ function DuLieuBaiDang() {
 
                       
                         <div className="relative">
-                            <select 
-                                value={filterStatus}
-                                onChange={(e) => setFilterStatus(e.target.value)}
-                                className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-medium cursor-pointer hover:bg-white transition-colors"
-                            >
+                            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+                                className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-medium cursor-pointer hover:bg-white transition-colors" >
                                 <option value="all">Tất cả trạng thái</option>
                                 <option value="Chờ duyệt">Chờ duyệt</option>
                                 <option value="Đã duyệt">Đã duyệt</option>
@@ -238,13 +235,13 @@ function DuLieuBaiDang() {
                                                 {new Date(post.created_at).toLocaleDateString('vi-VN')}
                                             </div>
                                             <div className="text-xs text-slate-400 mt-0.5">
-                                              lúc   {new Date(post.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}
+                                              Lúc   {new Date(post.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <div className="flex items-center justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                                                 <button
-                                                onClick={()=>{OpenMoDal(undefined,{TenTrang:'ChiTietBaiDang'})}}
+                                                onClick={()=>{OpenMoDal({id:post.id , DuLieu:post },{TenTrang:'ChiTietBaiDang'})}}
                                                     className="w-9 h-9 rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 flex items-center justify-center transition-all shadow-sm" 
                                                     title="Xem chi tiết"
                                                 >
