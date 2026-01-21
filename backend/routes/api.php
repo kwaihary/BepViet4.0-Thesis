@@ -49,3 +49,4 @@ Route::post('user/logout', [UserController::class, 'Logout']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/recipes/create', [RecipeController::class, 'store']);
 });
+Route::get('/recipes', [RecipeController::class, 'detail_recipe']);
