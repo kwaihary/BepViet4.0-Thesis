@@ -54,6 +54,7 @@ function DangNhap() {
                 url: 'user/login', 
                 PhuongThuc: 1 
             });
+            alert(JSON.stringify(ketqua))
 
             // 3. Xử lý kết quả
             if (ketqua.status === true) {
