@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect} from 'react';
+
+import { Link , useNavigate} from 'react-router-dom';
 import * as API from '../../JS/API/API';
+
 
 function Menu() {
     const navigate = useNavigate();
@@ -10,7 +12,6 @@ function Menu() {
         const savedUser = localStorage.getItem('user');
         return savedUser ? JSON.parse(savedUser) : null;
     });
-
     // --- State quản lý Filter ---
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const toggleFilter = () => {
@@ -39,6 +40,7 @@ function Menu() {
             navigate('/DangNhap'); 
         }
     };
+
     return (
         <>
             <nav className="bg-white shadow-sm fixed w-full z-50 top-0 h-16 border-b border-gray-200">
@@ -219,7 +221,10 @@ function Menu() {
 
                                     {/* Footer: Đăng xuất */}
                                     <div className="border-t border-gray-100 mt-2 pt-2">
+                                        <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-semibold flex items-center gap-3 transition"></button>
+
                                         <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-semibold flex items-center gap-3 transition">
+
                                             <i className="fa-solid fa-arrow-right-from-bracket w-5"></i> Đăng xuất
                                         </button>
                                     </div>

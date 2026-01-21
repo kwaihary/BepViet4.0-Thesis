@@ -67,6 +67,7 @@ function QuanLiNguoiDung() {
         if(!id){ ThongBao.ThongBao_CanhBao('Dữ liệu id người dùng không tồn tại!'); return; }
         const fromdata= await fun.objectToFormData({id:id,giatri:trangthai});
         const CapNhat= await API.CallAPI(fromdata,{PhuongThuc:1,url :'admin/CapNhatTrangThai'});
+        alert(JSON.stringify(CapNhat))
         if(CapNhat.validate){
              if (CapNhat.errors) { setValidateErrors(CapNhat.errors); return; }
              ThongBao.ThongBao_CanhBao(CapNhat.message);

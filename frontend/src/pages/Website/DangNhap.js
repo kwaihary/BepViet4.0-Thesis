@@ -16,6 +16,8 @@ function DangNhap() {
         password: '',
     });
 
+    
+
     // State cho đăng ký
     const [register, setRegister] = useState({
         name: '',
@@ -30,9 +32,13 @@ function DangNhap() {
         setFieldError({});
     };
 
+
+
+
     const handleLogin = async () => {
         setError("");
         setFieldError({}); 
+
 
         if (!login.phone || !login.password) {
             setError("Vui lòng điền đầy đủ thông tin đăng nhập");
@@ -48,7 +54,7 @@ function DangNhap() {
             const formdata = fun.objectToFormData(login);
             const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/login' });
 
-            if (ketqua.status === true) {
+            if (ketqua.status) {
                 localStorage.setItem('user', JSON.stringify(ketqua.data));
                 navigate('/');
             } else {
