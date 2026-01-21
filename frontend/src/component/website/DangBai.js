@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { objectToFormData } from "./function"; //
-import { CallAPI } from "./API"; //
-import { ThongBao_ThanhCong, ThongBao_Loi } from "./ThongBao"; //
-import Cookies from "js-cookie"; // Cần cài: npm install js-cookie
-
+import { objectToFormData } from "../../JS/FUNCTION/function"; //
+import { CallAPI } from "../../JS/API/API"; //
+import * as tb from "../../JS/FUNCTION/ThongBao"; //
+import Cookies from "js-cookie"; 
 function DangBai() {
     // State quản lý thông tin chung
     const [info, setInfo] = useState({
         title: "",
         description: "",
         cook_time: "",
-        portion: "", // Khẩu phần (DB chưa có cột này, có thể thêm hoặc bỏ qua)
         difficulty: "Dễ",
     });
 
@@ -79,19 +77,19 @@ function DangBai() {
             description: info.description,
             cook_time: info.cook_time,
             difficulty: info.difficulty,
-            ingredients: ingredients, // objectToFormData sẽ tự xử lý mảng này
+            ingredients: ingredients, 
             steps: steps,
-            file_image: imageFile // File ảnh
+            file_image: imageFile 
         };
 
         // 2. Chuyển sang FormData
         const formData = objectToFormData(dataObj);
 
-        // 3. Lấy Token (Giả sử bạn lưu trong cookie tên 'token' hoặc 'token_bepviet')
-        const token = Cookies.get('token') || Cookies.get('token_bepviet');
+        // 3. Lấy Token (Giả sử bạn lưu trong cookie 'token_bepviet')
+        const token = Cookies.get('token_bepviet');
 
         if (!token) {
-            ThongBao_Loi("Bạn cần đăng nhập để thực hiện chức năng này.");
+            tb.ThongBao_Loi("Bạn cần đăng nhập để thực hiện chức năng này.");
             return;
         }
 
@@ -104,21 +102,21 @@ function DangBai() {
             });
 
             if (res.status === true) {
-                ThongBao_ThanhCong("Đăng công thức thành công!");
+                tb.ThongBao_ThanhCong("Đăng công thức thành công!");
                 // Reset form hoặc chuyển hướng
             } else if (res.validate) {
-                ThongBao_Loi(res.message); // Lỗi validate
+                tb.ThongBao_Loi(res.message); // Lỗi validate
             } else {
-                ThongBao_Loi(res.message || "Có lỗi xảy ra.");
+                tb.ThongBao_Loi(res.message || "Có lỗi xảy ra.");
             }
         } catch (error) {
-            ThongBao_Loi("Lỗi kết nối server.");
+            tb.ThongBao_Loi("Lỗi kết nối server.");
         }
     };
 
     return (
         <div className="bg-gray-50 font-sans">
-             {/* Navbar giữ nguyên... */}
+             {/* Navbar  */}
             <nav className="bg-white border-b h-16 fixed w-full top-0 z-50 flex items-center justify-between px-6 shadow-sm">
                 <div className="flex items-center gap-4">
                     <span className="font-bold text-lg text-gray-800">Tạo công thức mới</span>
