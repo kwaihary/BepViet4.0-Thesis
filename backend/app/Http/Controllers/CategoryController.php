@@ -26,7 +26,7 @@ class CategoryController extends Controller
             'slug.max'      => 'Slug không được vượt quá 255 ký tự.',
             'slug.unique'   => 'Slug đã tồn tại trong hệ thống.',
             'type.required' => 'Loại danh mục là bắt buộc.',
-            'type.in'       => 'Loại danh mục chỉ được phép là: khu vực, loại món ăn hoặc chế độ ăn.',
+            'type.in'       => 'Loại danh mục không hợp lệ',
         ]);
          $category = Category::create([
                 'name' => $validated['name'],

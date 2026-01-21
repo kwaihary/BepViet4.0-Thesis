@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import * as API from '../../JS/API/API';
+import * as ThongBao from '../../JS/FUNCTION/ThongBao';
+import * as fun from '../../JS/FUNCTION/function';
 
 function ChiTietBaiDang({ DuLieu }) {
     const [loading, setloading] = useState(false);
     const [DuLieu_NguyenLieu, setNguyenLieu] = useState([]);
     const [DuLieu_BuocLam, setBuocLam] = useState([]);
-
+     const [err, seterr] = useState({})
+    //$table->enum('status', ['Đang chờ', 'Đã duyệt', 'Đã xóa'])->default('Đang chờ');
     useEffect(() => {
         if (!DuLieu?.id) return;
 
@@ -31,7 +34,34 @@ function ChiTietBaiDang({ DuLieu }) {
             }
         }
         LayTT_BaiViet();
-    }, [DuLieu.id]); 
+    }, [DuLieu.id]);
+    const CapNhat_TrangThai=async(DuLieu)=>{
+        const kiemtra= fun.KiemTraRong(DuLieu);
+        if(!kiemtra.Status){
+            ThongBao.ThongBao_CanhBao('Vui lòng kiểm tra lại thông tin cần thao tác!');
+            return;
+        }
+        const XacNhan= await ThongBao.ThongBao_XacNhanTT(DuLieu.ThongBao);
+        if(!XacNhan) return ;
+        const formdata= fun.objectToFormData({id:DuLieu.id, data:DuLieu.data})
+        try {
+            const data = await API.CallAPI(formdata,{PhuongThuc:1, url :'admin/CapNhatTT_BaiViet_by_admin'});
+            alert(JSON.stringify(data))
+             if (data.validate) {
+                seterr(data.errors);
+                return;
+             }
+             if(data.status){
+                ThongBao.ThongBao_ThanhCong(data.message);
+                return;
+             }else{
+                ThongBao.ThongBao_Loi(data.message);
+                return;
+             }
+        } catch (error) {
+            console.error('đã có lỗi sãy ra:' + error)
+        }
+    }
 
 
     if (loading) {
@@ -58,7 +88,21 @@ function ChiTietBaiDang({ DuLieu }) {
             <div className="flex-1 overflow-y-auto custom-scrollbar scroll-smooth">
                 <div className="p-5 lg:p-8">
                     <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden min-h-[500px]">
-
+                        {Object.keys(err).length > 0 && (
+                    <div className="rounded-lg border border-red-200 bg-red-50 p-3 flex gap-3">
+                        <i className="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+                        <div className="flex-1">
+                            <h4 className="text-red-700 font-bold text-xs mb-1">Dữ liệu lỗi</h4>
+                            <ul className="text-xs text-red-600 space-y-1">
+                                {Object.entries(err).map(([field, messages]) =>
+                                    messages.map((msg, idx) => (
+                                        <li key={`${field}-${idx}`}>{msg}</li>
+                                    ))
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+                )}
                       
                         <div className="relative h-72 md:h-96 group">
                             <img 
@@ -135,7 +179,6 @@ function ChiTietBaiDang({ DuLieu }) {
                                             </div>
                                         ))
                                     ) : (
-                                        // Empty State Cách làm
                                         <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50/50">
                                             <span className="material-icons-round text-4xl text-slate-300 mb-2">menu_book</span>
                                             <p className="text-slate-500 font-medium">Chưa có hướng dẫn thực hiện</p>
@@ -182,11 +225,11 @@ function ChiTietBaiDang({ DuLieu }) {
                     <div className="flex gap-3">
                         {currentStatus === 'Đang chờ' && (
                             <>
-                                <button className="flex items-center justify-center gap-2 py-2.5 px-5 border-2 border-red-100 text-red-500 font-bold rounded-lg hover:bg-red-50 hover:border-red-200 transition-all text-sm">
+                                <button onClick={()=>{CapNhat_TrangThai({data:'Đã xóa' , id:DuLieu.id , ThongBao:'Bạn có chắc chắn muốn từ chối bài viết này không?'})}} className="flex items-center justify-center gap-2 py-2.5 px-5 border-2 border-red-100 text-red-500 font-bold rounded-lg hover:bg-red-50 hover:border-red-200 transition-all text-sm">
                                     <span className="material-icons-round text-lg">Từ chối</span> 
                                     
                                 </button>
-                                <button className="flex items-center justify-center gap-2 py-2.5 px-6 bg-emerald-500 text-white font-bold rounded-lg shadow-md shadow-emerald-200 hover:bg-emerald-600 hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm">
+                                <button nClick={()=>{CapNhat_TrangThai({data:'Đã duyệt' , id:DuLieu.id , ThongBao:'Bạn có chắc chắn muốn duyệt bài viết này không?'})}} className="flex items-center justify-center gap-2 py-2.5 px-6 bg-emerald-500 text-white font-bold rounded-lg shadow-md shadow-emerald-200 hover:bg-emerald-600 hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm">
                                     <span className="material-icons-round text-lg"> Duyệt bài</span> 
                                    
                                 </button>
@@ -195,7 +238,7 @@ function ChiTietBaiDang({ DuLieu }) {
 
     
                         {currentStatus === 'Đã duyệt' && (
-                            <button className="flex items-center justify-center gap-2 py-2.5 px-6 bg-amber-500 text-white font-bold rounded-lg shadow-md shadow-amber-200 hover:bg-amber-600 hover:shadow-lg transition-all text-sm">
+                            <button onClick={()=>{CapNhat_TrangThai({data:'Đã xóa' , id:DuLieu.id , ThongBao:'Bạn có chắc chắn muốn khóa bài viết này không?'})}} className="flex items-center justify-center gap-2 py-2.5 px-6 bg-amber-500 text-white font-bold rounded-lg shadow-md shadow-amber-200 hover:bg-amber-600 hover:shadow-lg transition-all text-sm">
                                 <span className="material-icons-round text-lg"> Khóa bài viết</span> 
                                
                             </button>
@@ -203,8 +246,8 @@ function ChiTietBaiDang({ DuLieu }) {
 
                     
                         {currentStatus === 'Đã xóa' && (
-                            <button className="flex items-center justify-center gap-2 py-2.5 px-6 bg-slate-500 text-white font-bold rounded-lg shadow-md hover:bg-slate-600 transition-all text-sm">
-                                <span className="material-icons-round text-lg">Khôi phục</span> 
+                            <button onClick={()=>{CapNhat_TrangThai({data:'Đã duyệt' , id:DuLieu.id , ThongBao:'Bạn có chắc chắn muốn khôi phục bài viết này không?'})}} className="flex items-center justify-center gap-2 py-2.5 px-6 bg-slate-500 text-white font-bold rounded-lg shadow-md hover:bg-slate-600 transition-all text-sm">
+                                <span className="material-icons-round text-lg">Khôi phục bài viết</span> 
                             </button>
                         )}
                     </div>

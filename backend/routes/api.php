@@ -29,6 +29,7 @@ Route::post('/admin/mo_khoa_vipham', [PostController::class, 'mo_khoa_vipham']);
 Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
 Route::post('/admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
 Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
+Route::post('/admin/CapNhatTT_BaiViet_by_admin', [PostController::class, 'CapNhatTT_BaiViet_by_admin']);
 
 
 Route::post('user/login', [UserController::class, 'Login']);

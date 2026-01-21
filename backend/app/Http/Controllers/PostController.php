@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\Recipe;
 use Symfony\Component\HttpFoundation\Response;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {   
@@ -165,5 +166,34 @@ class PostController extends Controller
             'status' => true,
             'data' => $steps
         ]);
+    }
+    public function CapNhatTT_BaiViet_by_admin(Request $request){
+         $validated = $request->validate([
+            'id' => 'required|integer|exists:recipes,id',
+            'data' => [
+                'required',
+                 Rule::in(['Đang chờ', 'Đã duyệt', 'Đã xóa']),
+            ]
+        ], [
+            'id.required' => 'ID bài viết là bắt buộc.',
+            'id.integer'  => 'ID phải là số nguyên.',
+            'id.exists'   => 'ID không tồn tại trong hệ thống.',
+            'data.required' => 'thuộc tính kèm theo là bắt buộc.',
+            'data.in'       => 'thuộc tính kèm theo không hợp lệ',
+        ]);
+        $id = $validated['id'];
+        $data = $validated['data'];
+        $kq = Recipe::where('id', $id)->update(['status' => $data]);
+        if($kq){
+            return response()->json([
+                'status' => true,
+                'message' =>'Cập nhật trạng thái thành công!'
+            ]);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' =>'Cập nhật trạng thái thất bại!'
+            ]);
+        }
     }
 }
