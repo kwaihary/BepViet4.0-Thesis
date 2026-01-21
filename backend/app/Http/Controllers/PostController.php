@@ -6,43 +6,16 @@ use Illuminate\Http\Request;
 use App\Models\Report;
 use App\Models\Recipe;
 use Symfony\Component\HttpFoundation\Response;
-<<<<<<< HEAD
 
-class PostController extends Controller
-{   
 
-    public function index()
-{
-    // Lấy danh sách bài viết kèm thông tin tác giả và lượt like/comment
-    $recipes = DB::table('recipes')
-        ->join('users', 'recipes.user_id', '=', 'users.id')
-        ->select(
-            'recipes.id',
-            'recipes.title',
-            'recipes.description as content',
-            'recipes.image_url as image',
-            'recipes.created_at as time',
-            'users.name as author',
-            'users.avatar as authorAvatar',
-            DB::raw('(SELECT COUNT(*) FROM interactions WHERE recipe_id = recipes.id AND type = "like") as likes'),
-            DB::raw('(SELECT COUNT(*) FROM comments WHERE recipe_id = recipes.id) as commentCount')
-        )
-        ->where('recipes.status', 'published') // Chỉ lấy bài đã đăng
-        ->orderBy('recipes.created_at', 'desc')
-        ->get();
 
-    return response()->json([
-        'status' => true,
-        'data' => $recipes
-    ]);
-}
-=======
+
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {   
->>>>>>> acd37fde714ca9b5d1639445037e9eb8781a659b
+
     public function ThongTin_nguoidung_dangbai(Request $request){
          $validated = $request->validate([
             'id' => 'required|integer|exists:reports,id',
@@ -155,8 +128,8 @@ class PostController extends Controller
             ]);
         }
     }
-<<<<<<< HEAD
-=======
+
+
     public function laydl_thongke_bd(){
          $XuLi_HomNay = Recipe::where('status', 'Đã duyệt') ->whereDate('updated_at', Carbon::today())->count();
          $Cho_Duyet = Recipe::where('status', 'Đang chờ')->count();
@@ -230,5 +203,5 @@ class PostController extends Controller
             ]);
         }
     }
->>>>>>> acd37fde714ca9b5d1639445037e9eb8781a659b
+
 }

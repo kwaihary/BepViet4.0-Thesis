@@ -6,20 +6,20 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RecipeController;
 
-<<<<<<< HEAD
-=======
+
 
 //ĐỊNH NGHĨA DEMO 
 Route::get('admin/lay_dl', [UserController::class,'demo']);
->>>>>>> acd37fde714ca9b5d1639445037e9eb8781a659b
+
 // I. ĐỊNH NGHĨA ROUTE GET
 Route::get('/admin/layDLUS', [UserController::class, 'layDL']);
 Route::get('/admin/laydl_baocao', [ReportController::class, 'layDL']);
 Route::get('/admin/ThongKeNguoiDung',[UserController::class,'ThongKe']);
 Route::get('/admin/ThongKeViPham', [ReportController::class,'ThongKe']);
 Route::get('/admin/laydl_nguoidung_dangbai',[PostController::class, 'ThongTin_nguoidung_dangbai']);
-<<<<<<< HEAD
+
 Route::get('admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
@@ -30,7 +30,7 @@ Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
 Route::post('admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
 Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
 Route::get('/get-all-posts', [PostController::class, 'index']);
-=======
+
 
 Route::get('/admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
 Route::get('/admin/laydl_thongke_bd',[PostController::class,'laydl_thongke_bd']);
@@ -57,4 +57,7 @@ Route::post('user/register', [UserController::class, 'Register']);
 Route::post('user/logout', [UserController::class, 'Logout']);
 
 
->>>>>>> acd37fde714ca9b5d1639445037e9eb8781a659b
+
+
+// URL sẽ là: http://localhost:8000/api/recipes
+Route::get('/recipes', [RecipeController::class, 'index']);
