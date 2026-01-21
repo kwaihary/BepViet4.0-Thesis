@@ -257,13 +257,10 @@ function BaiViet({ data }) {
                                 </button>
                             </div>
 
-                            {/* Nút Save & Share */}
+                            {/* Nút Save*/}
                             <div className="flex items-center gap-4">
                                 <button className="text-gray-400 hover:text-orange-500 transition">
                                     <i className="fa-regular fa-bookmark text-xl"></i>
-                                </button>
-                                <button className="text-gray-400 hover:text-gray-800 transition">
-                                    <i className="fa-solid fa-share-nodes text-xl"></i>
                                 </button>
                             </div>
                         </div>
