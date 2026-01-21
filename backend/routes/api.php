@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RecipeController;
 
 
 //ĐỊNH NGHĨA DEMO 
@@ -28,6 +29,8 @@ Route::get('/user/layThongTinNguoiDung/{id}', [UserController::class, 'layThongT
 Route::get('/admin/lay_thongke' ,[PostController::class , 'lay_thongke']);
 Route::get('/admin/dulieu_bieudo_baiviet' , [PostController::class, 'dulieu_bieudo_baiviet']);
 Route::get('/admin/dulieu_bieudo_danhmuc' , [CategoryController::class ,'dulieu_bieudo_danhmuc']);
+Route::get('recipes/{id}', [RecipeController::class, 'show']);
+Route::get('recipes', [RecipeController::class, 'index']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('/admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
 Route::post('/admin/BoQua_ViPham',[PostController::class, 'BoQua_ViPham']);
@@ -46,3 +49,4 @@ Route::post('user/logout', [UserController::class, 'Logout']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/recipes/create', [RecipeController::class, 'store']);
 });
+Route::get('/recipes', [RecipeController::class, 'detail_recipe']);

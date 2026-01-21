@@ -127,4 +127,54 @@ class RecipeController extends Controller
             ], 500);
         }
     }
+    public function index()
+    {
+        // Lấy danh sách món ăn, trạng thái = 1 (đã duyệt), kèm thông tin tác giả
+        $recipes = Recipe::with('author') 
+                    ->where('status', 1) 
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(12);
+
+        // Quan trọng: Phải trả về đúng cấu trúc này
+        return response()->json([
+            'status' => true,
+            'data' => $recipes // Laravel paginate trả về object có chứa mảng data bên trong
+        ]);
+    }
+
+public function show($id)
+{
+    // Tìm món ăn theo ID, load kèm các quan hệ
+    $recipe = Recipe::with(['author', 'steps', 'ingredients', 'comments.user'])
+        ->where('id', $id)
+        ->first();
+
+    if ($recipe) {
+        // Tăng lượt xem
+        $recipe->increment('view_count');
+        
+        return response()->json([
+            'status' => true,
+            'data' => $recipe
+        ]);
+    }
+
+    return response()->json([
+        'status' => false,
+        'message' => 'Không tìm thấy món ăn này'
+    ], 404);
+}
+
+public function detail_recipe()
+{
+    $recipes = Recipe::with(['author', 'comments.user', 'interactions'])
+        // ->where('status', 'Đã duyệt') // <--- Tạm thời đóng dòng này lại
+        ->orderBy('created_at', 'desc')
+        ->paginate(10); 
+
+    return response()->json([
+        'status' => true,
+        'data' => $recipes
+    ]);
+}
 }
