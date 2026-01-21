@@ -2,32 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function MonDaLuu({ data, onRefresh }) {
-    // Ưu tiên lấy data từ props (HoSo truyền xuống), nếu chưa có mới dùng mẫu
     const [savedRecipes, setSavedRecipes] = useState(data);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('Tất cả');
 
-    // Cập nhật state nội bộ khi props data thay đổi
     useEffect(() => {
         setSavedRecipes(data);
     }, [data]);
 
     const categories = ['Tất cả', 'Món chính', 'Ăn sáng', 'Canh', 'Salad', 'Món ngọt'];
 
+    // --- CẬP NHẬT CHỨC NĂNG BỎ LƯU TẠI LOCALSTORAGE ---
     const handleUnsave = async (e, id) => {
         e.stopPropagation();
+        
         if (window.confirm('Bạn có chắc muốn bỏ lưu món này không?')) {
             try {
-                // GỌI API XÓA TẠI ĐÂY
-                // await API.delete(`/unsave/${id}`);
+                // 1. Lấy danh sách hiện tại từ LocalStorage
+                const currentSaved = JSON.parse(localStorage.getItem('mon_da_luu')) || [];
                 
-                // Sau đó báo cho Cha cập nhật lại
+                // 2. Lọc bỏ món ăn có id trùng khớp
+                const updatedList = currentSaved.filter(item => item.id !== id);
+                
+                // 3. Cập nhật lại vào LocalStorage
+                localStorage.setItem('mon_da_luu', JSON.stringify(updatedList));
+
+                // 4. Cập nhật state nội bộ để mất món ngay trên màn hình (UX mượt hơn)
+                setSavedRecipes(updatedList);
+                
+                // 5. Báo cho component HoSo cập nhật lại số lượng/dữ liệu tổng
                 if(onRefresh) onRefresh();
-                
-                // Hoặc update tạm thời tại local
-                setSavedRecipes(prev => prev.filter(item => item.id !== id));
+
             } catch (err) {
-                console.error("Lỗi khi bỏ lưu");
+                console.error("Lỗi khi bỏ lưu:", err);
+                alert("Không thể thực hiện bỏ lưu lúc này.");
             }
         }
     };
@@ -39,7 +47,7 @@ function MonDaLuu({ data, onRefresh }) {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-10 pb-12"> {/* Giữ nguyên class gốc */}
+        <div className="min-h-screen bg-gray-50 pt-10 pb-12">
             <div className="container mx-auto max-w-7xl px-4">
                 {/* ================= HEADER ================= */}
                 <div className="mb-10">
@@ -108,7 +116,8 @@ function MonDaLuu({ data, onRefresh }) {
                                 {/* Image */}
                                 <div className="relative aspect-[4/3] overflow-hidden">
                                     <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover hover:scale-110 transition duration-700" />
-                                    <button onClick={(e) => handleUnsave(e, recipe.id)} className="absolute top-3 right-3 w-9 h-9 bg-white rounded-full text-red-500 flex items-center justify-center shadow hover:bg-red-500 hover:text-white transition">
+                                    {/* Icon Bookmark - Nhấn vào để bỏ lưu */}
+                                    <button onClick={(e) => handleUnsave(e, recipe.id)} className="absolute top-3 right-3 w-9 h-9 bg-red-600 rounded-full text-white flex items-center justify-center shadow hover:bg-white hover:text-red-500 transition border border-red-600">
                                         <i className="fa-solid fa-bookmark"></i>
                                     </button>
                                     <div className="absolute top-3 left-3 flex gap-1 whitespace-nowrap">

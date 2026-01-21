@@ -61,3 +61,10 @@ Route::get('/recipes', [RecipeController::class, 'index']);
 
 // Route xóa bài viết
 Route::delete('recipes/{id}', [RecipeController::class, 'destroy']);
+
+
+// Route để thực hiện lưu hoặc bỏ lưu (Toggle Save)
+Route::post('saves', [RecipeController::class, 'toggleSave']);
+
+// Route để lấy danh sách các món đã lưu của người dùng đang đăng nhập
+Route::get('my-saved-recipes', [RecipeController::class, 'getSavedRecipes']);

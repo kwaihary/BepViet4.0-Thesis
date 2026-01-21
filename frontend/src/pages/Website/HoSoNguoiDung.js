@@ -4,30 +4,35 @@ import { useModalContext } from '../../context/QuanLiModal';
 import Cookbook from '../../component/website/CookbookCuaToi';
 import BaiViet from '../../component/website/BaiViet';
 import MonDaLuu from '../../component/website/MonDaLuu';
-// import { API } from '../../utils/api'; // Giả sử bạn có file quản lý API
 
 function HoSo() {
     const { OpenMoDal } = useModalContext();
     const [tab, setTab] = useState('BaiDang');
     const [savedData, setSavedData] = useState([]); // State cho món đã lưu
 
-    // Hàm lấy danh sách món đã lưu từ Database
-    const fetchSavedData = async () => {
+    // --- LOGIC LƯU TẠM THỜI: Lấy danh sách từ LocalStorage ---
+    const fetchSavedData = () => {
         try {
-            // Thay thế bằng hàm gọi API thực tế của bạn
-            // const res = await API.get('/user/saved-recipes');
-            // if (res.data) setSavedData(res.data);
-            
-            // Giả lập sau khi fetch:
-            // setSavedData(responseFromServer);
+            // Đọc dữ liệu từ bộ nhớ trình duyệt (localStorage)
+            const localData = JSON.parse(localStorage.getItem('mon_da_luu')) || [];
+            setSavedData(localData);
         } catch (error) {
-            console.error("Lỗi fetch dữ liệu:", error);
+            console.error("Lỗi fetch dữ liệu local:", error);
+            setSavedData([]);
         }
     };
 
+    // Chạy khi component mount
     useEffect(() => {
         fetchSavedData();
     }, []);
+
+    // Refresh dữ liệu mỗi khi người dùng chuyển sang tab "Món đã lưu"
+    useEffect(() => {
+        if (tab === 'MonDaLuu') {
+            fetchSavedData();
+        }
+    }, [tab]);
 
     const getTabClass = (tabName) => {
         const baseClass = "nav-item flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider cursor-pointer py-2 transition-all";
@@ -84,9 +89,26 @@ function HoSo() {
             </header>
             
             <main className="w-full max-w-3xl mx-auto px-0 md:px-4 py-6 flex-1">
-                {tab === 'BaiDang' && <BaiViet onSaveSuccess={fetchSavedData} />}
-                {tab === 'MonDaLuu' && <MonDaLuu data={savedData} onRefresh={fetchSavedData} />}
-                {tab === 'cookbook' && <div className="w-full"><Cookbook /></div>}
+                {/* Giữ nguyên cấu trúc gọi Component gốc */}
+                {tab === 'BaiDang' && (
+                    <BaiViet 
+                        data={[]} // Bạn truyền dữ liệu bài viết thật vào đây
+                        onSaveSuccess={fetchSavedData} 
+                    />
+                )}
+                
+                {tab === 'MonDaLuu' && (
+                    <MonDaLuu 
+                        data={savedData} 
+                        onRefresh={fetchSavedData} 
+                    />
+                )}
+                
+                {tab === 'cookbook' && (
+                    <div className="w-full">
+                        <Cookbook />
+                    </div>
+                )}
             </main>
         </div>
     );
