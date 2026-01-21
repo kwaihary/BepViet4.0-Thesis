@@ -2,7 +2,10 @@
 
 // config/cors.php
 return [
+
+
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
+
     'allowed_methods' => ['*'],
     
     // ĐỊA CHỈ PHẢI CHÍNH XÁC: Không được để dấu '*' nếu dùng Cookie

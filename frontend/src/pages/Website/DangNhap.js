@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as API from '../../JS/API/API';
 import * as fun from '../../JS/FUNCTION/function';
+import * as tb from '../../JS/FUNCTION/ThongBao';
+import { error } from 'jquery';
 
 function DangNhap() {
     const navigate = useNavigate();
@@ -76,9 +78,22 @@ const duLieuDangKy = {
             return;
         }
 
-        const formdata = fun.objectToFormData(register);
+        if(!fun.validatePhone(login.phone)) {
+            tb.ThongBao_Loi("Số điện thoại không hợp lệ");
+            return;
+        }
         try {
-            const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/register' });
+            // 2. Gọi API
+            const formdata = fun.objectToFormData(login);
+            
+            // SỬA LỖI 404: Đổi url thành 'user/login' cho khớp với api.php
+            const ketqua = await API.CallAPI(formdata, { 
+                url: 'user/login', 
+                PhuongThuc: 1 
+            });
+            alert(JSON.stringify(ketqua))
+
+            // 3. Xử lý kết quả
             if (ketqua.status === true) {
                 alert("Đăng ký thành công!");
                 setActiveTab('login');
@@ -93,7 +108,7 @@ const duLieuDangKy = {
     return (
         <div className="bg-gray-50 font-sans h-screen flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex overflow-hidden h-[600px]">
-                
+
                 {/* --- CỘT TRÁI (ẢNH) --- */}
                 <div className="hidden md:block w-1/2 bg-cover bg-center relative" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3')" }}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-10 text-white">
@@ -104,12 +119,13 @@ const duLieuDangKy = {
 
                 {/* --- CỘT PHẢI (FORM) --- */}
                 <div className="w-full md:w-1/2 p-8 md:p-12 relative overflow-y-auto">
-                    <Link to='/' className="absolute top-6 right-6 text-gray-400 hover:text-red-600">
+                    {/* Nút đóng */}
+                    <Link to='/' className="absolute top-6 right-6 text-gray-400 hover:text-red-600 transition">
                         <i className="fa-solid fa-xmark text-2xl"></i>
                     </Link>
 
                     <div className="max-w-md mx-auto">
-                        {/* TAB BUTTONS */}
+                        {/* TAB LOGIN / REGISTER */}
                         <div className="flex border-b border-gray-200 mb-8">
                             <button onClick={() => {setActiveTab('login'); setError("");}} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'login' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Nhập</button>
                             <button onClick={() => {setActiveTab('register'); setError("");}} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'register' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Ký</button>
@@ -126,30 +142,64 @@ const duLieuDangKy = {
                         )}
 
                         {activeTab === 'login' ? (
+                            /* --- FORM ĐĂNG NHẬP --- */
                             <div className="space-y-5">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
-                                    <input type="text" onChange={(e) => setLogin({...login, phone: e.target.value})} placeholder="09......" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
+                                    <input 
+                                        type="text" 
+                                        value={login.phone} 
+                                        onChange={(e) => setLogin({ ...login, phone: e.target.value })} 
+                                        placeholder="0912345678" 
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none transition" 
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
-                                    <input type="password" onChange={(e) => setLogin({...login, password: e.target.value})} placeholder="..." className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
+                                    <input 
+                                        type="password" 
+                                        value={login.password} 
+                                        onChange={(e) => setLogin({ ...login, password: e.target.value })} 
+                                        placeholder="" 
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none transition" 
+                                    />
                                 </div>
                                 <button onClick={handleLogin} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Đăng nhập ngay</button>
                             </div>
                         ) : (
+                            /* --- FORM ĐĂNG KÝ --- */
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Họ và Tên</label>
-                                    <input type="text" onChange={(e) => setRegister({...register, name: e.target.value})} placeholder="Nguyễn Văn A" className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" />
+                                    <input 
+                                        type="text" 
+                                        value={register.name} 
+                                        onChange={(e) => setRegister({ ...register, name: e.target.value })} 
+                                        placeholder="Nguyễn Văn A" 
+                                        className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.name ? 'border-red-500' : 'border-gray-300'}`} 
+                                    />
+                                    {fieldError.name && <span className="text-xs text-red-500 mt-1">{fieldError.name}</span>}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
-                                    <input type="text" onChange={(e) => setRegister({...register, phone: e.target.value})} placeholder="09......" className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" />
+                                    <input 
+                                        type="text" 
+                                        value={register.phone} 
+                                        onChange={(e) => setRegister({ ...register, phone: e.target.value })} 
+                                        placeholder="0123456789" 
+                                        className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.phone ? 'border-red-500' : 'border-gray-300'}`} 
+                                    />
+                                    {fieldError.phone && <span className="text-xs text-red-500 mt-1">{fieldError.phone}</span>}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
-                                    <input type="password" onChange={(e) => setRegister({...register, password: e.target.value})} className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" />
+                                    <input 
+                                        type="password" 
+                                        value={register.password} 
+                                        onChange={(e) => setRegister({ ...register, password: e.target.value })} 
+                                        className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.password ? 'border-red-500' : 'border-gray-300'}`} 
+                                    />
+                                    {fieldError.password && <span className="text-xs text-red-500 mt-1">{fieldError.password}</span>}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Nhập lại mật khẩu</label>

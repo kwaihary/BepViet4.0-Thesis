@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useLocation} from 'react-router-dom';
 import Menu from "../../component/website/MenuWebsite";
 import ThongTinBaiViet from "../../component/website/ThongTinBaiViet";
 import HoSo from "./HoSoNguoiDung";
@@ -13,7 +13,6 @@ import DangBai from '../../component/website/DangBai';
 
 function TrangChu() {
     const location = useLocation();
-
     // Style cho từng mục menu
     const getLinkClass = (path) => {
         const isActive = location.pathname === path;

@@ -45,10 +45,11 @@ const ThemDanhMuc = ({DuLieu , url}) => {
     const ThemDL = async () => {
         setloading(true);
         setErrors({}); 
-        
         try {
-            const formdata = fun.objectToFormData({id:DuLieu.DuLieu.id || null, name: name, slug: slug, type: type });
+            const formdata = fun.objectToFormData({id: DuLieu?.DuLieu?.id || null, name: name, slug: slug, type: type });
             const data = await API.CallAPI(formdata, { PhuongThuc: 1,url: url});
+           
+            
             if (data.validate === true && data.errors) {
                 const serverErrors = {};
                 Object.keys(data.errors).forEach((key) => {
@@ -74,7 +75,6 @@ const ThemDanhMuc = ({DuLieu , url}) => {
 
         } catch (error) {
             console.error('Lỗi xảy ra:', error);
-            alert("Lỗi kết nối server");
         } finally {
             setloading(false);
         }
@@ -127,8 +127,8 @@ const ThemDanhMuc = ({DuLieu , url}) => {
                                 ${errors.type ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}`}
                         > 
                             <option value="">--Chọn loại--</option>
-                            <option value="khu vực">Khu vực (Vùng miền)</option>
-                            <option value="loaị món ăn">Loại món ăn</option>
+                            <option value="Vùng miền">Khu vực (Vùng miền)</option>
+                            <option value="Loại món ăn">Loại món ăn</option>
                             <option value="Chế độ ăn">Chế độ ăn (Diet)</option>
                         </select>
                         {errors.type && <p className="text-red-500 text-xs mt-1 italic">{errors.type}</p>}

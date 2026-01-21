@@ -1,10 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import * as tb from '../../JS/FUNCTION/ThongBao';
 import * as API from '../../JS/API/API';
-
 function Menu() {
     // --- State quản lý Filter ---
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const navigate = useNavigate();
+
+    // Lấy thông tin User từ LocalStorage
+    const [user, setUser] = useState(() => {
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
+
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
     const toggleFilter = () => {
         setIsFilterOpen(!isFilterOpen);
         if (isUserMenuOpen) setIsUserMenuOpen(false); // Đóng menu user nếu mở filter
@@ -17,16 +30,42 @@ function Menu() {
         if (isFilterOpen) setIsFilterOpen(false); // Đóng filter nếu mở menu user
     };
     return (
-        <>
-            <nav className="bg-white shadow-sm fixed w-full z-50 top-0 h-16 border-b border-gray-200">
-                <div className="container mx-auto px-4 h-full flex justify-between items-center max-w-7xl">
-                    
-                    {/* --- Logo --- */}
-                    <Link to='/' className="flex items-center gap-2">
-                        <div className="bg-red-600 text-white p-2 rounded-lg">
-                            <i className="fa-solid fa-utensils"></i>
+        <nav className="bg-white shadow-sm fixed w-full z-50 top-0 h-16 border-b border-gray-200">
+            <div className="container mx-auto px-4 h-full flex justify-between items-center max-w-7xl">
+                
+                {/* Logo */}
+                <Link to='/' className="flex items-center gap-2">
+                    <div className="bg-red-600 text-white p-2 rounded-lg">
+                        <i className="fa-solid fa-utensils"></i>
+                    </div>
+                    <span className="text-xl font-bold text-red-600 hidden md:block">Bếp Việt 4.0</span>
+                </Link>
+
+                {/* Search & Filter */}
+                <div className="flex-1 max-w-xl mx-4 relative group z-50">
+                    <div className="relative flex items-center">
+                        <i className="fa-solid fa-magnifying-glass absolute left-4 text-gray-400"></i>
+                        <input 
+                            type="text" 
+                            placeholder="Tìm món ăn..."
+                            className="w-full bg-gray-100 text-gray-700 rounded-full py-2.5 pl-12 pr-12 focus:outline-none focus:ring-2 focus:ring-red-200 focus:bg-white transition-all border border-transparent focus:border-red-100"
+                        />
+                        <button onClick={toggleFilter} className="absolute right-2 p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition">
+                            <i className="fa-solid fa-sliders"></i>
+                        </button>
+                    </div>
+                    {/* Filter Panel */}
+                    {isFilterOpen && (
+                        <div className="absolute top-full left-0 mt-3 w-full bg-white rounded-xl shadow-2xl border border-gray-100 p-5 animate-fade-in-down">
+                            <p className="text-gray-500 text-center text-sm">Nội dung bộ lọc...</p>
                         </div>
-                        <span className="text-xl font-bold text-red-600 hidden md:block">Bếp Việt 4.0</span>
+                    )}
+                </div>
+
+                {/* Right Actions */}
+                <div className="flex items-center gap-4">
+                    <Link to='/AI' className="hidden md:flex items-center gap-1 text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-80">
+                        <i className="fa-solid fa-wand-magic-sparkles"></i> AI Gợi ý
                     </Link>
 
                     {/* --- Search & Filter Area (Giữ nguyên) --- */}
@@ -201,8 +240,8 @@ function Menu() {
 
                     </div>
                 </div>
-            </nav>
-        </>
+            </div>
+        </nav>
     );
 }
 

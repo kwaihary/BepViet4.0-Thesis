@@ -99,5 +99,26 @@ export const validateImage = (file) => {
       return true;
     }
   };
+//
+export function formatNumber(num) {
+  // BƯỚC 1: Kiểm tra an toàn
+  // Nếu num là null, undefined, hoặc NaN -> trả về '0' ngay lập tức
+  if (num === undefined || num === null || isNaN(num)) {
+      return '0';
+  }
+
+  // BƯỚC 2: Xử lý logic rút gọn
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M'; // Thêm M cho triệu (1.2M)
+  }
+  if (num >= 1000) {
+    // Dùng toFixed(1) để giữ 1 số lẻ (1200 -> 1.2k) thay vì làm tròn thô (1k)
+    return (num / 1000).toFixed(1) + 'k'; 
+  }
+
+  // BƯỚC 3: Trả về số nhỏ
+  return num.toString();
+}
+
 
 

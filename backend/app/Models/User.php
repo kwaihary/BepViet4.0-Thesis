@@ -9,7 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'users';
 
@@ -25,10 +25,7 @@ class User extends Authenticatable
         'social_id'
     ];
 
-    protected $hidden = [
-        'password',
-        'remember_token'
-    ];
+   
 
     // 1 người dùng có thể có nhiều công thức món ăn
     public function recipes()
