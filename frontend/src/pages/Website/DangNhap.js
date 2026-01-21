@@ -59,12 +59,12 @@ function DangNhap() {
         }
     };
 
-    // --- HÀM ĐĂNG KÝ (ĐÃ BỎ hasError) ---
+    // --- HÀM ĐĂNG KÝ ---
     const handleRegister = async () => {
         setError(""); 
         setFieldError({}); 
 
-        let newFieldErrors = {}; // Chỉ cần dùng biến này
+        let newFieldErrors = {};
 
         // 1. Kiểm tra rỗng
         const checkEmpty = fun.KiemTraRong(register);
