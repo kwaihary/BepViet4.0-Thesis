@@ -262,9 +262,6 @@ function BaiViet({ data }) {
                                 <button className="text-gray-400 hover:text-orange-500 transition">
                                     <i className="fa-regular fa-bookmark text-xl"></i>
                                 </button>
-                                <button className="text-gray-400 hover:text-gray-800 transition">
-                                    <i className="fa-solid fa-share-nodes text-xl"></i>
-                                </button>
                             </div>
                         </div>
 
