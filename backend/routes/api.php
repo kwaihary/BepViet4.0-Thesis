@@ -25,6 +25,7 @@ Route::get('/admin/TTBaiViet_BuocLam' , [PostController::class, 'TTBaiViet_BuocL
 
 Route::get('admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
 Route::get('/user/layThongTinNguoiDung/{id}', [UserController::class, 'layThongTinNguoiDung']);
+Route::get('admin/lay_thongke' ,[PostController::class , 'lay_thongke']);
 
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('/admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
