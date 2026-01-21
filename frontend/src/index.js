@@ -9,6 +9,8 @@ import { AppProvider } from './context/QuanLiModal'
 import DangNhap from './pages/Website/DangNhap';
 import DangNhapAD from './pages/Admin/DangNhapAdmin';
 import TrangChuAD from './pages/Admin/TrangChuAdmin';
+import ChiTietMonAn from './pages/Website/ChiTietMonAn';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -20,7 +22,8 @@ root.render(
           <Route path='/DangNhap' element={<DangNhap/>} />
           <Route path='/DangNhap_AD' element={<DangNhapAD/>} />
           <Route path='/admin/*' element={<TrangChuAD/>} />
-      </Routes>
+          <Route path="/chi-tiet-mon/:id" element={<ChiTietMonAn />} />
+        </Routes>
       </AppProvider>
     </BrowserRouter>
   </React.StrictMode>
