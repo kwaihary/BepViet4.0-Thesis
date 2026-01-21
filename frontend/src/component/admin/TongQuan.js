@@ -1,8 +1,39 @@
 import React from 'react';
+import { useEffect , useState } from 'react';
+import * as API from '../../JS/API/API';
+import * as fun from '../../JS/FUNCTION/function';
 
 function TongQuan() {
+   
+    const [ThongKe, setThongKe] = useState({}); 
+    const [loading, setloading] = useState(false);
+
+    useEffect(() => {
+        const data = async () => {
+            setloading(true);
+            try {
+                const kq = await API.CallAPI(undefined, { PhuongThuc: 2, url: 'admin/lay_thongke' });
+                if (kq.status) {
+                    setThongKe(kq.data);
+                }
+            } catch (error) {
+                console.error('Lỗi xảy ra:', error);
+            } finally {
+                setloading(false);
+            }
+        };
+        data();
+    }, []);
+    if(loading){
+        return (
+            <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+                <span className="text-indigo-600 font-bold"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</span>
+             </div>
+        )
+    }
+
     return (
-        <div className="flex-1 p-6 bg-gray-50 h-screen overflow-y-auto">
+        <div className="flex-1 p-6 bg-gray-50 h-screen">
 
             {/* --- HEADER --- */}
             <div className="mb-8">
@@ -11,15 +42,16 @@ function TongQuan() {
             </div>
 
             {/* --- PHẦN 1: KPI CARDS (Thống kê số liệu) --- */}
-            {/* Dựa trên các tính năng: Người dùng, Đóng góp, Tương tác, AI [cite: 25, 39, 48] */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
                 
-                {/* Card 1: Thành viên */}
+                {/* Card 1: Thành viên -> Mapping: TongND */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="text-sm text-gray-500 font-medium">Tổng thành viên</p>
-                            <h3 className="text-3xl font-bold text-gray-800 mt-2">1,245</h3>
+                            <h3 className="text-3xl font-bold text-gray-800 mt-2">
+                                {fun.formatNumber(ThongKe.TongND || 0)}
+                            </h3>
                         </div>
                         <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -27,29 +59,35 @@ function TongQuan() {
                     </div>
                 </div>
 
-                {/* Card 2: Công thức (Contribution) */}
+                {/* Card 2: Công thức -> Mapping: TongBaiViet & BaiViet_HN */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="text-sm text-gray-500 font-medium">Tổng công thức</p>
-                            <h3 className="text-3xl font-bold text-gray-800 mt-2">856</h3>
+                            <h3 className="text-3xl font-bold text-gray-800 mt-2">
+                                {fun.formatNumber(ThongKe.TongBaiViet || 0)}
+                            </h3>
                         </div>
                         <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         </div>
                     </div>
                     <div className="mt-4 flex items-center text-sm">
-                        <span className="text-green-500 flex items-center font-medium">+5 bài viết</span>
+                        <span className="text-green-500 flex items-center font-medium">
+                            + {fun.formatNumber(ThongKe.BaiViet_HN || 0)} bài viết
+                        </span>
                         <span className="text-gray-400 ml-2">hôm nay</span>
                     </div>
                 </div>
 
-                {/* Card 3: Tương tác (Rating/Review) */}
+                {/* Card 3: Tương tác -> Mapping: Tong_BL */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="text-sm text-gray-500 font-medium">Đánh giá & Bình luận</p>
-                            <h3 className="text-3xl font-bold text-gray-800 mt-2">3.2k</h3>
+                            <h3 className="text-3xl font-bold text-gray-800 mt-2">
+                                {fun.formatNumber(ThongKe.Tong_BL || 0)}
+                            </h3>
                         </div>
                         <div className="p-2 bg-red-50 rounded-lg text-red-600">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
@@ -61,7 +99,7 @@ function TongQuan() {
                 </div>
             </div>
 
-            {/* --- PHẦN 2: BIỂU ĐỒ (CHARTS) --- */}
+            {/* --- PHẦN 2: BIỂU ĐỒ (CHARTS) - Giữ nguyên --- */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
                 
                 {/* 2.1 Bar Chart: Truy cập */}
@@ -104,7 +142,10 @@ function TongQuan() {
                             border-b-blue-400 
                             mb-6 relative flex items-center justify-center box-border">
                             <div className="text-center">
-                                <span className="block text-2xl font-bold text-gray-800">856</span>
+                                {/* Liên kết tổng số bài viết vào giữa biểu đồ tròn */}
+                                <span className="block text-2xl font-bold text-gray-800">
+                                    {fun.formatNumber(ThongKe.TongBaiViet || 0)}
+                                </span>
                                 <span className="text-xs text-gray-400">Công thức</span>
                             </div>
                         </div>
@@ -137,60 +178,6 @@ function TongQuan() {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            {/* --- PHẦN 3: BẢNG DỮ LIỆU (TABLE) --- */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                    <h3 className="font-bold text-gray-800 text-lg">Bài viết chờ duyệt</h3>
-                    <button className="text-orange-600 text-sm font-medium hover:underline">
-                        Xem tất cả
-                    </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-gray-50 text-gray-500 uppercase text-xs font-semibold">
-                            <tr>
-                                <th className="px-6 py-4">Tên Món Ăn</th>
-                                <th className="px-6 py-4">Người đăng</th>
-                                <th className="px-6 py-4">Danh mục</th>
-                                <th className="px-6 py-4">Thời gian</th>
-                                <th className="px-6 py-4 text-right">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {[
-                                ['Cá Kho Tộ Miền Tây', 'Nguyễn Văn A', 'Món mặn', '10 phút trước'],
-                                ['Canh Bầu Nấu Tôm', 'Lê Thị B', 'Canh/Súp', '35 phút trước'],
-                                ['Chè Trôi Nước', 'Hoàng Tuấn', 'Tráng miệng', '1 giờ trước'],
-                                ['Bún Riêu Cua', 'Phạm Quỳnh', 'Món nước', '2 giờ trước'],
-                            ].map((item, i) => (
-                                <tr key={i} className="hover:bg-gray-50 transition">
-                                    <td className="px-6 py-4 font-medium text-gray-800">{item[0]}</td>
-                                    <td className="px-6 py-4 text-gray-600 flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">
-                                            {item[1].charAt(0)}
-                                        </div>
-                                        {item[1]}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs">{item[2]}</span>
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-400">{item[3]}</td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded text-xs font-medium transition mr-2">
-                                            Duyệt
-                                        </button>
-                                        <button className="text-red-500 hover:bg-red-50 px-3 py-1 rounded text-xs font-medium transition">
-                                            Hủy
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
