@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 
+use Illuminate\Support\Facades\DB;
+
 
 class CategoryController extends Controller
 {
@@ -118,5 +120,17 @@ class CategoryController extends Controller
                 'message' => 'Cập nhật danh mục thành công!'
             ]);
          }
+    }
+ 
+
+      public function dulieu_bieudo_danhmuc(){
+        $totals = Category::select('type', DB::raw('COUNT(*) as total'))
+            ->whereIn('type', ['Vùng miền', 'Loại món ăn', 'Chế độ ăn'])
+            ->groupBy('type')
+            ->get();
+        return response()->json([
+            'status'=>true,
+            'data' =>$totals
+        ]);
     }
 }

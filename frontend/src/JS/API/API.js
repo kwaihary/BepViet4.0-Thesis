@@ -27,8 +27,12 @@ export function CallAPI(dulieu = null, yeucau) {
 
     let ajaxOptions = {
         url: DuongDan,
+
         // Nếu PhuongThuc là 3 thì dùng "DELETE", 1 là "POST", còn lại là "GET"
         type: yeucau.PhuongThuc === 1 ? "POST" : (yeucau.PhuongThuc === 3 ? "DELETE" : "GET"),
+
+        type: yeucau.PhuongThuc === 1 ? "POST" : "GET",
+
         xhrFields: { withCredentials: true },
         processData: false,
         contentType: false,
@@ -48,7 +52,11 @@ export function CallAPI(dulieu = null, yeucau) {
             return response;
         })
         .catch(function (xhr) {
+
             // Trường hợp validate lỗi (422)
+
+
+
             if (xhr.status === 422) {
                 return {
                     validate: true,

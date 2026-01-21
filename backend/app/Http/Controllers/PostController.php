@@ -10,11 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 
 
+
+use App\Models\Comment;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {   
+
 
     public function ThongTin_nguoidung_dangbai(Request $request){
          $validated = $request->validate([
@@ -130,6 +136,7 @@ class PostController extends Controller
     }
 
 
+
     public function laydl_thongke_bd(){
          $XuLi_HomNay = Recipe::where('status', 'Đã duyệt') ->whereDate('updated_at', Carbon::today())->count();
          $Cho_Duyet = Recipe::where('status', 'Đang chờ')->count();
@@ -204,4 +211,31 @@ class PostController extends Controller
         }
     }
 
+
+    public function lay_thongke() {
+        return response()->json([
+            'status' => true,
+            'data' => [
+                 'BaiViet_HN' => Recipe::whereDate('created_at', Carbon::today())->count(),
+                 'TongND' =>  User::count(),
+                 'Tong_BL' => Comment::count(),
+                 'TongBaiViet' => Recipe::count(),
+            ]
+        ]);
+    }
+    public function dulieu_bieudo_baiviet(){
+        $postsPerDay = Recipe::select(
+            DB::raw('DATE(created_at) as day'),
+            DB::raw('COUNT(*) as total')
+        )
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->groupBy('day')
+            ->orderBy('day', 'asc')
+            ->get();
+        return response()->json([
+            'status' => true,
+            'data' => $postsPerDay
+        ]);
+    }
+  
 }

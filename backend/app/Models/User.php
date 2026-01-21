@@ -25,10 +25,12 @@ class User extends Authenticatable
         'social_id'
     ];
 
+
     protected $hidden = [
         'password',
         'remember_token'
     ];
+
 
     // 1 người dùng có thể có nhiều công thức món ăn
     public function recipes()
