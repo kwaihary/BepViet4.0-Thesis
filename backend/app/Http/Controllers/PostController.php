@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\Recipe;
 use App\Models\Comment;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
@@ -209,4 +210,19 @@ class PostController extends Controller
             ]
         ]);
     }
+    public function dulieu_bieudo_baiviet(){
+        $postsPerDay = Recipe::select(
+            DB::raw('DATE(created_at) as day'),
+            DB::raw('COUNT(*) as total')
+        )
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->groupBy('day')
+            ->orderBy('day', 'asc')
+            ->get();
+        return response()->json([
+            'status' => true,
+            'data' => $postsPerDay
+        ]);
+    }
+  
 }
