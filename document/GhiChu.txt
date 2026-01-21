@@ -1,6 +1,6 @@
 ======================================
 1. khi tải file về lần đầu chạy 2 lệnh sau
-+ fontend : npm install
++ frontend : npm install
 + backend : composer install
 ======================================
 2 
@@ -33,7 +33,31 @@
         + api/user/...
         + api/website/...
 ========================
-
+6.
+ trạng thái người dùng (status)
+    + 1 : Chờ xác nhận
+    + 2 : tài khoản hoạt động
+    + 0 : tài khoản bị khóa
+============================
+7 .
+ trạng thái báo cáo ( status) :
+    + 0 : đang chờ báo cáo
+    + 1 : đã xóa bài viết
+    + 2 : bỏ qua bài viết đó
+============================
+8. 
+trạng thái category 
+    + 1 : hoạt động
+    + 0 : ngừng hoạt động
+định dạng ngày/tháng/năm : new Date(ThongTinPhieu.NgayNhap).toLocaleDateString("vi-VN")
+=============================================
+định dạng giờ : vd :11:00 AM
+ new Date(ThongTinPhieu.NgayNhap).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    })
+======================================
 
  <a href="dangbai.html" className="aspect-square bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:bg-red-50 hover:border-red-400 hover:text-red-500 transition cursor-pointer md:rounded-lg">
                         <i className="fa-solid fa-plus text-3xl mb-2"></i>

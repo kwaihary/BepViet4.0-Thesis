@@ -1,14 +1,9 @@
-.hide-scrollbar::-webkit-scrollbar { display: none; }
-        .active-tab {
-            color: #dc2626; /* Red-600 */
-            border-bottom: 2px solid #dc2626;
-            font-weight: 700;
-        }
-        .nav-item {
-            color: #6b7280;
-            padding-bottom: 12px;
-            font-weight: 500;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .nav-item:hover { color: #dc2626; }
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+}

@@ -1,27 +1,25 @@
-import React, { useState } from 'react'; // 1. Import useState
+import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import XuLiViPham from "../../component/admin/XuLiViPham";
 import QuanLiNguoiDung from "../../component/admin/QuanLiNguoiDung";
 import DuLieuBaiDang from "../../component/admin/DuLieuBaiDang";
 import TongQuan from "../../component/admin/TongQuan";
 import HoSoAdmin from '../../component/admin/HoSoAdmin';
+import DanhMuc from '../../component/admin/QuanLiDanhMuc';
 
 function TrangChuAD() {
-    // 2. State quản lý đóng/mở menu User
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-    // Toggle menu function
     const toggleUserMenu = () => {
         setIsUserMenuOpen(!isUserMenuOpen);
     };
 
-    // (Tùy chọn) Hook để xác định link đang active ở sidebar
     const location = useLocation();
     const isActive = (path) => location.pathname === path ? "bg-slate-800 border-l-4 border-red-500 text-white" : "text-slate-400 hover:text-white hover:bg-slate-800 border-l-4 border-transparent";
 
     return (
         <>
-            <div className="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
+            <div className="bg-gray-100 font-sans text-gray-800 flex h-screen">
 
                 {/* --- SIDEBAR --- */}
                 <aside className="w-64 bg-slate-900 text-white flex flex-col shrink-0">
@@ -30,7 +28,8 @@ function TrangChuAD() {
                         <span className="font-bold text-lg">Bếp Việt Admin</span>
                     </div>
                     
-                    <nav className="flex-1 py-6 space-y-1">
+                    {/* Thêm no-scrollbar vào sidebar để dự phòng menu quá dài */}
+                    <nav className="flex-1 py-6 space-y-1 overflow-y-auto no-scrollbar">
                         <Link to="/admin" className={`flex items-center gap-3 px-6 py-3 transition ${isActive('/admin')}`}>
                             <i className="fas fa-tachometer-alt w-5"></i> Tổng Quan
                         </Link>
@@ -42,6 +41,9 @@ function TrangChuAD() {
                         </Link>
                         <Link to="/admin/DuLieuBaiViet" className={`flex items-center gap-3 px-6 py-3 transition ${isActive('/admin/DuLieuBaiViet')}`}>
                             <i className="fa-solid fa-database w-5"></i> Dữ liệu bài đăng
+                        </Link>
+                          <Link to="/admin/danhmuc" className={`flex items-center gap-3 px-6 py-3 transition ${isActive('/admin/danhmuc')}`}>
+                            <i className="fas fa-layer-group"></i> Quản lí danh mục
                         </Link>
                     </nav>
 
@@ -87,7 +89,6 @@ function TrangChuAD() {
                                 {/* Dropdown Menu Content */}
                                 {isUserMenuOpen && (
                                     <div className="absolute right-0 top-full mt-3 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 animate-fade-in-down origin-top-right">
-                                        {/* Mũi tên trang trí */}
                                         <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
 
                                         <div className="px-4 py-3 border-b border-gray-100">
@@ -109,19 +110,19 @@ function TrangChuAD() {
                                     </div>
                                 )}
                             </div>
-                            {/* --- END USER DROPDOWN --- */}
-
                         </div>
                     </header>
 
                     {/* --- PAGE CONTENT --- */}
-                    <div className="flex-1 overflow-auto p-6 bg-gray-50">
+                    {/* CẬP NHẬT: Thêm class no-scrollbar tại đây */}
+                    <div className="flex-1 overflow-auto p-6 bg-gray-50 no-scrollbar">
                         <Routes>
                             <Route path='/xulivipham' element={<XuLiViPham />} />
                             <Route path='/QuanLiNguoiDung' element={<QuanLiNguoiDung />} />
                             <Route path='/DuLieuBaiViet' element={<DuLieuBaiDang />} />
                             <Route path='/' index element={<TongQuan />} />
                             <Route path='/HSAD' element={<HoSoAdmin/>} />
+                            <Route path='/danhmuc' element={<DanhMuc/>} />
                         </Routes>
                     </div>
                 </main>

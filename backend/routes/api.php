@@ -7,12 +7,19 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
 
+<<<<<<< HEAD
+=======
+
+//ĐỊNH NGHĨA DEMO 
+Route::get('admin/lay_dl', [UserController::class,'demo']);
+>>>>>>> acd37fde714ca9b5d1639445037e9eb8781a659b
 // I. ĐỊNH NGHĨA ROUTE GET
 Route::get('/admin/layDLUS', [UserController::class, 'layDL']);
 Route::get('/admin/laydl_baocao', [ReportController::class, 'layDL']);
 Route::get('/admin/ThongKeNguoiDung',[UserController::class,'ThongKe']);
 Route::get('/admin/ThongKeViPham', [ReportController::class,'ThongKe']);
 Route::get('/admin/laydl_nguoidung_dangbai',[PostController::class, 'ThongTin_nguoidung_dangbai']);
+<<<<<<< HEAD
 Route::get('admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
@@ -23,3 +30,31 @@ Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
 Route::post('admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
 Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
 Route::get('/get-all-posts', [PostController::class, 'index']);
+=======
+
+Route::get('/admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
+Route::get('/admin/laydl_thongke_bd',[PostController::class,'laydl_thongke_bd']);
+Route::get('/admin/dl_bv', [PostController::class,'dl_bv']);
+Route::get('/admin/TTBaiViet_NguyenLieu',[PostController::class, 'TTBaiViet']);
+Route::get('/admin/TTBaiViet_BuocLam' , [PostController::class, 'TTBaiViet_BuocLam']);
+
+Route::get('admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
+Route::get('/user/layThongTinNguoiDung/{id}', [UserController::class, 'layThongTinNguoiDung']);
+
+// II. ĐỊNH NGHĨA ROUTE POST
+Route::post('/admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
+Route::post('/admin/BoQua_ViPham',[PostController::class, 'BoQua_ViPham']);
+Route::post('/admin/xoa_vipham', [PostController::class, 'Xoa_BaiViet'] );
+Route::post('/admin/mo_khoa_vipham', [PostController::class, 'mo_khoa_vipham']);
+Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
+Route::post('/admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
+Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
+Route::post('/admin/CapNhatTT_BaiViet_by_admin', [PostController::class, 'CapNhatTT_BaiViet_by_admin']);
+
+
+Route::post('user/login', [UserController::class, 'Login']);
+Route::post('user/register', [UserController::class, 'Register']);
+Route::post('user/logout', [UserController::class, 'Logout']);
+
+
+>>>>>>> acd37fde714ca9b5d1639445037e9eb8781a659b

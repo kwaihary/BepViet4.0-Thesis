@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useLocation} from 'react-router-dom';
 import Menu from "../../component/website/MenuWebsite";
 import ThongTinBaiViet from "../../component/website/ThongTinBaiViet";
 import HoSo from "./HoSoNguoiDung";
@@ -13,7 +13,6 @@ import DangBai from '../../component/website/DangBai';
 
 function TrangChu() {
     const location = useLocation();
-
     // Style cho từng mục menu
     const getLinkClass = (path) => {
         const isActive = location.pathname === path;
@@ -46,6 +45,10 @@ function TrangChu() {
                             <Link to="/HoSo-NguoiDung" className={getLinkClass('/HoSo-NguoiDung')}>
                                 <i className={`fa-solid fa-user w-6 text-center text-lg ${location.pathname === '/HoSo-NguoiDung' ? 'text-white' : 'text-gray-400 group-hover:text-orange-500'}`}></i> 
                                 <span>Trang cá nhân</span>
+                            </Link>
+                            <Link to="/cong-thuc" className={getLinkClass('/cong-thuc')}>
+                                <i className={`fa-solid fa-utensils ${location.pathname === '/cong-thuc' ? 'text-white' : 'text-gray-400 group-hover:text-orange-500'}`}></i> 
+                                <span>Công thức nấu ăn</span>
                             </Link>
 
                             <Link to="/CookbookCuaToi" className={getLinkClass('/CookbookCuaToi')}>
