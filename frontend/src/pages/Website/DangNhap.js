@@ -3,22 +3,43 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as API from '../../JS/API/API';
 import * as fun from '../../JS/FUNCTION/function';
 import * as tb from '../../JS/FUNCTION/ThongBao';
-import { error } from 'jquery';
+import { useDangNhapContext } from '../../context/QuanLiDangNhap_NguoiDung';
+
 
 function DangNhap() {
-    const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('login');
-    
-    // State hiển thị lỗi đỏ dưới input (dành cho form đăng ký)
-    const [fieldError, setFieldError] = useState({}); 
-
-    // State cho đăng nhập
+    const [err,seterr] = useState({})
     const [login, setLogin] = useState({
         phone: '',
         password: '',
     });
+    const [errHT,seterrHT] = useState('')
+    const { handleLogin } = useDangNhapContext();
+    const DangNhap = async()=>{
+        const ketqua= await handleLogin(login);
+        if(ketqua.validate){
+            seterr(ketqua.err);
+            return;
+        };
+        if(ketqua.status===false){
+            seterrHT(ketqua.message);
+            return;
+        }
+        if(ketqua.status){
+            tb.ThongBao_ThanhCong(ketqua.message);
+            navigate('/HoSo-NguoiDung');
+            return;
+        }
 
-    // State cho đăng ký
+    }
+    
+    //đã sửa phía trên
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState('login');
+    const [showLoginPassword, setShowLoginPassword] = useState(false);
+    const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [fieldError, setFieldError] = useState({}); 
+    
     const [register, setRegister] = useState({
         name: '',
         phone: '',
@@ -29,44 +50,37 @@ function DangNhap() {
     const switchTab = (tab) => {
         setActiveTab(tab);
         setFieldError({});
+        setShowLoginPassword(false);
+        setShowRegisterPassword(false);
+        setShowConfirmPassword(false);
     };
 
     // --- XỬ LÝ ĐĂNG NHẬP ---
-    const handleLogin = async () => {
-        setFieldError({}); 
+    const handlogin = async () => {
+        const kiemtra= fun.KiemTraRong(login);
+        if(kiemtra.Status){
 
-        // 1. Validate
-        if (!login.phone || !login.password) {
-            tb.ThongBao_Loi("Vui lòng điền đầy đủ thông tin đăng nhập");
-            return;
         }
-
-        if(!fun.validatePhone(login.phone)) {
-            tb.ThongBao_Loi("Số điện thoại không hợp lệ");
-            return;
-        }
+        alert(JSON.stringify(kiemtra))
         try {
             // 2. Gọi API
             const formdata = fun.objectToFormData(login);
             
-            // SỬA LỖI 404: Đổi url thành 'user/login' cho khớp với api.php
             const ketqua = await API.CallAPI(formdata, { 
                 url: 'user/login', 
                 PhuongThuc: 1 
             });
-            alert(JSON.stringify(ketqua))
+            // alert(JSON.stringify(ketqua))
 
             // 3. Xử lý kết quả
             if (ketqua.status === true) {
-                // Lưu user vào LocalStorage
                 localStorage.setItem('user', JSON.stringify(ketqua.data));
                 
                 tb.ThongBao_ThanhCong("Đăng nhập thành công!");
                 
-                // Chuyển hướng sau 1s
                 setTimeout(() => {
                     navigate('/');
-                    window.location.reload(); // Reload để cập nhật Menu (hiện Avatar)
+                    window.location.reload(); 
                 }, 1000);
             } else {
                 tb.ThongBao_Loi(ketqua.message || "Đăng nhập thất bại");
@@ -115,7 +129,6 @@ function DangNhap() {
         try {
             // 5. Gọi API
             const formdata = fun.objectToFormData(register);
-            // Route đăng ký thường là 'user/register'
             const ketqua = await API.CallAPI(formdata, { 
                 url: 'user/register', 
                 PhuongThuc: 1 
@@ -127,7 +140,6 @@ function DangNhap() {
                 // Reset form & chuyển tab
                 setRegister({ name: '', phone: '', password: '', password_confirmation: '' });
                 switchTab('login');
-                // Điền sẵn SĐT vừa đăng ký vào ô đăng nhập
                 setLogin(prev => ({ ...prev, phone: register.phone }));
             } else {
                 tb.ThongBao_Loi(ketqua.message || "Đăng ký thất bại");
@@ -174,22 +186,54 @@ function DangNhap() {
                                         value={login.phone} 
                                         onChange={(e) => setLogin({ ...login, phone: e.target.value })} 
                                         placeholder="0912345678" 
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none transition" 
+                                        className={ `${err.phone && 'border-red-700'}  w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none transition`}
                                     />
+                                    {
+                                        err.phone && (
+                                            <p className="text-red-500 text-xs mt-1 ml-1 italic">{err.phone}</p>
+                                        )
+                                    }
                                 </div>
+                                
+                                {/* Login Password Field with Toggle */}
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
-                                    <input 
-                                        type="password" 
-                                        value={login.password} 
-                                        onChange={(e) => setLogin({ ...login, password: e.target.value })} 
-                                        placeholder="" 
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none transition" 
-                                    />
+                                    <div className="relative">
+                                        <input 
+                                            type={showLoginPassword ? "text" : "password"} 
+                                            value={login.password} 
+                                            onChange={(e) => setLogin({ ...login, password: e.target.value })} 
+                                            placeholder="" 
+                                            className={`${err.password && 'border-red-700'} w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none transition pr-10`}
+                                        />
+                                        {
+                                            err.password && (
+                                                <p className="text-red-500 text-xs mt-1 ml-1 italic">{err.password}</p>
+                                            )
+                                        }
+                                        <button 
+                                            type="button"
+                                            onClick={() => setShowLoginPassword(!showLoginPassword)}
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            <i className={`fa-solid ${showLoginPassword ? 'fa-eye' : 'fa-eye-slash'}`}></i>
+                                        </button>
+                                    </div>
+                                    {
+                                        errHT && (
+                                           <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center shadow-sm">
+                                            <i className="fa-solid fa-circle-exclamation text-xl mr-3"></i>
+                                                <div>
+                                                    <p className="font-bold text-sm">Đã có lỗi xảy ra!</p>
+                                                    <p className="text-sm">{errHT}</p>
+                                                </div>
+                                           </div>
+                                        )
+                                    }
                                 </div>
                                 
                                 <button
-                                    onClick={handleLogin}
+                                    onClick={DangNhap}
                                     className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition transform active:scale-95"
                                 >
                                     Đăng nhập ngay
@@ -220,27 +264,49 @@ function DangNhap() {
                                     />
                                     {fieldError.phone && <span className="text-xs text-red-500 mt-1">{fieldError.phone}</span>}
                                 </div>
+
+                                {/* Register Password Field with Toggle */}
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
-                                    <input 
-                                        type="password" 
-                                        value={register.password} 
-                                        onChange={(e) => setRegister({ ...register, password: e.target.value })} 
-                                        className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.password ? 'border-red-500' : 'border-gray-300'}`} 
-                                    />
+                                    <div className="relative">
+                                        <input 
+                                            type={showRegisterPassword ? "text" : "password"} 
+                                            value={register.password} 
+                                            onChange={(e) => setRegister({ ...register, password: e.target.value })} 
+                                            className={`w-full px-4 py-3 rounded-lg border outline-none pr-10 ${fieldError.password ? 'border-red-500' : 'border-gray-300'}`} 
+                                        />
+                                        <button 
+                                            type="button"
+                                            onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            <i className={`fa-solid ${showRegisterPassword ? 'fa-eye' : 'fa-eye-slash'}`}></i>
+                                        </button>
+                                    </div>
                                     {fieldError.password && <span className="text-xs text-red-500 mt-1">{fieldError.password}</span>}
                                 </div>
 
+                                {/* Register Confirm Password Field with Toggle */}
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Nhập lại mật khẩu</label>
-                                    <input 
-                                        type="password" 
-                                        value={register.password_confirmation} 
-                                        onChange={(e) => setRegister({ ...register, password_confirmation: e.target.value })} 
-                                        className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.password_confirmation ? 'border-red-500' : 'border-gray-300'}`} 
-                                    />
+                                    <div className="relative">
+                                        <input 
+                                            type={showConfirmPassword ? "text" : "password"} 
+                                            value={register.password_confirmation} 
+                                            onChange={(e) => setRegister({ ...register, password_confirmation: e.target.value })} 
+                                            className={`w-full px-4 py-3 rounded-lg border outline-none pr-10 ${fieldError.password_confirmation ? 'border-red-500' : 'border-gray-300'}`} 
+                                        />
+                                        <button 
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            <i className={`fa-solid ${showConfirmPassword ? 'fa-eye' : 'fa-eye-slash'}`}></i>
+                                        </button>
+                                    </div>
                                     {fieldError.password_confirmation && <span className="text-xs text-red-500 mt-1">{fieldError.password_confirmation}</span>}
                                 </div>
+                                
                                 <button onClick={handleRegister} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition transform active:scale-95">
                                     Tạo tài khoản mới
                                 </button>

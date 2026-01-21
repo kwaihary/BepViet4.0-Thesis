@@ -57,6 +57,26 @@ class UserController extends Controller
 
     public function Login(Request $request)
     {
+        $validated = $request->validate([
+            'phone'    => [
+                'required', 
+                'numeric', 
+                'digits:10', 
+                'regex:/^(03|05|07|08|09)+([0-9]{8})$/'
+            ],
+            'password' => 'required|string|min:6', 
+        ], [
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.numeric'  => 'Số điện thoại phải là số.',
+            'phone.digits'   => 'Số điện thoại phải bao gồm đúng 10 số.',
+            'phone.regex'    => 'Đầu số điện thoại không hợp lệ.',
+            'password.required' => 'Vui lòng nhập mật khẩu.',
+            'password.min'      => 'Mật khẩu phải có ít nhất 6 ký tự.',
+        ]);
+         $phone = $validated['phone'];
+         $password = $validated['password'];
+         $users = User::where('phone', $phone)->first();
+         if (!$users || !Hash::check($password, $users->password)) {
         $request->validate([
             'phone'    => 'required|max:10',
             'password' => 'required',
@@ -70,17 +90,16 @@ class UserController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Số điện thoại hoặc mật khẩu không đúng.'
-            ], 401);
-        }
-
-        if ($user->status == 0) { // Ví dụ: tài khoản bị khóa
-            return response()->json(['status' => false, 'message' => 'Tài khoản đã bị khóa'], 403);
-        }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // tạo cookie
-        $cookie = cookie(
+            ]);
+         };
+         if($users->status == 0){
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản đã bị khóa, hoặc vi phạm nguyên tắc cộng đông!'
+            ]);
+         }
+         $token = $users->createToken('auth_token')->plainTextToken;
+         $cookie = cookie(
             'token_bepviet', // tên cookie
             $token,          // giá trị cookie
             60 * 24 * 30,     // thời gian sống: 30 ngày
@@ -89,9 +108,13 @@ class UserController extends Controller
             false,           // local http: false, host https: true
             true             // chỉ truy cập HTTP Only (không cho JS truy cập)
         );
-
         return response()->json([
             'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'id' =>$users->id,
+            'rule' => $users->rule
+        ])->cookie($cookie);
+
             'message' => 'Đăng nhập thành công!',
             'data' => $user,
         ])->withCookie($cookie);

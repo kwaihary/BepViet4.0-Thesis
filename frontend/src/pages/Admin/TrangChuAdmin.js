@@ -62,11 +62,7 @@ function TrangChuAD() {
                         <h2 className="font-bold text-gray-700 text-xl">Trung tâm kiểm duyệt</h2>
                         
                         <div className="flex items-center gap-6">
-                            {/* Notification */}
-                            <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold animate-pulse cursor-pointer hover:bg-red-100 transition">
-                                <i className="fa-solid fa-bell mr-1"></i> 5 báo cáo mới
-                            </span>
-
+            
                             {/* --- USER DROPDOWN AREA --- */}
                             <div className="relative">
                                 {/* Avatar Button */}

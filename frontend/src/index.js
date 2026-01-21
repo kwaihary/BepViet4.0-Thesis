@@ -5,7 +5,8 @@ import { BrowserRouter, Route, Routes} from 'react-router-dom'
 import reportWebVitals from './reportWebVitals';
 import TrangChu from './pages/Website/TrangChu';
 import KeHoachAnUong from './pages/Website/KeHoachAnUong';
-import { AppProvider } from './context/QuanLiModal'
+import { AppProvider } from './context/QuanLiModal';
+import { AppDangNhapProvider } from './context/QuanLiDangNhap_NguoiDung';
 import DangNhap from './pages/Website/DangNhap';
 import DangNhapAD from './pages/Admin/DangNhapAdmin';
 import TrangChuAD from './pages/Admin/TrangChuAdmin';
@@ -15,6 +16,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
+    <AppDangNhapProvider>
      <AppProvider>
       <Routes>
           <Route path='/*' element={<TrangChu/>} />
@@ -25,6 +27,7 @@ root.render(
           <Route path="/chi-tiet-mon/:id" element={<ChiTietMonAn />} />
         </Routes>
       </AppProvider>
+      </AppDangNhapProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

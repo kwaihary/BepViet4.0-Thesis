@@ -47,7 +47,7 @@ export function CallAPI(dulieu = null, yeucau) {
             return response;
         })
         .catch(function (xhr) {
-            // Trường hợp validate lỗi (422)
+
             if (xhr.status === 422) {
                 return {
                     validate: true,
