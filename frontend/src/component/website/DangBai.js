@@ -167,6 +167,15 @@ function DangBai() {
                                     <option value="Khó">Khó</option>
                                 </select>
                             </div>
+
+                            <div>
+                                <label className="block font-bold text-sm text-gray-700 mb-2">Danh mục</label>
+                                <select name="difficulty" value={info.difficulty} onChange={handleChangeInfo} className="w-full border border-gray-300 rounded-lg p-3 bg-white focus:border-red-500 outline-none">
+                                    <option value="Dễ">Dễ</option>
+                                    <option value="Trung bình">Trung bình</option>
+                                    <option value="Khó">Khó</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
