@@ -77,6 +77,16 @@ class UserController extends Controller
          $password = $validated['password'];
          $users = User::where('phone', $phone)->first();
          if (!$users || !Hash::check($password, $users->password)) {
+        $request->validate([
+            'phone'    => 'required|max:10',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('phone', $request->phone)->get();
+        // return response()->json([
+        //     'data' => $users
+        // ]);
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Số điện thoại hoặc mật khẩu không đúng.'
@@ -104,6 +114,10 @@ class UserController extends Controller
             'id' =>$users->id,
             'rule' => $users->rule
         ])->cookie($cookie);
+
+            'message' => 'Đăng nhập thành công!',
+            'data' => $user,
+        ])->withCookie($cookie);
     }
 
     // đăng xuất
@@ -239,4 +253,3 @@ class UserController extends Controller
         return response()->json(['status' => false, 'message' => 'Không tìm thấy!']);
     }
 }
-
