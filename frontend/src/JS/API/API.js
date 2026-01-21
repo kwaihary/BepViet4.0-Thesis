@@ -27,7 +27,8 @@ export function CallAPI(dulieu = null, yeucau) {
 
     let ajaxOptions = {
         url: DuongDan,
-        type: yeucau.PhuongThuc === 1 ? "POST" : "GET",
+        // Nếu PhuongThuc là 3 thì dùng "DELETE", 1 là "POST", còn lại là "GET"
+        type: yeucau.PhuongThuc === 1 ? "POST" : (yeucau.PhuongThuc === 3 ? "DELETE" : "GET"),
         xhrFields: { withCredentials: true },
         processData: false,
         contentType: false,

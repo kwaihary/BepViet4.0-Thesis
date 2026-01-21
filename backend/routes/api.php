@@ -57,7 +57,7 @@ Route::post('user/register', [UserController::class, 'Register']);
 Route::post('user/logout', [UserController::class, 'Logout']);
 
 
-
-
-// URL sẽ là: http://localhost:8000/api/recipes
 Route::get('/recipes', [RecipeController::class, 'index']);
+
+// Route xóa bài viết
+Route::delete('recipes/{id}', [RecipeController::class, 'destroy']);

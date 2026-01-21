@@ -39,4 +39,34 @@ class RecipeController extends Controller
 
         return response()->json($formattedPosts);
     }
+    public function destroy($id)
+{
+    try {
+        $recipe = Recipe::find($id);
+
+        if (!$recipe) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bài viết không tồn tại'
+            ], 404);
+        }
+
+        // Xóa ảnh cũ trong thư mục storage nếu có
+        if ($recipe->image) {
+            \Storage::disk('public')->delete($recipe->image);
+        }
+
+        $recipe->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Xóa bài viết thành công'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Lỗi: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }
