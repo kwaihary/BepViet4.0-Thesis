@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import * as API from '../../JS/API/API';
 
 function Menu() {
+    const navigate = useNavigate();
+    // --- State quản lý User ---
+    // Khởi tạo state user từ localStorage
+    const [user, setUser] = useState(() => {
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
+
     // --- State quản lý Filter ---
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const toggleFilter = () => {
@@ -15,6 +23,21 @@ function Menu() {
     const toggleUserMenu = () => {
         setIsUserMenuOpen(!isUserMenuOpen);
         if (isFilterOpen) setIsFilterOpen(false); // Đóng filter nếu mở menu user
+    };
+
+    const handleLogout = async () => {
+        try {
+            // 1. Gọi API để backend xóa cookie (token_bepviet)
+            await API.CallAPI(null, { url: 'user/logout', PhuongThuc: 1 });
+        } catch (error) {
+            console.error("Lỗi khi gọi API logout:", error);
+        } finally {
+            localStorage.removeItem('user'); // Xóa thông tin user
+            setUser(null); // Reset state
+            setIsUserMenuOpen(false); // Đóng menu
+            // 3. Chuyển hướng về trang đăng nhập hoặc trang chủ
+            navigate('/DangNhap'); 
+        }
     };
     return (
         <>
@@ -196,7 +219,7 @@ function Menu() {
 
                                     {/* Footer: Đăng xuất */}
                                     <div className="border-t border-gray-100 mt-2 pt-2">
-                                        <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-semibold flex items-center gap-3 transition">
+                                        <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-semibold flex items-center gap-3 transition">
                                             <i className="fa-solid fa-arrow-right-from-bracket w-5"></i> Đăng xuất
                                         </button>
                                     </div>

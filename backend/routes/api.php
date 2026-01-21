@@ -14,6 +14,7 @@ Route::get('/admin/ThongKeNguoiDung',[UserController::class,'ThongKe']);
 Route::get('/admin/ThongKeViPham', [ReportController::class,'ThongKe']);
 Route::get('/admin/laydl_nguoidung_dangbai',[PostController::class, 'ThongTin_nguoidung_dangbai']);
 Route::get('admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
+Route::get('/user/layThongTinNguoiDung/{id}', [UserController::class, 'layThongTinNguoiDung']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
 Route::post('admin/DangNhap',[UserController::class,'login']);
@@ -24,4 +25,6 @@ Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
 Route::post('admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
 Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
 Route::post('user/login', [UserController::class, 'Login']);
+Route::post('user/logout', [UserController::class, 'Logout']);
 Route::post('user/register', [UserController::class, 'Register']);
+Route::post('user/CapNhatThongTinNguoiDung/{id}', [UserController::class, 'capNhatThongTinNguoiDung']);
