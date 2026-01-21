@@ -9,7 +9,7 @@ use App\Http\Controllers\CategoryController;
 
 
 //ĐỊNH NGHĨA DEMO 
-Route::get('admin/lay_dl', [UserController::class,'demo']);
+Route::get('/admin/lay_dl', [UserController::class,'demo']);
 // I. ĐỊNH NGHĨA ROUTE GET
 Route::get('/admin/layDLUS', [UserController::class, 'layDL']);
 Route::get('/admin/laydl_baocao', [ReportController::class, 'layDL']);
@@ -23,9 +23,9 @@ Route::get('/admin/dl_bv', [PostController::class,'dl_bv']);
 Route::get('/admin/TTBaiViet_NguyenLieu',[PostController::class, 'TTBaiViet']);
 Route::get('/admin/TTBaiViet_BuocLam' , [PostController::class, 'TTBaiViet_BuocLam']);
 
-Route::get('admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
+Route::get('/admin/laydl_danhmuc', [CategoryController::class, 'laydl_danhmuc']);
 Route::get('/user/layThongTinNguoiDung/{id}', [UserController::class, 'layThongTinNguoiDung']);
-Route::get('admin/lay_thongke' ,[PostController::class , 'lay_thongke']);
+Route::get('/admin/lay_thongke' ,[PostController::class , 'lay_thongke']);
 
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('/admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
@@ -38,8 +38,8 @@ Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
 Route::post('/admin/CapNhatTT_BaiViet_by_admin', [PostController::class, 'CapNhatTT_BaiViet_by_admin']);
 
 
-Route::post('user/login', [UserController::class, 'Login']);
-Route::post('user/register', [UserController::class, 'Register']);
+Route::post('/user/login', [UserController::class, 'Login']);
+Route::post('/user/register', [UserController::class, 'Register']);
 Route::post('user/logout', [UserController::class, 'Logout']);
 
 
