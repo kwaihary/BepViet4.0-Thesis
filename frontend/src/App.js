@@ -1,5 +1,4 @@
 import './App.css';
-import Menu from './component/website/MenuWebsite';
 import TrangChu from './pages/Website/TrangChu';
 import DangNhap from './pages/Website/DangNhap';
 function App() {
