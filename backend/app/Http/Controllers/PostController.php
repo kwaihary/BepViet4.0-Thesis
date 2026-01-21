@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Report;
 use App\Models\Recipe;
+use App\Models\Comment;
+use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
@@ -195,5 +197,16 @@ class PostController extends Controller
                 'message' =>'Cập nhật trạng thái thất bại!'
             ]);
         }
+    }
+    public function lay_thongke() {
+        return response()->json([
+            'status' => true,
+            'data' => [
+                 'BaiViet_HN' => Recipe::whereDate('created_at', Carbon::today())->count(),
+                 'TongND' =>  User::count(),
+                 'Tong_BL' => Comment::count(),
+                 'TongBaiViet' => Recipe::count(),
+            ]
+        ]);
     }
 }
