@@ -57,6 +57,96 @@ class UserController extends Controller
 
     public function Login(Request $request)
     {
+        $request->validate([
+            'phone'    => 'required|max:10',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Số điện thoại hoặc mật khẩu không đúng.'
+            ], 401);
+        }
+
+        if ($user->status == 0) { // Ví dụ: tài khoản bị khóa
+            return response()->json(['status' => false, 'message' => 'Tài khoản đã bị khóa'], 403);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // tạo cookie
+        $cookie = cookie(
+            'token_bepviet', // tên cookie
+            $token,          // giá trị cookie
+            60 * 24 * 30,     // thời gian sống: 30 ngày
+            '/',             // đường dẫn
+            null,            // domain
+            false,           // local http: false, host https: true
+            true             // chỉ truy cập HTTP Only (không cho JS truy cập)
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công!',
+            'data' => $user,
+        ])->withCookie($cookie);
+    }
+
+    // đăng xuất
+    public function Logout()
+    {
+        $cookie = cookie()->forget('token_bepviet');
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng xuất thành công!'
+        ])->withCookie($cookie);
+    }
+
+    public function layDL()
+    {
+        $users = User::orderBy('id', 'asc')->paginate(10);
+        return response()->json(['status' => true, 'data' => $users]);
+    }
+
+    public function ThongKe()
+    {
+        return response()->json([
+            'status' => true,
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ], 400);
+        }
+
+        try {
+            $user = new User();
+            $user->name = $request->name;
+            $user->phone = $request->phone;
+            $user->password = Hash::make($request->password); // Mã hóa mật khẩu
+            $user->status = 1; 
+            $user->rule = 0;
+            $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Đăng ký tài khoản thành công! Vui lòng đăng nhập.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi hệ thống: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function Login(Request $request)
+    {
         $validated = $request->validate([
             'phone'    => [
                 'required', 
@@ -241,4 +331,7 @@ class UserController extends Controller
         }
         return response()->json(['status' => false, 'message' => 'Không tìm thấy!']);
     }
+}
+
+
 }

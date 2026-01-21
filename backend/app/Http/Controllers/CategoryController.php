@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+
+
 use Illuminate\Support\Facades\DB;
 
 
@@ -119,6 +121,8 @@ class CategoryController extends Controller
             ]);
          }
     }
+ 
+
       public function dulieu_bieudo_danhmuc(){
         $totals = Category::select('type', DB::raw('COUNT(*) as total'))
             ->whereIn('type', ['Vùng miền', 'Loại món ăn', 'Chế độ ăn'])

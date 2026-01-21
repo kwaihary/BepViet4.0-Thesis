@@ -58,4 +58,10 @@ class Recipe extends Model
     {
         return $this->hasMany(Interaction::class);
     }
+
+    public function user() {
+    return $this->belongsTo(User::class);
+}
+
+
 }
