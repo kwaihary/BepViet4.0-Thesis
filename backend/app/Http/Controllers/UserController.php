@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
     // --- CHỨC NĂNG ĐĂNG KÝ ---
@@ -124,57 +124,59 @@ class UserController extends Controller
 
     public function capNhatThongTinNguoiDung(Request $request, $id)
     {
+       // 1. Tìm người dùng
         $user = User::find($id);
 
         if (!$user) {
             return response()->json([
-                'status' => false,
-                'message' => 'Không tìm thấy tài khoản người dùng'
+                'status' => 404,
+                'message' => 'Không tìm thấy người dùng'
             ], 404);
         }
 
+        // 2. Validate dữ liệu
         $validator = Validator::make($request->all(), [
-            'name'    => 'required|string|max:255',
-            'phone'   => 'required|digits:10|unique:users,phone,' . $id, // Cho phép trùng số cũ của chính mình
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:255',
-            'bio'     => 'nullable|string',
-            // Kiểm tra file ảnh (nếu có gửi lên)
-            'avatar'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ], [
-            'phone.unique' => 'Số điện thoại này đã thuộc về người khác.'
+            'bio' => 'nullable|string',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Kiểm tra file ảnh
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => false,
-                'message' => $validator->errors()->first()
+                'status' => 422,
+                'message' => $validator->errors()->first() // Trả về lỗi đầu tiên tìm thấy
             ], 422);
         }
 
-        if ($request->hasFile('files')) {
-            $file = $request->file('files')[0]; // Lấy file đầu tiên trong mảng
+        // 3. Cập nhật thông tin text
+        $user->name = $request->input('name');
+        $user->phone = $request->input('phone');
+        $user->address = $request->input('address');
+        $user->bio = $request->input('bio');
 
-            // Đặt tên file để không trùng: time_tenfile
-            $filename = time() . '_' . $file->getClientOriginalName();
+        // 4. Xử lý upload ảnh (nếu có gửi file)
+        if ($request->hasFile('avatar')) {
+            // Xóa ảnh cũ nếu có (tránh rác server)
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
 
-            // Lưu vào thư mục public/uploads/avatars
-            $file->move(public_path('uploads/avatars'), $filename);
-
-            // Cập nhật đường dẫn vào DB
-            $user->avatar = 'uploads/avatars/' . $filename;
+            // Lưu ảnh mới vào thư mục 'avatars' trong storage/app/public
+            $path = $request->file('avatar')->store('avatars', 'public');
+            
+            // Lưu đường dẫn vào DB
+            $user->avatar = $path;
         }
 
-        // cap nhat thong tin
-        $user->name    = $request->name;
-        $user->phone   = $request->phone;
-        $user->address = $request->address;
-        $user->bio     = $request->bio;
+        // 5. Lưu vào Database
         $user->save();
 
         return response()->json([
-            'status'  => true,
-            'message' => 'Cập nhật hồ sơ thành công!',
-            'data'    => $user
+            'status' => 200,
+            'message' => 'Cập nhật thành công',
+            'avatar' => $user->avatar // Trả về đường dẫn ảnh mới để React cập nhật LocalStorage
         ]);
     }
 

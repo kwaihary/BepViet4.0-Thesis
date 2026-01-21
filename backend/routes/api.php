@@ -27,4 +27,3 @@ Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
 Route::post('user/login', [UserController::class, 'Login']);
 Route::post('user/logout', [UserController::class, 'Logout']);
 Route::post('user/register', [UserController::class, 'Register']);
-Route::post('user/CapNhatThongTinNguoiDung/{id}', [UserController::class, 'capNhatThongTinNguoiDung']);
