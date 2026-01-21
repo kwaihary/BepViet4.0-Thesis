@@ -43,4 +43,6 @@ Route::post('/user/login', [UserController::class, 'Login']);
 Route::post('/user/register', [UserController::class, 'Register']);
 Route::post('user/logout', [UserController::class, 'Logout']);
 
-
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/recipes/create', [RecipeController::class, 'store']);
+});
