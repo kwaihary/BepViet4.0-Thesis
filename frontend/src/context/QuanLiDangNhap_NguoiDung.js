@@ -8,7 +8,7 @@ export function AppDangNhapProvider({ children }) {
         id:'',
         rule:''
     });
-    const handleLogin = async (login) => {
+    const handleLogin = async (login , url ) => {
         const kiemtra= fun.KiemTraRong(login);
         if(!kiemtra.Status){
             let errorsTemp = {};
@@ -22,7 +22,7 @@ export function AppDangNhapProvider({ children }) {
         }
         const formdata= fun.objectToFormData(login);
         try {
-            const data = await API.CallAPI(formdata,{PhuongThuc:1, url: 'user/login'});
+            const data = await API.CallAPI(formdata,{PhuongThuc:1, url: url});
             if(data.status===false){
                 return {
                     status:false,

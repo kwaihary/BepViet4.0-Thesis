@@ -5,7 +5,6 @@ import * as fun from '../../JS/FUNCTION/function';
 import * as tb from '../../JS/FUNCTION/ThongBao';
 import { useDangNhapContext } from '../../context/QuanLiDangNhap_NguoiDung';
 
-
 function DangNhap() {
     const [err,seterr] = useState({})
     const [login, setLogin] = useState({
@@ -15,7 +14,7 @@ function DangNhap() {
     const [errHT,seterrHT] = useState('')
     const { handleLogin } = useDangNhapContext();
     const DangNhap = async()=>{
-        const ketqua= await handleLogin(login);
+        const ketqua= await handleLogin(login ,'user/login');
         if(ketqua.validate){
             seterr(ketqua.err);
             return;
@@ -55,41 +54,7 @@ function DangNhap() {
         setShowConfirmPassword(false);
     };
 
-    // --- XỬ LÝ ĐĂNG NHẬP ---
-    const handlogin = async () => {
-        const kiemtra= fun.KiemTraRong(login);
-        if(kiemtra.Status){
-
-        }
-        alert(JSON.stringify(kiemtra))
-        try {
-            // 2. Gọi API
-            const formdata = fun.objectToFormData(login);
-            
-            const ketqua = await API.CallAPI(formdata, { 
-                url: 'user/login', 
-                PhuongThuc: 1 
-            });
-            // alert(JSON.stringify(ketqua))
-
-            // 3. Xử lý kết quả
-            if (ketqua.status === true) {
-                localStorage.setItem('user', JSON.stringify(ketqua.data));
-                
-                tb.ThongBao_ThanhCong("Đăng nhập thành công!");
-                
-                setTimeout(() => {
-                    navigate('/');
-                    window.location.reload(); 
-                }, 1000);
-            } else {
-                tb.ThongBao_Loi(ketqua.message || "Đăng nhập thất bại");
-            }
-        } catch (error) {
-            console.error(error);
-            tb.ThongBao_Loi("Không thể kết nối đến server");
-        }
-    };
+   
 
     // --- XỬ LÝ ĐĂNG KÝ ---
     const handleRegister = async () => {

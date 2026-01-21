@@ -76,7 +76,7 @@ class UserController extends Controller
          $phone = $validated['phone'];
          $password = $validated['password'];
          $users = User::where('phone', $phone)->first();
-         if (!$users || !Hash::check($password, $users->password)) {
+        if (!$users || !Hash::check($password, $users->password)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Số điện thoại hoặc mật khẩu không đúng.'
@@ -239,4 +239,3 @@ class UserController extends Controller
         return response()->json(['status' => false, 'message' => 'Không tìm thấy!']);
     }
 }
-
