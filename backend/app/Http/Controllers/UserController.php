@@ -1,16 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Auth;
+
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-<<<<<<< HEAD
-use Illuminate\Support\Facades\Hash; // Quan trọng: Phải có dòng này
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cookie;
-=======
->>>>>>> 3e209228af4eb46f6ca98286d7037ae57df83f2c
 
 use Illuminate\Support\Facades\Hash; 
 use Illuminate\Support\Facades\Validator;
@@ -40,15 +34,6 @@ class UserController extends Controller
             ], 400);
         }
 
-<<<<<<< HEAD
-        $user = User::create([
-            'name'     => $request->name,
-            'display_name'=> $request->name,
-            'phone'    => $request->phone,
-            'password' => Hash::make($request->password),
-            'status'   => 2, 
-            'rule'=>0
-=======
         try {
             $user = new User();
             $user->name = $request->name;
@@ -75,14 +60,13 @@ class UserController extends Controller
         $request->validate([
             'phone'    => 'required|max:10',
             'password' => 'required',
->>>>>>> 3e209228af4eb46f6ca98286d7037ae57df83f2c
         ]);
 
-        $users = User::where('phone', $request->phone)->get();
-        return response()->json([
-            'data' => $users
-        ]);
-        /*if (!$user || !Hash::check($request->password, $user->password)) {
+        $user = User::where('phone', $request->phone)->get();
+        // return response()->json([
+        //     'data' => $users
+        // ]);
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Số điện thoại hoặc mật khẩu không đúng.'
@@ -110,36 +94,9 @@ class UserController extends Controller
             'status' => true,
             'message' => 'Đăng nhập thành công!',
             'data' => $user,
-        ])->withCookie($cookie);*/
+        ])->withCookie($cookie);
     }
 
-<<<<<<< HEAD
-public function login(Request $request) {
-    // Lấy dữ liệu từ request
-    $phone = $request->phone;
-    $password = $request->password;
-
-    // Sử dụng hàm Auth::attempt của Laravel để kiểm tra
-    if (Auth::attempt(['phone' => $phone, 'password' => $password])) {
-        $user = Auth::user();
-        $token = $user->createToken('UserToken')->plainTextToken;
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Đăng nhập thành công'
-        ])->withCookie(cookie('token', $token, 60, null, null, false, true));
-    }
-
-    return response()->json([
-        'status' => false,
-        'message' => 'Tài khoản hoặc mật khẩu không đúng'
-    ], 401);
-}
-
-
-
-    public function layDL() {
-=======
     // đăng xuất
     public function Logout()
     {
@@ -152,7 +109,6 @@ public function login(Request $request) {
 
     public function layDL()
     {
->>>>>>> 3e209228af4eb46f6ca98286d7037ae57df83f2c
         $users = User::orderBy('id', 'asc')->paginate(10);
         return response()->json(['status' => true, 'data' => $users]);
     }
@@ -274,4 +230,3 @@ public function login(Request $request) {
         return response()->json(['status' => false, 'message' => 'Không tìm thấy!']);
     }
 }
-
