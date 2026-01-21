@@ -46,20 +46,20 @@ export function CallAPI(dulieu = null, yeucau) {
         .then(function (response) {
             return response;
         })
-.catch(function (xhr) {
-    let msg = "Có lỗi xảy ra";
-    try {
-        // Parse chuỗi JSON từ server trả về
-        const response = JSON.parse(xhr.responseText);
-        // Lấy đúng trường "message" mà bạn đã viết ở Laravel
-        msg = response.message; 
-    } catch (e) {
-        msg = "Lỗi " + xhr.status;
-    }
+        .catch(function (xhr) {
+            // Trường hợp validate lỗi (422)
+            if (xhr.status === 422) {
+                return {
+                    validate: true,
+                    message: "Dữ liệu không hợp lệ",
+                    errors: xhr.responseJSON?.errors
+                };
+            }
 
-    return {
-        status: false,
-        message: msg // Đảm bảo trả về chuỗi thuần túy
-    };
-});
+            // Các lỗi khác
+            return {
+                status: false,
+                message: `Lỗi HTTP ${xhr.status}: ${xhr.responseText ? xhr.responseText.substring(0, 50) + "..." : "Không rõ"}`
+            };
+        });
 }

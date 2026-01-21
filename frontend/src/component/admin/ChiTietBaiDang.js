@@ -7,8 +7,7 @@ function ChiTietBaiDang({ DuLieu }) {
     const [loading, setloading] = useState(false);
     const [DuLieu_NguyenLieu, setNguyenLieu] = useState([]);
     const [DuLieu_BuocLam, setBuocLam] = useState([]);
-     const [err, seterr] = useState({})
-    //$table->enum('status', ['Đang chờ', 'Đã duyệt', 'Đã xóa'])->default('Đang chờ');
+    const [err, seterr] = useState({})
     useEffect(() => {
         if (!DuLieu?.id) return;
 
@@ -46,7 +45,6 @@ function ChiTietBaiDang({ DuLieu }) {
         const formdata= fun.objectToFormData({id:DuLieu.id, data:DuLieu.data})
         try {
             const data = await API.CallAPI(formdata,{PhuongThuc:1, url :'admin/CapNhatTT_BaiViet_by_admin'});
-            alert(JSON.stringify(data))
              if (data.validate) {
                 seterr(data.errors);
                 return;

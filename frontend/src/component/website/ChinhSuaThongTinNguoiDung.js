@@ -1,4 +1,18 @@
+import React, { useState, useEffect} from 'react';
+import * as API from '../../JS/API/API';
 function ChinhSua(){
+
+    const [formData, setFormData] = useState({
+        id: '',
+        name: '',
+        phone: '',
+        address: '',
+        bio: '',
+        avatar: null
+    });
+
+    const [img, setImg] = useState("https://i.pravatar.cc/150?img=32");
+
     return(
         <>
         <div class="p-6 overflow-y-auto custom-scrollbar space-y-8">
@@ -20,10 +34,10 @@ function ChinhSua(){
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="col-span-1">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tên hiển thị</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên đầy đủ</label>
                         <div class="relative">
                             <i class="fa-regular fa-id-badge absolute left-3 top-3 text-gray-400"></i>
-                            <input type="text" value="Mẹ Bắp 🌽" class="form-input w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 transition placeholder-gray-400"/>
+                            <input type="text" value="Vũ Thu Phương" class="form-input w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 transition placeholder-gray-400"/>
                         </div>
                     </div>
 
@@ -38,14 +52,6 @@ function ChinhSua(){
                     <div class="col-span-1 md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tiểu sử</label>
                         <textarea rows="3" class="form-input w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 transition placeholder-gray-400">🍳 Yêu bếp, nghiện nhà. Chuyên cơm gia đình & ăn dặm.</textarea>
-                    </div>
-
-                    <div class="col-span-1 md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Website / Blog</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-globe absolute left-3 top-3 text-gray-400"></i>
-                            <input type="url" value="https://bepphuong.com" class="form-input w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 text-blue-600 transition"/>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -66,15 +72,6 @@ function ChinhSua(){
                         <div class="relative">
                             <i class="fa-solid fa-phone absolute left-3 top-3 text-gray-400"></i>
                             <input type="tel" value="0987 *** ***" class="form-input w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 transition"/>
-                        </div>
-                    </div>
-
-                    <div class="col-span-1 md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email đăng nhập</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-envelope absolute left-3 top-3 text-gray-400"></i>
-                            <input type="email" value="mebap.cooking@email.com" disabled class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed select-none"/>
-                            <span class="absolute right-3 top-3 text-xs text-blue-500 cursor-pointer hover:underline">Thay đổi?</span>
                         </div>
                     </div>
                 </div>
