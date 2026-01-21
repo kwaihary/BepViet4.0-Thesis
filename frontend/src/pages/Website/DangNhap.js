@@ -2,180 +2,128 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as API from '../../JS/API/API';
 import * as fun from '../../JS/FUNCTION/function';
-
-function DangNhap() {
-    const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('login');
-    
-    const [error, setError] = useState(""); 
-    const [fieldError, setFieldError] = useState({}); 
-
-    // State cho đăng nhập
-    const [login, setLogin] = useState({
-        phone: '',
-        password: '',
-    });
-
-    
-
-    // State cho đăng ký
-
 import * as tb from '../../JS/FUNCTION/ThongBao';
 import { useDangNhapContext } from '../../context/QuanLiDangNhap_NguoiDung';
 
-
 function DangNhap() {
-    const [err,seterr] = useState({})
-    const [login, setLogin] = useState({
-        phone: '',
-        password: '',
-    });
-    const [errHT,seterrHT] = useState('')
-    const { handleLogin } = useDangNhapContext();
-    const DangNhap = async()=>{
-        const ketqua= await handleLogin(login);
-        if(ketqua.validate){
-            seterr(ketqua.err);
-            return;
-        };
-        if(ketqua.status===false){
-            seterrHT(ketqua.message);
-            return;
-        }
-        if(ketqua.status){
-            tb.ThongBao_ThanhCong(ketqua.message);
-            navigate('/HoSo-NguoiDung');
-            return;
-        }
-
-    }
-    
-    //đã sửa phía trên
     const navigate = useNavigate();
+    const { handleLogin: loginContext } = useDangNhapContext();
+
+    // --- STATES ---
     const [activeTab, setActiveTab] = useState('login');
     const [showLoginPassword, setShowLoginPassword] = useState(false);
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [fieldError, setFieldError] = useState({}); 
     
-    const [register, setRegister] = useState({
+    // Lỗi chung và lỗi từng trường
+    const [errorHT, setErrorHT] = useState(""); 
+    const [fieldErrors, setFieldErrors] = useState({}); 
+
+    const [loginData, setLoginData] = useState({ phone: '', password: '' });
+    const [registerData, setRegisterData] = useState({
         name: '',
         phone: '',
         password: '',
         password_confirmation: ''
     });
 
+    // --- FUNCTIONS ---
     const switchTab = (tab) => {
         setActiveTab(tab);
-        setError("");
-        setFieldError({});
+        setErrorHT("");
+        setFieldErrors({});
     };
 
+    const handleLoginAction = async () => {
+        setErrorHT("");
+        setFieldErrors({});
 
-
-
-    const handleLogin = async () => {
-        setError("");
-        setFieldError({}); 
-
-
-        if (!login.phone || !login.password) {
-            setError("Vui lòng điền đầy đủ thông tin đăng nhập");
-            return;
-        }
-
-        if(!fun.validatePhone(login.phone)) {
-            setError("Số điện thoại không hợp lệ");
+        // 1. Validate nhanh client-side
+        if (!loginData.phone || !loginData.password) {
+            setErrorHT("Vui lòng điền đầy đủ thông tin");
             return;
         }
 
         try {
-            const formdata = fun.objectToFormData(login);
-            const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/login' });
+            // Sử dụng handleLogin từ Context để đồng bộ trạng thái toàn app
+            const ketqua = await loginContext(loginData);
+
+            if (ketqua.validate) {
+                setFieldErrors(ketqua.err); // Lỗi từ phía server validate
+                return;
+            }
 
             if (ketqua.status) {
-                localStorage.setItem('user', JSON.stringify(ketqua.data));
-                navigate('/');
+                tb.ThongBao_ThanhCong("Đăng nhập thành công!");
+                setTimeout(() => {
+                    navigate('/HoSo-NguoiDung');
+                    window.location.reload();
+                }, 1000);
             } else {
-                setError(ketqua.message);
+                setErrorHT(ketqua.message || "Tài khoản hoặc mật khẩu không chính xác");
             }
         } catch (error) {
-            setError("Không thể kết nối đến server");
+            tb.ThongBao_Loi("Không thể kết nối đến server");
         }
     };
 
-    // --- HÀM ĐĂNG KÝ ---
-    const handleRegister = async () => {
-        setError(""); 
-        setFieldError({}); 
+    const handleRegisterAction = async () => {
+        setFieldErrors({});
+        setErrorHT("");
 
-        let newFieldErrors = {};
-
-        // 1. Kiểm tra rỗng
-        const checkEmpty = fun.KiemTraRong(register);
+        // Logic validate
+        let errors = {};
+        const checkEmpty = fun.KiemTraRong(registerData);
         if (!checkEmpty.Status) {
-            checkEmpty.ErrorKeys.forEach(key => {
-                newFieldErrors[key] = "Không được để trống";
-            });
+            checkEmpty.ErrorKeys.forEach(key => { errors[key] = "Không được để trống"; });
+        }
+        if (registerData.phone && !fun.validatePhone(registerData.phone)) {
+            errors.phone = "Số điện thoại không hợp lệ";
+        }
+        if (registerData.password && registerData.password.length < 6) {
+            errors.password = "Mật khẩu tối thiểu 6 ký tự";
+        }
+        if (registerData.password !== registerData.password_confirmation) {
+            errors.password_confirmation = "Mật khẩu không khớp";
         }
 
-        // 2. Validate SĐT
-        if(register.phone && !fun.validatePhone(register.phone)) {
-            newFieldErrors.phone = "Số điện thoại không hợp lệ";
-        }
-
-        // 3. Validate Mật khẩu
-        if (register.password && register.password.length < 6) {
-            newFieldErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
-        }
-
-        // 4. Validate Khớp mật khẩu
-        if (register.password !== register.password_confirmation) {
-            newFieldErrors.password_confirmation = "Mật khẩu nhập lại không khớp";
-        }
-
-        // --- KIỂM TRA ĐỘ DÀI OBJECT LỖI ---
-        // Nếu object có key (length > 0) nghĩa là có lỗi -> Dừng lại
-        if (Object.keys(newFieldErrors).length > 0) {
-            setFieldError(newFieldErrors);
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
             return;
         }
 
         try {
-            const formdata = new FormData();
-            formdata.append('name', register.name);
-            formdata.append('phone', register.phone);
-            formdata.append('password', register.password);
-            formdata.append('password_confirmation', register.password_confirmation);
+            const formdata = fun.objectToFormData(registerData);
+            const ketqua = await API.CallAPI(formdata, { url: 'user/register', PhuongThuc: 1 });
 
-            const ketqua = await API.CallAPI(formdata, { PhuongThuc: 1, url: 'user/register' });
-            
-            if (ketqua.status === true) {
-                setRegister({ name: '', phone: '', password: '', password_confirmation: '' });
-                switchTab('login'); 
+            if (ketqua.status) {
+                tb.ThongBao_ThanhCong("Đăng ký thành công! Hãy đăng nhập.");
+                setLoginData(prev => ({ ...prev, phone: registerData.phone }));
+                switchTab('login');
             } else {
-                setError(ketqua.message); 
+                setErrorHT(ketqua.message);
             }
-        } catch (error) {
-            setError("Không thể kết nối đến server");
+        } catch (e) {
+            tb.ThongBao_Loi("Lỗi kết nối");
         }
     };
 
     return (
-        <div className="bg-gray-50 font-sans h-screen flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex overflow-hidden h-[600px]">
-
-                {/* --- CỘT TRÁI (ẢNH) --- */}
-                <div className="hidden md:block w-1/2 bg-cover bg-center relative" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3')" }}>
+        <div className="bg-gray-50 font-sans min-h-screen flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex overflow-hidden h-[650px]">
+                
+                {/* CỘT TRÁI - ẢNH */}
+                <div className="hidden md:block w-1/2 bg-cover bg-center relative" 
+                     style={{ backgroundImage: "url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3')" }}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-10 text-white">
                         <h2 className="text-4xl font-bold mb-2">Bếp Việt 4.0</h2>
                         <p className="text-lg opacity-90">Kết nối đam mê, sẻ chia hương vị Việt.</p>
                     </div>
                 </div>
 
-                {/* --- CỘT PHẢI (FORM) --- */}
+                {/* CỘT PHẢI - FORM */}
                 <div className="w-full md:w-1/2 p-8 md:p-12 relative overflow-y-auto">
-                    <Link to='/' className="absolute top-6 right-6 text-gray-400 hover:text-red-600">
+                    <Link to='/' className="absolute top-6 right-6 text-gray-400 hover:text-red-600 transition">
                         <i className="fa-solid fa-xmark text-2xl"></i>
                     </Link>
 
@@ -184,13 +132,12 @@ function DangNhap() {
                             <button onClick={() => switchTab('login')} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'login' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Nhập</button>
                             <button onClick={() => switchTab('register')} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'register' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Ký</button>
                         </div>
-    
-                        {error && (
-                            <div className="bg-red-50 border-l-4 border-red-500 p-3 mb-4">
-                                <div className="flex items-center">
-                                    <i className="fa-solid fa-circle-exclamation text-red-500 mr-2"></i>
-                                    <p className="text-sm text-red-700 font-medium text-lg">{error}</p>
-                                </div>
+
+                        {/* Hiển thị lỗi tổng quát */}
+                        {errorHT && (
+                            <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-3 flex items-center shadow-sm">
+                                <i className="fa-solid fa-circle-exclamation text-red-500 mr-2"></i>
+                                <p className="text-sm text-red-700 font-medium">{errorHT}</p>
                             </div>
                         )}
 
@@ -198,206 +145,33 @@ function DangNhap() {
                             <div className="space-y-5">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
-                                    <input type="text" value={login.phone || ''} onChange={(e) => setLogin({ ...login, phone: e.target.value })} placeholder="0123456789" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
-
-
-    const switchTab = (tab) => {
-        setActiveTab(tab);
-        setFieldError({});
-        setShowLoginPassword(false);
-        setShowRegisterPassword(false);
-        setShowConfirmPassword(false);
-    };
-
-    // --- XỬ LÝ ĐĂNG NHẬP ---
-    const handlogin = async () => {
-        const kiemtra= fun.KiemTraRong(login);
-        if(kiemtra.Status){
-
-        }
-        alert(JSON.stringify(kiemtra))
-        try {
-            // 2. Gọi API
-            const formdata = fun.objectToFormData(login);
-            
-            const ketqua = await API.CallAPI(formdata, { 
-                url: 'user/login', 
-                PhuongThuc: 1 
-            });
-            // alert(JSON.stringify(ketqua))
-
-            // 3. Xử lý kết quả
-            if (ketqua.status === true) {
-                localStorage.setItem('user', JSON.stringify(ketqua.data));
-                
-                tb.ThongBao_ThanhCong("Đăng nhập thành công!");
-                
-                setTimeout(() => {
-                    navigate('/');
-                    window.location.reload(); 
-                }, 1000);
-            } else {
-                tb.ThongBao_Loi(ketqua.message || "Đăng nhập thất bại");
-            }
-        } catch (error) {
-            console.error(error);
-            tb.ThongBao_Loi("Không thể kết nối đến server");
-        }
-    };
-
-    // --- XỬ LÝ ĐĂNG KÝ ---
-    const handleRegister = async () => {
-        setFieldError({}); 
-
-        let newFieldErrors = {};
-
-        // 1. Kiểm tra rỗng
-        const checkEmpty = fun.KiemTraRong(register);
-        if (!checkEmpty.Status) {
-            checkEmpty.ErrorKeys.forEach(key => {
-                newFieldErrors[key] = "Không được để trống";
-            });
-        }
-
-        // 2. Validate SĐT
-        if(register.phone && !fun.validatePhone(register.phone)) {
-            newFieldErrors.phone = "Số điện thoại không hợp lệ";
-        }
-
-        // 3. Validate Mật khẩu
-        if (register.password && register.password.length < 6) {
-            newFieldErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
-        }
-
-        // 4. Validate Khớp mật khẩu
-        if (register.password !== register.password_confirmation) {
-            newFieldErrors.password_confirmation = "Mật khẩu nhập lại không khớp";
-        }
-
-        // Nếu có lỗi -> Hiển thị và dừng lại
-        if (Object.keys(newFieldErrors).length > 0) {
-            setFieldError(newFieldErrors);
-            return;
-        }
-
-        try {
-            // 5. Gọi API
-            const formdata = fun.objectToFormData(register);
-            const ketqua = await API.CallAPI(formdata, { 
-                url: 'user/register', 
-                PhuongThuc: 1 
-            });
-            
-            if (ketqua.status === true) {
-                tb.ThongBao_ThanhCong("Đăng ký thành công! Vui lòng đăng nhập.");
-                
-                // Reset form & chuyển tab
-                setRegister({ name: '', phone: '', password: '', password_confirmation: '' });
-                switchTab('login');
-                setLogin(prev => ({ ...prev, phone: register.phone }));
-            } else {
-                tb.ThongBao_Loi(ketqua.message || "Đăng ký thất bại");
-            }
-        } catch (error) {
-            tb.ThongBao_Loi("Không thể kết nối đến server");
-        }
-    };
-
-    return (
-        <div className="bg-gray-50 font-sans h-screen flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex overflow-hidden h-[600px]">
-
-                {/* --- CỘT TRÁI (ẢNH) --- */}
-                <div className="hidden md:block w-1/2 bg-cover bg-center relative" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3')" }}>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-10 text-white">
-                        <h2 className="text-4xl font-bold mb-2">Bếp Việt 4.0</h2>
-                        <p className="text-lg opacity-90">Kết nối đam mê, sẻ chia hương vị Việt.</p>
-                    </div>
-                </div>
-
-                {/* --- CỘT PHẢI (FORM) --- */}
-                <div className="w-full md:w-1/2 p-8 md:p-12 relative overflow-y-auto">
-                    {/* Nút đóng */}
-                    <Link to='/' className="absolute top-6 right-6 text-gray-400 hover:text-red-600 transition">
-                        <i className="fa-solid fa-xmark text-2xl"></i>
-                    </Link>
-
-                    <div className="max-w-md mx-auto">
-                        {/* TAB LOGIN / REGISTER */}
-                        <div className="flex border-b border-gray-200 mb-8">
-                            <button onClick={() => switchTab('login')} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'login' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Nhập</button>
-                            <button onClick={() => switchTab('register')} className={`flex-1 pb-3 font-bold border-b-2 transition ${activeTab === 'register' ? 'text-red-600 border-red-600' : 'text-gray-500 border-transparent'}`}>Đăng Ký</button>
-                        </div>
-    
-                        {/* FORM CONTENT */}
-                        {activeTab === 'login' ? (
-                            /* --- FORM ĐĂNG NHẬP --- */
-                            <div className="space-y-5">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
                                     <input 
                                         type="text" 
-                                        value={login.phone} 
-                                        onChange={(e) => setLogin({ ...login, phone: e.target.value })} 
-                                        placeholder="0912345678" 
-                                        className={ `${err.phone && 'border-red-700'}  w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none transition`}
+                                        value={loginData.phone} 
+                                        onChange={(e) => setLoginData({ ...loginData, phone: e.target.value })}
+                                        className={`w-full px-4 py-3 rounded-lg border ${fieldErrors.phone ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-red-200 outline-none`}
+                                        placeholder="0912345678"
                                     />
-                                    {
-                                        err.phone && (
-                                            <p className="text-red-500 text-xs mt-1 ml-1 italic">{err.phone}</p>
-                                        )
-                                    }
+                                    {fieldErrors.phone && <p className="text-red-500 text-xs mt-1 italic">{fieldErrors.phone}</p>}
                                 </div>
-                                
-                                {/* Login Password Field with Toggle */}
+
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
-                                    <input type="password" value={login.password || ''} onChange={(e) => setLogin({ ...login, password: e.target.value })} placeholder="" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none" />
-                                </div>
-                                
-                                <button
-                                    onClick={handleLogin}
-                                    className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition"
-
                                     <div className="relative">
                                         <input 
                                             type={showLoginPassword ? "text" : "password"} 
-                                            value={login.password} 
-                                            onChange={(e) => setLogin({ ...login, password: e.target.value })} 
-                                            placeholder="" 
-                                            className={`${err.password && 'border-red-700'} w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-200 outline-none transition pr-10`}
+                                            value={loginData.password} 
+                                            onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                                            className={`w-full px-4 py-3 rounded-lg border ${fieldErrors.password ? 'border-red-500' : 'border-gray-300'} outline-none pr-10`}
                                         />
-                                        {
-                                            err.password && (
-                                                <p className="text-red-500 text-xs mt-1 ml-1 italic">{err.password}</p>
-                                            )
-                                        }
-                                        <button 
-                                            type="button"
-                                            onClick={() => setShowLoginPassword(!showLoginPassword)}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
-                                        >
+                                        <button type="button" onClick={() => setShowLoginPassword(!showLoginPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
                                             <i className={`fa-solid ${showLoginPassword ? 'fa-eye' : 'fa-eye-slash'}`}></i>
                                         </button>
                                     </div>
-                                    {
-                                        errHT && (
-                                           <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center shadow-sm">
-                                            <i className="fa-solid fa-circle-exclamation text-xl mr-3"></i>
-                                                <div>
-                                                    <p className="font-bold text-sm">Đã có lỗi xảy ra!</p>
-                                                    <p className="text-sm">{errHT}</p>
-                                                </div>
-                                           </div>
-                                        )
-                                    }
+                                    {fieldErrors.password && <p className="text-red-500 text-xs mt-1 italic">{fieldErrors.password}</p>}
                                 </div>
-                                
-                                <button
-                                    onClick={DangNhap}
-                                    className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition transform active:scale-95"
 
-                                >
+                                <button onClick={handleLoginAction} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition transform active:scale-95">
                                     Đăng nhập ngay
                                 </button>
                             </div>
@@ -405,91 +179,41 @@ function DangNhap() {
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Họ và Tên</label>
-                                    <input type="text" value={register.name || ''} onChange={(e) => setRegister({ ...register, name: e.target.value })} placeholder="Nguyễn Văn A" className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.name ? 'border-red-500' : 'border-gray-300'}`} />
-
-                            /* --- FORM ĐĂNG KÝ --- */
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Họ và Tên</label>
-                                    <input 
-                                        type="text" 
-                                        value={register.name} 
-                                        onChange={(e) => setRegister({ ...register, name: e.target.value })} 
-                                        placeholder="Nguyễn Văn A" 
-                                        className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.name ? 'border-red-500' : 'border-gray-300'}`} 
-                                    />
-                                    {fieldError.name && <span className="text-xs text-red-500 mt-1">{fieldError.name}</span>}
+                                    <input type="text" value={registerData.name} onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })} className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldErrors.name ? 'border-red-500' : 'border-gray-300'}`} placeholder="Nguyễn Văn A" />
+                                    {fieldErrors.name && <span className="text-xs text-red-500">{fieldErrors.name}</span>}
                                 </div>
+
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Số điện thoại</label>
-                                    <input type="text" value={register.phone || ''} onChange={(e) => setRegister({ ...register, phone: e.target.value })} placeholder="0123456789" className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.phone ? 'border-red-500' : 'border-gray-300'}`} />
-
-                                    <input 
-                                        type="text" 
-                                        value={register.phone} 
-                                        onChange={(e) => setRegister({ ...register, phone: e.target.value })} 
-                                        placeholder="0123456789" 
-                                        className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.phone ? 'border-red-500' : 'border-gray-300'}`} 
-                                    />
-                                    {fieldError.phone && <span className="text-xs text-red-500 mt-1">{fieldError.phone}</span>}
+                                    <input type="text" value={registerData.phone} onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })} className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldErrors.phone ? 'border-red-500' : 'border-gray-300'}`} placeholder="09..." />
+                                    {fieldErrors.phone && <span className="text-xs text-red-500">{fieldErrors.phone}</span>}
                                 </div>
 
-                                {/* Register Password Field with Toggle */}
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
-                                    <input type="password" value={register.password || ''} onChange={(e) => setRegister({ ...register, password: e.target.value })} className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.password ? 'border-red-500' : 'border-gray-300'}`} />
-                                    {fieldError.password && <span className="text-xs text-red-500 mt-1">{fieldError.password}</span>}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Nhập lại mật khẩu</label>
-                                    <input type="password" value={register.password_confirmation || ''} onChange={(e) => setRegister({ ...register, password_confirmation: e.target.value })} className={`w-full px-4 py-3 rounded-lg border outline-none ${fieldError.password_confirmation ? 'border-red-500' : 'border-gray-300'}`} />
-                                    {fieldError.password_confirmation && <span className="text-xs text-red-500 mt-1">{fieldError.password_confirmation}</span>}
-                                </div>
-                                <button onClick={handleRegister} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Tạo tài khoản mới</button>
                                     <div className="relative">
-                                        <input 
-                                            type={showRegisterPassword ? "text" : "password"} 
-                                            value={register.password} 
-                                            onChange={(e) => setRegister({ ...register, password: e.target.value })} 
-                                            className={`w-full px-4 py-3 rounded-lg border outline-none pr-10 ${fieldError.password ? 'border-red-500' : 'border-gray-300'}`} 
-                                        />
-                                        <button 
-                                            type="button"
-                                            onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
-                                        >
+                                        <input type={showRegisterPassword ? "text" : "password"} value={registerData.password} onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })} className={`w-full px-4 py-3 rounded-lg border outline-none pr-10 ${fieldErrors.password ? 'border-red-500' : 'border-gray-300'}`} />
+                                        <button type="button" onClick={() => setShowRegisterPassword(!showRegisterPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
                                             <i className={`fa-solid ${showRegisterPassword ? 'fa-eye' : 'fa-eye-slash'}`}></i>
                                         </button>
                                     </div>
-                                    {fieldError.password && <span className="text-xs text-red-500 mt-1">{fieldError.password}</span>}
+                                    {fieldErrors.password && <span className="text-xs text-red-500">{fieldErrors.password}</span>}
                                 </div>
 
-                                {/* Register Confirm Password Field with Toggle */}
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Nhập lại mật khẩu</label>
                                     <div className="relative">
-                                        <input 
-                                            type={showConfirmPassword ? "text" : "password"} 
-                                            value={register.password_confirmation} 
-                                            onChange={(e) => setRegister({ ...register, password_confirmation: e.target.value })} 
-                                            className={`w-full px-4 py-3 rounded-lg border outline-none pr-10 ${fieldError.password_confirmation ? 'border-red-500' : 'border-gray-300'}`} 
-                                        />
-                                        <button 
-                                            type="button"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
-                                        >
+                                        <input type={showConfirmPassword ? "text" : "password"} value={registerData.password_confirmation} onChange={(e) => setRegisterData({ ...registerData, password_confirmation: e.target.value })} className={`w-full px-4 py-3 rounded-lg border outline-none pr-10 ${fieldErrors.password_confirmation ? 'border-red-500' : 'border-gray-300'}`} />
+                                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
                                             <i className={`fa-solid ${showConfirmPassword ? 'fa-eye' : 'fa-eye-slash'}`}></i>
                                         </button>
                                     </div>
-                                    {fieldError.password_confirmation && <span className="text-xs text-red-500 mt-1">{fieldError.password_confirmation}</span>}
+                                    {fieldErrors.password_confirmation && <span className="text-xs text-red-500">{fieldErrors.password_confirmation}</span>}
                                 </div>
-                                
-                                <button onClick={handleRegister} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition transform active:scale-95">
+
+                                <button onClick={handleRegisterAction} className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition transform active:scale-95">
                                     Tạo tài khoản mới
                                 </button>
-
                             </div>
                         )}
                     </div>
