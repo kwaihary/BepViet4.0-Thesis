@@ -167,16 +167,10 @@ public function show($id)
 
 public function detail_recipe()
 {
-    $recipes = Recipe::with([
-        'author',                  // Lấy thông tin người đăng (User)
-        'categories',              // Lấy danh mục
-        'comments.user',           // Lấy bình luận kèm thông tin người bình luận
-        'comments.replies.user',   // Lấy phản hồi kèm người phản hồi (nếu cần hiển thị sâu)
-        'interactions'             // Lấy lượt thích/lưu
-    ])
-    ->withCount('comments', 'interactions') // Đếm số lượng để hiển thị nhanh
-    ->orderBy('created_at', 'desc')
-    ->paginate(10); // Hoặc get()
+    $recipes = Recipe::with(['author', 'comments.user', 'interactions'])
+        // ->where('status', 'Đã duyệt') // <--- Tạm thời đóng dòng này lại
+        ->orderBy('created_at', 'desc')
+        ->paginate(10); 
 
     return response()->json([
         'status' => true,
