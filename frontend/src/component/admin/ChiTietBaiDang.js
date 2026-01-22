@@ -34,6 +34,7 @@ function ChiTietBaiDang({ DuLieu }) {
         }
         LayTT_BaiViet();
     }, [DuLieu.id]);
+    
     const CapNhat_TrangThai=async(DuLieu)=>{
         const kiemtra= fun.KiemTraRong(DuLieu);
         if(!kiemtra.Status){

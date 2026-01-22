@@ -158,6 +158,17 @@ class PostController extends Controller
             'data' => $ingredients
          ]);
     }
+
+    public function TTBaiViet_id(Request $request){
+         $id = $request->query('id');
+         $recipe = Recipe::findOrFail($id);
+         $ingredients = $recipe->ingredients()->select('note', 'quantity')->get();
+         return response()->json([
+            'status' => true,
+            'data' => $ingredients
+         ]);
+    }
+
     public function TTBaiViet_BuocLam(Request $request){
          $id = $request->query('id');
          $recipe = Recipe::findOrFail($id);

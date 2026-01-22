@@ -161,7 +161,7 @@ function DangBai() {
             <div className="container mx-auto mt-24 max-w-4xl px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    {/* CỘT TRÁI */}
+                    {/* CỘT TRÁI - INFO CƠ BẢN & PHÂN LOẠI */}
                     <div className="lg:col-span-1 space-y-6">
                         {/* Nhập URL Ảnh */}
                         <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
@@ -172,7 +172,7 @@ function DangBai() {
                             </div>
                         </div>
 
-                        {/* --- PHẦN CHỌN DANH MỤC (ĐÃ SỬA LỖI LOGIC) --- */}
+                        {/* --- PHẦN CHỌN DANH MỤC --- */}
                         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                             <h3 className="font-bold text-gray-800 flex items-center gap-2"><i className="fa-solid fa-list text-orange-500"></i> Phân loại</h3>
                             
@@ -184,9 +184,8 @@ function DangBai() {
                             >
                                 <option value="">-- Chọn loại món --</option>
                                 {DanhMuc && DanhMuc.length > 0 && DanhMuc.map((dm, idx) => {
-                                    // SỬA LỖI: Kiểm tra nếu dm là Object thì lấy thuộc tính (ví dụ name), nếu là string thì lấy chính nó
-                                    const valueShow = typeof dm === 'object' ? dm.name : dm; // Hoặc dm.id tùy DB của bạn
-                                    const valueKey = typeof dm === 'object' ? dm.name : dm;  // Giá trị dùng để query API con
+                                    const valueShow = typeof dm === 'object' ? dm.name : dm; 
+                                    const valueKey = typeof dm === 'object' ? dm.name : dm;  
                                     return <option key={idx} value={valueKey}>{valueShow}</option>
                                 })}
                             </select>
@@ -206,7 +205,6 @@ function DangBai() {
                                                 >
                                                     <option value="">-- Chọn chi tiết --</option>
                                                     {TenDanhMuc.map((ten, idx) => {
-                                                        // SỬA LỖI: Tương tự, xử lý nếu là Object (Lấy ID làm value để gửi server)
                                                         const idValue = typeof ten === 'object' ? ten.id : ten; 
                                                         const nameShow = typeof ten === 'object' ? ten.name : ten;
                                                         return <option key={idx} value={idValue}>{nameShow}</option>
@@ -241,7 +239,7 @@ function DangBai() {
                         </div>
                     </div>
 
-                    {/* CỘT PHẢI (Nội dung chính) */}
+                    {/* CỘT PHẢI - NỘI DUNG CHÍNH */}
                     <div className="lg:col-span-2 space-y-6">
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                              <input name="title" value={info.title} onChange={handleChangeInfo} type="text" placeholder="Tên món ăn..." className="w-full text-xl font-bold border-b pb-2 outline-none" />
@@ -271,35 +269,14 @@ function DangBai() {
                                  </div>
                              ))}
                              
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block font-bold text-sm text-gray-700 mb-2">Thời gian (phút)</label>
-                                <input name="cook_time" value={info.cook_time} onChange={handleChangeInfo} type="number" className="w-full border border-gray-300 rounded-lg p-3 focus:border-red-500 outline-none" />
-                            </div>
-                            <div>
-                                <label className="block font-bold text-sm text-gray-700 mb-2">Độ khó</label>
-                                <select name="difficulty" value={info.difficulty} onChange={handleChangeInfo} className="w-full border border-gray-300 rounded-lg p-3 bg-white focus:border-red-500 outline-none">
-                                    <option value="Dễ">Dễ</option>
-                                    <option value="Trung bình">Trung bình</option>
-                                    <option value="Khó">Khó</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block font-bold text-sm text-gray-700 mb-2">Danh mục</label>
-                                <select name="difficulty" value={info.difficulty} onChange={handleChangeInfo} className="w-full border border-gray-300 rounded-lg p-3 bg-white focus:border-red-500 outline-none">
-                                    <option value="Dễ">Dễ</option>
-                                    <option value="Trung bình">Trung bình</option>
-                                    <option value="Khó">Khó</option>
-                                </select>
-                            </div>
+                             {/* ĐÃ XÓA PHẦN CODE BỊ LẶP (INPUT THỜI GIAN, ĐỘ KHÓ BỊ DƯ Ở ĐÂY) */}
                         </div>
                     </div>
                 </div>
 
                 {/* Footer Buttons */}
                 <div className="flex justify-end gap-4 mt-8 pt-6 border-t">
-                    <button  className="px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold">Hủy bỏ</button>
+                    <button onClick={() => navigate(-1)} className="px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold">Hủy bỏ</button>
                     <button onClick={handleOpenPreview} className="px-6 py-2 rounded-lg bg-orange-500 text-white text-sm font-bold shadow hover:bg-orange-600">Xem trước & Đăng</button>
                 </div>
             </div>

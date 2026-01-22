@@ -34,6 +34,9 @@ Route::get('recipes', [RecipeController::class, 'index']);
 Route::get('/recipes', [RecipeController::class, 'detail_recipe']);
 Route::get('/website/type_danhmuc' , [CategoryController::class , 'type_danhmuc']);
 Route::get('/website/Ten_danhmuc' , [CategoryController::class , 'Ten_danhmuc']);
+
+Route::get('website/laydulieutheoID', [PostController::class ,'TTBaiViet_id']);
+
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('/admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
 Route::post('/admin/BoQua_ViPham',[PostController::class, 'BoQua_ViPham']);
