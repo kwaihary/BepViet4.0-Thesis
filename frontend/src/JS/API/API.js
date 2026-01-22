@@ -31,6 +31,7 @@ export function CallAPI(dulieu = null, yeucau) {
         xhrFields: { withCredentials: true },
         processData: false,
         contentType: false,
+        withCredentials: true,
         data: dulieu,
         headers: {
             "Accept": "application/json"

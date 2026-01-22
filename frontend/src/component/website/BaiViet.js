@@ -1,11 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
-import moment from 'moment'; // Cần cài: npm install moment (hoặc dùng hàm tự viết bên dưới)
-import 'moment/locale/vi'; // Import tiếng Việt cho moment
+import { useDangNhapContext } from '../../context/QuanLiDangNhap_NguoiDung';
 
-// Cấu hình đường dẫn ảnh (Giống bên ChiTietMonAn)
-const STORAGE_URL = "http://127.0.0.1:8000/storage/";
+
 
 // --- 1. HÀM FORMAT THỜI GIAN (Dùng thay moment nếu chưa cài) ---
 const formatTime = (dateString) => {
@@ -25,7 +23,7 @@ const formatTime = (dateString) => {
 const CommentItem = ({ comment }) => {
     // Xử lý avatar user bình luận
     const userAvatar = comment.user?.avatar 
-        ? STORAGE_URL + comment.user.avatar 
+        ? comment.user.avatar 
         : "https://via.placeholder.com/150";
 
     return (
@@ -64,10 +62,14 @@ const CommentItem = ({ comment }) => {
 
 // --- 3. MAIN COMPONENT: BaiViet ---
 function BaiViet({ data }) {
+      const {  GiaTri } = useDangNhapContext();
     const [openPostId, setOpenPostId] = useState(null); // ID bài viết đang mở bình luận
     const [openMenuId, setOpenMenuId] = useState(null); // ID bài viết đang mở menu 3 chấm
     
     const navigate = useNavigate();
+    const Tang_like = async(id)=>{
+        alert(JSON.stringify(id))
+    }
 
     // Đóng menu khi click ra ngoài
     useEffect(() => {
@@ -128,12 +130,10 @@ function BaiViet({ data }) {
                 // Xử lý dữ liệu an toàn trước khi render
                 const authorName = recipe.author?.name || "Người dùng";
                 const authorAvatar = recipe.author?.avatar 
-                    ? STORAGE_URL + recipe.author.avatar 
-                    : "https://via.placeholder.com/150";
+            
                 
                 const recipeImage = recipe.image_url 
-                    ? STORAGE_URL + recipe.image_url 
-                    : "https://via.placeholder.com/600x400";
+                 
                 
                 const likesCount = recipe.interactions 
                     ? recipe.interactions.filter(i => i.type === 'like').length // Giả sử model Interaction có cột 'type'
@@ -234,13 +234,12 @@ function BaiViet({ data }) {
                             )}
                         </Link>
 
-                        {/* --- ACTION BAR --- */}
+                        {/**Nút like */}
                         <div className="px-4 py-3 border-t border-gray-100 flex justify-between items-center">
                             <div className="flex gap-6">
-                                {/* Nút Like */}
                                 <div className="flex items-center gap-2 group cursor-pointer">
-                                    <button className="text-gray-500 group-hover:text-red-500 transition-transform active:scale-125 p-1">
-                                        <i className="fa-regular fa-heart text-2xl"></i>
+                                    <button onClick={(e)=>{Tang_like(recipe.id)}}  disabled={!GiaTri?.id} className="text-gray-500 group-hover:text-red-500 transition-transform active:scale-125 p-1">
+                                        <i className="fa-regular fa-thumbs-up"></i>
                                     </button>
                                     <span className="text-sm font-semibold text-gray-700">
                                         {likesCount}
@@ -257,12 +256,7 @@ function BaiViet({ data }) {
                                 </button>
                             </div>
 
-                            {/* Nút Save*/}
-                            <div className="flex items-center gap-4">
-                                <button className="text-gray-400 hover:text-orange-500 transition">
-                                    <i className="fa-regular fa-bookmark text-xl"></i>
-                                </button>
-                            </div>
+                
                         </div>
 
                         {/* --- NÚT XEM CHI TIẾT --- */}

@@ -129,4 +129,21 @@ class CategoryController extends Controller
             'data' =>$totals
         ]);
     }
+    public function type_danhmuc(){
+        $types = Category::select('type')->distinct()->pluck('type');
+        if($types){
+            return response()->json([
+                'status' => true,
+                'data' => $types
+            ]);
+        }
+    }
+    public function Ten_danhmuc(Request $request){
+        $loai  = $request->query('loai');
+        $names = Category::where('type', $loai)->pluck('name');
+        return response()->json([
+            'status' => true,
+            'data' => $names
+        ]);
+    }
 }

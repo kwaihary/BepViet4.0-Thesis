@@ -29,13 +29,6 @@ class RecipeController extends Controller
             'steps.required'       => 'Cần ít nhất 1 bước thực hiện',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status'  => 422,
-                'message' => $validator->errors()->first(),
-                'errors'  => $validator->errors()
-            ], 422);
-        }
 
         $imagePath = null;
         $recipe = null;
@@ -140,6 +133,14 @@ class RecipeController extends Controller
             'status' => true,
             'data' => $recipes // Laravel paginate trả về object có chứa mảng data bên trong
         ]);
+    }
+    public function ThongTinBaiVietTheoID(Request $request){
+         $id = $request->query('id');
+         $recipes = Recipe::where('user_id', $id)->get();
+         return response()->json([
+            'status' => true,
+            'data' => $recipes
+         ]);
     }
 
 public function show($id)

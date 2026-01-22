@@ -1,14 +1,13 @@
 import React, { createContext, useContext, useState } from "react";
 import * as fun from '../JS/FUNCTION/function';
-import * as tb from '../JS/FUNCTION/ThongBao';
 import * as API from '../JS/API/API';
+import * as ThongBao from '../JS/FUNCTION/ThongBao';
+import { useNavigate } from 'react-router-dom';
 const DangNhapContext = createContext();
 export function AppDangNhapProvider({ children }) {
-    const [GiaTri,setGT] = useState({
-        id:'',
-        rule:''
-    });
-    const handleLogin = async (login) => {
+    const [GiaTri,setGT] = useState([]);
+     const navigate = useNavigate();
+    const handleLogin = async (login , url ) => {
         const kiemtra= fun.KiemTraRong(login);
         if(!kiemtra.Status){
             let errorsTemp = {};
@@ -22,7 +21,7 @@ export function AppDangNhapProvider({ children }) {
         }
         const formdata= fun.objectToFormData(login);
         try {
-            const data = await API.CallAPI(formdata,{PhuongThuc:1, url: 'user/login'});
+            const data = await API.CallAPI(formdata,{PhuongThuc:1, url: url});
             if(data.status===false){
                 return {
                     status:false,
@@ -40,10 +39,7 @@ export function AppDangNhapProvider({ children }) {
                 }
             }
             if(data.status){
-                setGT({
-                    id:data.id,
-                    rule:data.rule
-                })
+                setGT(data.data)
                 return {
                     status: true,
                     message:data.message
@@ -53,13 +49,36 @@ export function AppDangNhapProvider({ children }) {
         } catch (error) {
             console.error('lỗi sãy ra:'+ error)
         }
+    };
+    const kiemtra_dangnhap= async(url)=>{
+        try {
+            const kiemtra= await API.CallAPI(undefined,{PhuongThuc:1,url:url});
+            if(kiemtra.status){
+                setGT(kiemtra.data)
+            }
+        } catch (error) {
+            console.error('lỗi :' + error)
+        }
     }
+    const handleLogout = async () => {
+        const logout = await ThongBao.ThongBao_XacNhanTT("Bạn có chắc muốn đăng xuất không?");
+        if (!logout) return;
+        try {
+           const data= await API.CallAPI(undefined, {url: 'user/logout', PhuongThuc: 1 });
+           alert(JSON.stringify(data))
+           if(data.status){
+                navigate('/DangNhap');
+           }
+           ThongBao.ThongBao_ThanhCong("Đăng xuất thành công!");
+        } catch (error) {
+            console.error("Lỗi logout:", error);
+        } 
+    };
 
 
     return (
-        <DangNhapContext.Provider  value={{ GiaTri, setGT, handleLogin }} >
-            {children}
-            
+        <DangNhapContext.Provider  value={{ GiaTri, setGT, handleLogin , kiemtra_dangnhap ,handleLogout }} >
+            {children} 
         </DangNhapContext.Provider>
     );
 }
