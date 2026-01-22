@@ -105,7 +105,7 @@ class UserController extends Controller
             'message' => 'Đăng nhập thành công',
             'id' =>$users->id,
             'rule' => $users->rule
-        ])->cookie($cookie);
+        ])->withCookie($cookie);
 
     }
 
