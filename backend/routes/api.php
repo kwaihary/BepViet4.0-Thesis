@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RecipeController;
 
 
+
 //ĐỊNH NGHĨA DEMO 
 Route::get('/admin/lay_dl', [UserController::class,'demo']);
 // I. ĐỊNH NGHĨA ROUTE GET
@@ -34,6 +35,9 @@ Route::get('recipes', [RecipeController::class, 'index']);
 Route::get('/recipes', [RecipeController::class, 'detail_recipe']);
 Route::get('/website/type_danhmuc' , [CategoryController::class , 'type_danhmuc']);
 Route::get('/website/Ten_danhmuc' , [CategoryController::class , 'Ten_danhmuc']);
+Route::get('user/detail/{id}', [UserController::class, 'layThongTinNguoiDung']); // Lấy thông tin
+// --- ROUTE CẬP NHẬT ---
+Route::post('/user/update', [UserController::class, 'capNhatThongTinNguoiDung']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('/admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
 Route::post('/admin/BoQua_ViPham',[PostController::class, 'BoQua_ViPham']);
@@ -55,3 +59,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::post('/nguoidung_dangnhap',[UserController::class, 'getUserProfile'])->middleware('Checklogin');
+
+// routes/api.php
+
+Route::group(['middleware' => ['auth:api']], function () {
+    // ... các route khác
+    Route::post('/recipes/{id}/like', [RecipeController::class, 'toggleLike']);
+});
+
+
+
+Route::post('user/update/{id}', [UserController::class, 'capNhatThongTinNguoiDung']); // Cập nhật

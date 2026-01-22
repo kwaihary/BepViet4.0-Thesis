@@ -6,16 +6,13 @@ import * as tb from "../../JS/FUNCTION/ThongBao";
 
 function DangBai() {
     const navigate = useNavigate();
-
-    // --- 1. STATE ---
-    const [DanhMuc, setDanhMuc] = useState([]);      // Cấp 1
-    const [LoaiDanhMuc, setLoaiDanhMuc] = useState(''); // Lưu tên/ID loại đang chọn
-    const [TenDanhMuc, setTenDanhMuc] = useState([]);   // Cấp 2
+    const [DanhMuc, setDanhMuc] = useState([]);      
+    const [LoaiDanhMuc, setLoaiDanhMuc] = useState(''); 
+    const [TenDanhMuc, setTenDanhMuc] = useState([]);  
     const [loading, setloading] = useState(false);      
 
     const [info, setInfo] = useState({
         title: "", description: "", cook_time: "", difficulty: "Dễ", 
-        category_child: "" // Quan trọng: ID danh mục con gửi đi
     });
     
     const [imageUrl, setImageUrl] = useState(""); 
@@ -24,24 +21,16 @@ function DangBai() {
     const [showPreview, setShowPreview] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // --- 2. API LOAD DỮ LIỆU ---
-
-    // Load Danh mục Cha
     useEffect(() => {
         const LoadDanhMuc = async () => {
             try {
                 const res = await API.CallAPI(undefined, { PhuongThuc: 2, url: 'website/type_danhmuc' });
-                // DEBUG: Kiểm tra dữ liệu cha từ DB
-                console.log("Danh mục cha từ DB:", res.data); 
                 if (res.status) setDanhMuc(res.data);
             } catch (error) { console.error(error); }
         };
         LoadDanhMuc();
     }, []);
-
-    // Load Danh mục Con (Khi chọn Cha)
     useEffect(() => {
-        // Reset lựa chọn con khi đổi cha để tránh lỗi logic
         setInfo(prev => ({ ...prev, category_child: "" }));
 
         if (!LoaiDanhMuc) {
@@ -52,12 +41,7 @@ function DangBai() {
         setloading(true);
         const layDL = async () => {
             try {
-                // DEBUG: Kiểm tra xem đang gọi API với giá trị gì
-                console.log("Đang gọi API con với loại:", LoaiDanhMuc);
-                
                 const res = await API.CallAPI(undefined, { PhuongThuc: 2, url: `website/Ten_danhmuc?loai=${LoaiDanhMuc}` });
-                console.log("Danh mục con trả về:", res.data); // Xem dữ liệu trả về
-
                 if (res.status) setTenDanhMuc(res.data);
                 else setTenDanhMuc([]);
             } catch (error) {
@@ -70,7 +54,7 @@ function DangBai() {
         layDL();
     }, [LoaiDanhMuc]);
 
-    // --- 3. HANDLERS ---
+    
 
     // Xử lý thay đổi Dropdown
     const handleChangeInfo = (e) => {
@@ -270,29 +254,6 @@ function DangBai() {
                                      <button onClick={()=>handleRemoveStep(step.id)} className="text-gray-400 hover:text-red-500"><i className="fa-solid fa-trash"></i></button>
                                  </div>
                              ))}
-                             
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block font-bold text-sm text-gray-700 mb-2">Thời gian (phút)</label>
-                                <input name="cook_time" value={info.cook_time} onChange={handleChangeInfo} type="number" className="w-full border border-gray-300 rounded-lg p-3 focus:border-red-500 outline-none" />
-                            </div>
-                            <div>
-                                <label className="block font-bold text-sm text-gray-700 mb-2">Độ khó</label>
-                                <select name="difficulty" value={info.difficulty} onChange={handleChangeInfo} className="w-full border border-gray-300 rounded-lg p-3 bg-white focus:border-red-500 outline-none">
-                                    <option value="Dễ">Dễ</option>
-                                    <option value="Trung bình">Trung bình</option>
-                                    <option value="Khó">Khó</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block font-bold text-sm text-gray-700 mb-2">Danh mục</label>
-                                <select name="difficulty" value={info.difficulty} onChange={handleChangeInfo} className="w-full border border-gray-300 rounded-lg p-3 bg-white focus:border-red-500 outline-none">
-                                    <option value="Dễ">Dễ</option>
-                                    <option value="Trung bình">Trung bình</option>
-                                    <option value="Khó">Khó</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                 </div>

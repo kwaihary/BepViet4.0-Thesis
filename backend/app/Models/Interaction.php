@@ -2,26 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Interaction extends Model
 {
     use HasFactory;
+
+    // QUAN TRỌNG: Dòng này cho phép lưu dữ liệu vào 3 cột này
     protected $fillable = [
         'user_id',
-        'recipe_id', 
-        'type', 
-        'rating_value'
+        'recipe_id',
+        'type' // Loại tương tác: like, save, v.v.
     ];
 
-    // Người dùng nào tương tác
-    public function user(){
+    // Khai báo mối quan hệ (tùy chọn, để dùng sau này)
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    // Tương tác cho công thức nào
-    public function recipe(){
+    public function recipe()
+    {
         return $this->belongsTo(Recipe::class);
     }
 }

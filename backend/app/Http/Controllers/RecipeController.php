@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Recipe;
-use App\Models\Ingredient; // Bắt buộc import để dùng firstOrCreate
+use App\Models\Ingredient; 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Interaction; 
+use Illuminate\Support\Facades\Auth;
 
 class RecipeController extends Controller
 {
@@ -121,19 +123,37 @@ class RecipeController extends Controller
         }
     }
     public function index()
-    {
-        // Lấy danh sách món ăn, trạng thái = 1 (đã duyệt), kèm thông tin tác giả
-        $recipes = Recipe::with('author') 
-                    ->where('status', 1) 
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(12);
+{
+    // Lấy ID người dùng đang đăng nhập (nếu có token)
+    $userId = Auth::guard('api')->id();
 
-        // Quan trọng: Phải trả về đúng cấu trúc này
-        return response()->json([
-            'status' => true,
-            'data' => $recipes // Laravel paginate trả về object có chứa mảng data bên trong
-        ]);
+    $recipes = Recipe::with(['author', 'comments.user', 'interactions'])
+        // Đếm số lượng like (type = 'like')
+        ->withCount(['interactions as likes_count' => function ($query) {
+            $query->where('type', 'like');
+        }])
+        ->where('status', 'like', '%Đã duyệt%')
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+
+    // Xử lý cờ "is_liked_by_me"
+    if ($userId) {
+        $recipes->getCollection()->transform(function ($recipe) use ($userId) {
+            // Kiểm tra xem trong list interactions của bài viết có user_id của mình không
+            $recipe->is_liked_by_me = $recipe->interactions->contains(function ($interaction) use ($userId) {
+                return $interaction->user_id == $userId && $interaction->type == 'like';
+            });
+            return $recipe;
+        });
     }
+
+    return response()->json([
+        'status' => true,
+        'data' => $recipes
+    ]);
+}
+
+
 
 public function show($id)
 {
@@ -170,4 +190,43 @@ public function detail_recipe()
         'data' => $recipes
     ]);
 }
+public function toggleLike(Request $request, $id)
+{
+    $user = auth()->user();
+    $recipe = Recipe::find($id);
+
+    if (!$recipe) {
+        return response()->json(['status' => false, 'message' => 'Không tìm thấy bài viết'], 404);
+    }
+
+    // Kiểm tra xem user đã like chưa
+    $existingLike = Interaction::where('user_id', $user->id)
+                             ->where('recipe_id', $id)
+                             ->where('type', 'like') // Giả sử bảng interaction có cột type
+                             ->first();
+
+    if ($existingLike) {
+        // Nếu đã like -> Xóa (Unlike)
+        $existingLike->delete();
+        $liked = false;
+    } else {
+        // Nếu chưa like -> Tạo mới
+        Interaction::create([
+            'user_id' => $user->id,
+            'recipe_id' => $id,
+            'type' => 'like'
+        ]);
+        $liked = true;
+    }
+
+    // Đếm lại tổng số like để trả về frontend cập nhật cho chuẩn
+    $totalLikes = Interaction::where('recipe_id', $id)->where('type', 'like')->count();
+
+    return response()->json([
+        'status' => true,
+        'liked' => $liked,          // Trạng thái mới (true/false)
+        'total_likes' => $totalLikes // Tổng số like mới
+    ]);
 }
+
+} 
