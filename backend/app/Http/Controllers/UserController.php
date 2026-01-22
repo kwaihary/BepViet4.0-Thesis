@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Laravel\Sanctum\PersonalAccessToken;
+
+
 use Illuminate\Support\Facades\Hash; 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
-
 class UserController extends Controller
 {
-    // --- 1. ĐĂNG KÝ ---
+    // --- CHỨC NĂNG ĐĂNG KÝ ---
     public function Register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -36,13 +37,13 @@ class UserController extends Controller
         }
 
         try {
-            $user = User::create([
-                'name'     => $request->name,
-                'phone'    => $request->phone,
-                'password' => Hash::make($request->password),
-                'status'   => 1, 
-                'rule'     => 0
-            ]);
+            $user = new User();
+            $user->name = $request->name;
+            $user->phone = $request->phone;
+            $user->password = Hash::make($request->password); // Mã hóa mật khẩu
+            $user->status = 1; 
+            $user->rule = 0;
+            $user->save();
 
             return response()->json([
                 'status' => true,
@@ -55,85 +56,208 @@ class UserController extends Controller
             ]);
         }
     }
+    public function Login(Request $request)
+    {
+        $validated = $request->validate([
+            'phone'    => [
+                'required', 
+                'numeric', 
+                'digits:10', 
+                'regex:/^(03|05|07|08|09)+([0-9]{8})$/'
+            ],
+            'password' => 'required|string|min:6', 
+        ], [
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.numeric'  => 'Số điện thoại phải là số.',
+            'phone.digits'   => 'Số điện thoại phải bao gồm đúng 10 số.',
+            'phone.regex'    => 'Đầu số điện thoại không hợp lệ.',
+            'password.required' => 'Vui lòng nhập mật khẩu.',
+            'password.min'      => 'Mật khẩu phải có ít nhất 6 ký tự.',
+        ]);
+         $phone = $validated['phone'];
+         $password = $validated['password'];
+         $users = User::where('phone', $phone)->first();
+    
+        if (!$users || !Hash::check($password, $users->password)) {
 
-    // --- 2. ĐĂNG NHẬP ---
-    public function Login(Request $request) {
-        $phone = $request->phone;
-        $password = $request->password;
-    
-        if (Auth::attempt(['phone' => $phone, 'password' => $password])) {
-            $user = Auth::user();
-            $token = $user->createToken('UserToken')->plainTextToken;
-    
+            return response()->json([
+                'status' => false,
+                'message' => 'Số điện thoại hoặc mật khẩu không đúng.'
+            ]);
+         };
+         if($users->status == 0){
+            return response()->json([
+                'status' => false,
+                'message' => 'Tài khoản đã bị khóa, hoặc vi phạm nguyên tắc cộng đông!'
+            ]);
+         }
+         $token = $users->createToken('auth_token')->plainTextToken;
+         $cookie = cookie(
+            'token_bepviet', // tên cookie
+            $token,          // giá trị cookie
+            60 * 24 * 30,     // thời gian sống: 30 ngày
+            '/',             // đường dẫn
+            null,            // domain
+            false,           // local http: false, host https: true
+            true             // chỉ truy cập HTTP Only (không cho JS truy cập)
+        );
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'data' => $users
+        ])->cookie($cookie);
+
+    }
+    public function getUserProfile(Request $request)
+    {
+       if ($request->hasCookie('token_bepviet')) {
+            $accessToken = PersonalAccessToken::findToken( $request->cookie('token_bepviet'));
+            if (!$accessToken) {
+                 return response()->json([
+                    'status' => false,
+                    'message' => 'Token không hợp lệ hoặc đã hết hạn.'
+                ]);
+            }
+            $user = $accessToken->tokenable;
             return response()->json([
                 'status' => true,
-                'message' => 'Đăng nhập thành công',
-                'token' => $token, 
-                'user' => $user
+                'data' => $user
             ]);
         }
-    
         return response()->json([
             'status' => false,
-            'message' => 'Tài khoản hoặc mật khẩu không đúng'
-        ], 401);
+            'message' => 'Cookie không tồn tại'
+        ]);
+    }
+    public function Logout()
+    {
+        $cookie = cookie()->forget('token_bepviet');
+        return response()->json([
+            'status' => true,
+            'message' => 'Đăng xuất thành công!'
+        ])->withCookie($cookie);
     }
 
-    // --- 3. CẬP NHẬT THÔNG TIN (Hàm bạn đang cần) ---
+    public function layDL()
+    {
+        $users = User::orderBy('id', 'asc')->paginate(10);
+        return response()->json(['status' => true, 'data' => $users]);
+    }
+
+    public function ThongKe()
+    {
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'Tong'               => User::count(),
+                'TongHoatDong'       => User::where('status', 2)->count(),
+                'TongKhongHoatDong'  => User::where('status', 0)->count(),
+                'NguoiMoi'           => User::whereMonth('created_at', Carbon::now()->month)->count()
+            ]
+        ]);
+    }
+      public function QuanLiTaiKhoan(Request $request){
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:users,id',
+            'giatri' => 'required|in:0,2', 
+        ], [
+            'id.required' => 'ID người dùng là bắt buộc.',
+            'id.integer'  => 'ID phải là số nguyên.',
+            'id.exists'   => 'ID không tồn tại trong hệ thống.',
+            'giatri.required' => 'Giá trị trạng thái là bắt buộc.',
+            'giatri.in'       => 'Giá trị trạng thái chỉ được phép là 0, 1 hoặc 2.',
+        ]);
+         $idnd = $validated['id'];
+         $nd   = $validated['giatri'];
+        $kq = User::where('id', $idnd)->update(['status' => $nd]);
+        if ($kq > 0) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Bạn đã cập nhật trạng thái thành công!'
+            ]);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => "Cập nhật trạng thái thất bại."
+            ]);
+        }
+    }
+
+    public function demo(Request $request){
+        $id = $request->query('id');
+        $user = User::where('id', $id)->get();
+        return response()->json([
+            'status' => true,
+            'data' => $user
+        ]);
+    }
+
+
+
     public function capNhatThongTinNguoiDung(Request $request, $id)
     {
+       // 1. Tìm người dùng
         $user = User::find($id);
 
         if (!$user) {
             return response()->json([
                 'status' => 404,
-                'message' => 'Không tìm thấy người dùng (ID: ' . $id . ')' // Debug xem ID là gì
+                'message' => 'Không tìm thấy người dùng'
             ], 404);
         }
 
+        // 2. Validate dữ liệu
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:15',
+            'address' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Kiểm tra file ảnh
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['status' => 422, 'message' => $validator->errors()->first()], 422);
+            return response()->json([
+                'status' => 422,
+                'message' => $validator->errors()->first() // Trả về lỗi đầu tiên tìm thấy
+            ], 422);
         }
 
-        // Cập nhật thông tin
+        // 3. Cập nhật thông tin text
         $user->name = $request->input('name');
-        if($request->has('phone')) $user->phone = $request->input('phone');
-        if($request->has('bio')) $user->bio = $request->input('bio');
-        if($request->has('address')) $user->address = $request->input('address');
+        $user->phone = $request->input('phone');
+        $user->address = $request->input('address');
+        $user->bio = $request->input('bio');
 
-        // Cập nhật ảnh
+        // 4. Xử lý upload ảnh (nếu có gửi file)
         if ($request->hasFile('avatar')) {
+            // Xóa ảnh cũ nếu có (tránh rác server)
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
             }
+
+            // Lưu ảnh mới vào thư mục 'avatars' trong storage/app/public
             $path = $request->file('avatar')->store('avatars', 'public');
+            
+            // Lưu đường dẫn vào DB
             $user->avatar = $path;
         }
 
+        // 5. Lưu vào Database
         $user->save();
 
         return response()->json([
             'status' => 200,
             'message' => 'Cập nhật thành công',
-            'data' => $user
+            'avatar' => $user->avatar // Trả về đường dẫn ảnh mới để React cập nhật LocalStorage
         ]);
     }
 
-    // --- 4. LẤY THÔNG TIN CHI TIẾT ---
     public function layThongTinNguoiDung($id)
     {
         $user = User::find($id);
         if ($user) {
             return response()->json(['status' => true, 'data' => $user]);
         }
-        return response()->json(['status' => false, 'message' => 'Không tìm thấy người dùng!']);
+        return response()->json(['status' => false, 'message' => 'Không tìm thấy!']);
     }
-    
-    // Giữ lại các hàm phụ nếu cần (layDL, QuanLiTaiKhoan...)
 }

@@ -146,6 +146,14 @@ class RecipeController extends Controller
             return $recipe;
         });
     }
+    public function ThongTinBaiVietTheoID(Request $request){
+         $id = $request->query('id');
+         $recipes = Recipe::where('user_id', $id)->get();
+         return response()->json([
+            'status' => true,
+            'data' => $recipes
+         ]);
+    }
 
     return response()->json([
         'status' => true,

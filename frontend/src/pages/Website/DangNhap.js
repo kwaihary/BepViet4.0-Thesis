@@ -28,7 +28,7 @@ function DangNhap() {
         }
         if(ketqua.status){
             tb.ThongBao_ThanhCong(ketqua.message);
-            navigate('/HoSo-NguoiDung');
+            navigate('/');
             return;
         }
 

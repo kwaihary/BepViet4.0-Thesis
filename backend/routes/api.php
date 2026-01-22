@@ -38,6 +38,7 @@ Route::get('/website/Ten_danhmuc' , [CategoryController::class , 'Ten_danhmuc'])
 Route::get('user/detail/{id}', [UserController::class, 'layThongTinNguoiDung']); // Lấy thông tin
 // --- ROUTE CẬP NHẬT ---
 Route::post('/user/update', [UserController::class, 'capNhatThongTinNguoiDung']);
+Route::get('/website/ThongTinBaiVietTheoID' , [RecipeController::class , 'ThongTinBaiVietTheoID']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('/admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
 Route::post('/admin/BoQua_ViPham',[PostController::class, 'BoQua_ViPham']);
