@@ -6,10 +6,8 @@ function Menu() {
      const { kiemtra_dangnhap , GiaTri , handleLogout} = useDangNhapContext();
      useEffect(()=>{
         kiemtra_dangnhap('');
-     },[kiemtra_dangnhap])
-
-     //Đã kiểm tra phía trên ( NNH )
-    // --- State quản lý Filter ---
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+     },[])
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const toggleFilter = () => {
         setIsFilterOpen(!isFilterOpen);
@@ -165,7 +163,7 @@ function Menu() {
                                  <button onClick={toggleUserMenu}
                                 className="flex items-center focus:outline-none transition-transform active:scale-95">
                                 <img 
-                                    src="https://i.pravatar.cc/150?img=32" 
+                                    src={GiaTri.avatar} 
                                     alt="User Avatar" 
                                     className={`w-9 h-9 rounded-full border-2 ${isUserMenuOpen ? 'border-red-500 shadow-md' : 'border-gray-200'} transition-all`} 
                                 />
@@ -187,23 +185,17 @@ function Menu() {
 
                                     {/* Header: Thông tin vắn tắt */}
                                     <div className="px-4 py-3 border-b border-gray-100 mb-2">
-                                        <p className="text-sm font-bold text-gray-900">Mẹ Bắp 🌽</p>
-                                        <p className="text-xs text-gray-500 truncate">mebap@gmail.com</p>
+                                        <p className="text-sm font-bold text-gray-900">{GiaTri.name}</p>
+                                        <p className="text-xs text-gray-500 truncate">{GiaTri.phone}</p>
                                     </div>
 
                                     {/* Các Links điều hướng */}
                                     <div className="flex flex-col">
-                                        <Link to="/HoSo" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
+                                        <Link to="/HoSo-NguoiDung" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
                                             <i className="fa-regular fa-id-badge w-5"></i> Hồ sơ cá nhân
                                         </Link>
-                                        <Link to="/Cookbook" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
+                                        <Link to="/CookbookCuaToi" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
                                             <i className="fa-solid fa-book-open w-5"></i> Cookbook của tôi
-                                        </Link>
-                                        <Link to="/MonDaLuu" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
-                                            <i className="fa-regular fa-bookmark w-5"></i> Món đã lưu
-                                        </Link>
-                                         <Link to="/CaiDat" className="px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 flex items-center gap-3 transition">
-                                            <i className="fa-solid fa-gear w-5"></i> Cài đặt tài khoản
                                         </Link>
                                     </div>
 
