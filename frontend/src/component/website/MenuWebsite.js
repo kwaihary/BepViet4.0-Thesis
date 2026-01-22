@@ -50,6 +50,33 @@ function Menu() {
                         </div>
 
                         {/* Filter Panel (Giữ nguyên nội dung bên trong) */}
+    return (
+        <nav className="bg-white shadow-sm fixed w-full z-50 top-0 h-16 border-b border-gray-200">
+            <div className="container mx-auto px-4 h-full flex justify-between items-center max-w-7xl">
+                
+                {/* Logo */}
+                <Link to='/' className="flex items-center gap-2">
+                    <div className="bg-red-600 text-white p-2 rounded-lg">
+                        <i className="fa-solid fa-utensils"></i>
+                    </div>
+                    <span className="text-xl font-bold text-red-600 hidden md:block">Bếp Việt 4.0</span>
+                </Link>
+
+                {/* Search & Filter */}
+                <div className="flex-1 max-w-xl mx-4 relative group z-50">
+                    <div className="relative flex items-center">
+                        <i className="fa-solid fa-magnifying-glass absolute left-4 text-gray-400"></i>
+                        <input 
+                            type="text" 
+                            placeholder="Tìm món ăn..."
+                            className="w-full bg-gray-100 text-gray-700 rounded-full py-2.5 pl-12 pr-12 focus:outline-none focus:ring-2 focus:ring-red-200 focus:bg-white transition-all border border-transparent focus:border-red-100"
+                        />
+                        <button onClick={toggleFilter} className="absolute right-2 p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition">
+                            <i className="fa-solid fa-sliders"></i>
+                        </button>
+                    </div>
+                    {/* Filter Panel */}
+                    {/* Filter Panel (Giữ nguyên nội dung bên trong) */}
                         <div id="filterPanel" className={`${isFilterOpen ? 'block' : 'hidden'} absolute top-full left-0 mt-3 w-full bg-white rounded-xl shadow-2xl border border-gray-100 p-5 animate-fade-in-down`}>
                             {/* ... (Nội dung Filter giữ nguyên như code cũ của bạn) ... */}
                              <div className="absolute -top-2 right-6 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
@@ -149,6 +176,8 @@ function Menu() {
                         </div>
                     </div>
 
+                </div>
+
                     {/* --- Right Side Actions --- */}
                     <div className="flex items-center gap-4">
                         <Link to='/AI' className="hidden md:flex items-center gap-1 text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-80">
@@ -159,6 +188,14 @@ function Menu() {
                         </Link>
 
                         {/* --- USER DROPDOWN MENU (MỚI) --- */}
+
+                    <Link to='/KeHoachAnUong' className="p-2 text-gray-500 hover:bg-gray-100 rounded-full" title="Kế hoạch ăn">
+                            <i className="fa-regular fa-calendar-days text-xl"></i>
+                    </Link>
+
+
+                    {/* --- LOGIC HIỂN THỊ MENU USER HOẶC NÚT ĐĂNG NHẬP --- */}
+                    {user ? (
                         <div className="relative">
                            {
                             GiaTri.id ? (

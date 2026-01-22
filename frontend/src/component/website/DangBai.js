@@ -270,6 +270,29 @@ function DangBai() {
                                      <button onClick={()=>handleRemoveStep(step.id)} className="text-gray-400 hover:text-red-500"><i className="fa-solid fa-trash"></i></button>
                                  </div>
                              ))}
+                             
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block font-bold text-sm text-gray-700 mb-2">Thời gian (phút)</label>
+                                <input name="cook_time" value={info.cook_time} onChange={handleChangeInfo} type="number" className="w-full border border-gray-300 rounded-lg p-3 focus:border-red-500 outline-none" />
+                            </div>
+                            <div>
+                                <label className="block font-bold text-sm text-gray-700 mb-2">Độ khó</label>
+                                <select name="difficulty" value={info.difficulty} onChange={handleChangeInfo} className="w-full border border-gray-300 rounded-lg p-3 bg-white focus:border-red-500 outline-none">
+                                    <option value="Dễ">Dễ</option>
+                                    <option value="Trung bình">Trung bình</option>
+                                    <option value="Khó">Khó</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block font-bold text-sm text-gray-700 mb-2">Danh mục</label>
+                                <select name="difficulty" value={info.difficulty} onChange={handleChangeInfo} className="w-full border border-gray-300 rounded-lg p-3 bg-white focus:border-red-500 outline-none">
+                                    <option value="Dễ">Dễ</option>
+                                    <option value="Trung bình">Trung bình</option>
+                                    <option value="Khó">Khó</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
