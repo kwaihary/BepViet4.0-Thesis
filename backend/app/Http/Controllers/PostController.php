@@ -13,52 +13,9 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 class PostController extends Controller
-{   
-    public function ThongTin_nguoidung_dangbai(Request $request){
-         $validated = $request->validate([
-            'id' => 'required|integer|exists:reports,id',
-        ], [
-            'id.required' => 'ID báo cáo là bắt buộc.',
-            'id.integer'  => 'ID phải là số nguyên.',
-            'id.exists'   => 'ID không tồn tại trong hệ thống.',
-        ]);
-         $id = $validated['id'];
-         $report = Report::select(
-            'users.id as ID_NguoiDang',
-            'users.name as TenNguoiDangBai'
-        )
-            ->join('recipes', 'reports.target_id', '=', 'recipes.id')
-            ->join('users', 'recipes.user_id', '=', 'users.id')
-            ->where('reports.id', $id)
-            ->first();
-        return response()->json([
-            'status'=>true,
-            'data' =>$report
-        ]);
-    }
-    public function BoQua_ViPham(Request $request){
-         $validated = $request->validate([
-            'id' => 'required|integer|exists:reports,id',
-        ], [
-            'id.required' => 'ID báo cáo là bắt buộc.',
-            'id.integer'  => 'ID phải là số nguyên.',
-            'id.exists'   => 'ID không tồn tại trong hệ thống.',
-        ]);
-         $id = $validated['id'];
-         $kq = Report::where('id', $id)->update(['status' => 2]);
-         if($kq>0){
-            return response()->json([
-                'status' => true,
-                'message' => 'Bỏ qua vi phạm thành công!'
-            ]);
-         }else{
-            return response()->json([
-                'status' => false,
-                'message' => 'Không thể bỏ qua vi phạm này, vui lòng thử lại!'
-            ]);
-         }
-    }
-    public function Xoa_BaiViet(Request $request){
+{
+    public function ThongTin_nguoidung_dangbai(Request $request)
+    {
         $validated = $request->validate([
             'id' => 'required|integer|exists:reports,id',
         ], [
@@ -67,32 +24,21 @@ class PostController extends Controller
             'id.exists'   => 'ID không tồn tại trong hệ thống.',
         ]);
         $id = $validated['id'];
-        $kq = Report::where('id', $id)->update(['status' => 1]);
-        if($kq){
-            $report = Report::find($id);
-            if ($report) {
-                $recipeId = $report->target_id;
-                $update = Recipe::where('id', $recipeId)->update(['status' => 'Đã xóa']);
-                if($update){
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Khóa bài viết thành công!'
-                    ]);
-                }else{
-                    return response()->json([
-                        'status' =>false,
-                        'message' => 'Khóa bài viết thất bại!'
-                    ]);
-                }
-            }
-        }else{
-            return response()->json([
-                    'status' =>false,
-                    'message' => 'Khóa bài viết thất bại!'
-            ]);
-        }
+        $report = Report::select(
+            'users.id as ID_NguoiDang',
+            'users.name as TenNguoiDangBai'
+        )
+            ->join('recipes', 'reports.target_id', '=', 'recipes.id')
+            ->join('users', 'recipes.user_id', '=', 'users.id')
+            ->where('reports.id', $id)
+            ->first();
+        return response()->json([
+            'status' => true,
+            'data' => $report
+        ]);
     }
-    public function mo_khoa_vipham(Request $request){
+    public function BoQua_ViPham(Request $request)
+    {
         $validated = $request->validate([
             'id' => 'required|integer|exists:reports,id',
         ], [
@@ -102,77 +48,140 @@ class PostController extends Controller
         ]);
         $id = $validated['id'];
         $kq = Report::where('id', $id)->update(['status' => 2]);
-        if($kq){
+        if ($kq > 0) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Bỏ qua vi phạm thành công!'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Không thể bỏ qua vi phạm này, vui lòng thử lại!'
+            ]);
+        }
+    }
+    public function Xoa_BaiViet(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:reports,id',
+        ], [
+            'id.required' => 'ID báo cáo là bắt buộc.',
+            'id.integer'  => 'ID phải là số nguyên.',
+            'id.exists'   => 'ID không tồn tại trong hệ thống.',
+        ]);
+        $id = $validated['id'];
+        $kq = Report::where('id', $id)->update(['status' => 1]);
+        if ($kq) {
+            $report = Report::find($id);
+            if ($report) {
+                $recipeId = $report->target_id;
+                $update = Recipe::where('id', $recipeId)->update(['status' => 'Đã xóa']);
+                if ($update) {
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Khóa bài viết thành công!'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Khóa bài viết thất bại!'
+                    ]);
+                }
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Khóa bài viết thất bại!'
+            ]);
+        }
+    }
+    public function mo_khoa_vipham(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:reports,id',
+        ], [
+            'id.required' => 'ID báo cáo là bắt buộc.',
+            'id.integer'  => 'ID phải là số nguyên.',
+            'id.exists'   => 'ID không tồn tại trong hệ thống.',
+        ]);
+        $id = $validated['id'];
+        $kq = Report::where('id', $id)->update(['status' => 2]);
+        if ($kq) {
             $report = Report::find($id);
             if ($report) {
                 $recipeId = $report->target_id;
                 $update = Recipe::where('id', $recipeId)->update(['status' => 'Đã duyệt']);
-                if($update){
+                if ($update) {
                     return response()->json([
                         'status' => true,
                         'message' => 'mở khóa tài bài viết thành công!'
                     ]);
-                }else{
+                } else {
                     return response()->json([
-                        'status' =>false,
+                        'status' => false,
                         'message' => 'mở khóa tài bài viết thất bại!'
                     ]);
                 }
             }
-        }else{
+        } else {
             return response()->json([
-                    'status' =>false,
-                    'message' => 'mở khóa tài bài viết thất bại!'
+                'status' => false,
+                'message' => 'mở khóa tài bài viết thất bại!'
             ]);
         }
     }
-    public function laydl_thongke_bd(){
-         $XuLi_HomNay = Recipe::where('status', 'Đã duyệt') ->whereDate('updated_at', Carbon::today())->count();
-         $Cho_Duyet = Recipe::where('status', 'Đang chờ')->count();
-         $da_xoa=Recipe::where('status','Đã xóa') -> count();
-         return response()->json([
-            'status'=>true,
+    public function laydl_thongke_bd()
+    {
+        $XuLi_HomNay = Recipe::where('status', 'Đã duyệt')->whereDate('updated_at', Carbon::today())->count();
+        $Cho_Duyet = Recipe::where('status', 'Đang chờ')->count();
+        $da_xoa = Recipe::where('status', 'Đã xóa')->count();
+        return response()->json([
+            'status' => true,
             'data' => [
-                'xuli_homnay'=>$XuLi_HomNay,
-                'Cho_duyet' =>$Cho_Duyet,
-                'da_xoa'=>$da_xoa
+                'xuli_homnay' => $XuLi_HomNay,
+                'Cho_duyet' => $Cho_Duyet,
+                'da_xoa' => $da_xoa
             ]
-         ]);
+        ]);
     }
-    public function dl_bv(){
-        $recipes = Recipe::select(['id', 'title', 'slug', 'cook_time', 'description', 'image_url', 'status', 'created_at',  'user_id' ])
-            ->with(['author:id,name,avatar', 'categories:id,name' ])
-            ->orderBy('created_at', 'desc') 
+    public function dl_bv()
+    {
+        $recipes = Recipe::select(['id', 'title', 'slug', 'cook_time', 'description', 'image_url', 'status', 'created_at',  'user_id'])
+            ->with(['author:id,name,avatar', 'categories:id,name'])
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
         return response()->json([
-            'status' =>true,
+            'status' => true,
             'data' => $recipes
         ]);
     }
-    public function TTBaiViet(Request $request){
-         $id = $request->query('id');
-         $recipe = Recipe::findOrFail($id);
-         $ingredients = $recipe->ingredients()->select('note', 'quantity')->get();
-         return response()->json([
+    public function TTBaiViet(Request $request)
+    {
+        $id = $request->query('id');
+        $recipe = Recipe::findOrFail($id);
+        $ingredients = $recipe->ingredients()->select('note', 'quantity')->get();
+        return response()->json([
             'status' => true,
             'data' => $ingredients
-         ]);
+        ]);
     }
 
-    public function TTBaiViet_id(Request $request){
-         $id = $request->query('id');
-         $recipe = Recipe::findOrFail($id);
-         $ingredients = $recipe->ingredients()->select('note', 'quantity')->get();
-         return response()->json([
+    public function TTBaiViet_id(Request $request)
+    {
+        $id = $request->query('id');
+        $recipe = Recipe::findOrFail($id);
+        $ingredients = $recipe->ingredients()->select('note', 'quantity')->get();
+        return response()->json([
             'status' => true,
             'data' => $ingredients
-         ]);
+        ]);
     }
 
-    public function TTBaiViet_BuocLam(Request $request){
-         $id = $request->query('id');
-         $recipe = Recipe::findOrFail($id);
-         $steps = $recipe->steps()
+    public function TTBaiViet_BuocLam(Request $request)
+    {
+        $id = $request->query('id');
+        $recipe = Recipe::findOrFail($id);
+        $steps = $recipe->steps()
             ->select('step_order', 'content', 'image_url')
             ->orderBy('step_order', 'asc')
             ->get();
@@ -181,12 +190,13 @@ class PostController extends Controller
             'data' => $steps
         ]);
     }
-    public function CapNhatTT_BaiViet_by_admin(Request $request){
-         $validated = $request->validate([
+    public function CapNhatTT_BaiViet_by_admin(Request $request)
+    {
+        $validated = $request->validate([
             'id' => 'required|integer|exists:recipes,id',
             'data' => [
                 'required',
-                 Rule::in(['Đang chờ', 'Đã duyệt', 'Đã xóa']),
+                Rule::in(['Đang chờ', 'Đã duyệt', 'Đã xóa']),
             ]
         ], [
             'id.required' => 'ID bài viết là bắt buộc.',
@@ -198,30 +208,32 @@ class PostController extends Controller
         $id = $validated['id'];
         $data = $validated['data'];
         $kq = Recipe::where('id', $id)->update(['status' => $data]);
-        if($kq){
+        if ($kq) {
             return response()->json([
                 'status' => true,
-                'message' =>'Cập nhật trạng thái thành công!'
+                'message' => 'Cập nhật trạng thái thành công!'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => false,
-                'message' =>'Cập nhật trạng thái thất bại!'
+                'message' => 'Cập nhật trạng thái thất bại!'
             ]);
         }
     }
-    public function lay_thongke() {
+    public function lay_thongke()
+    {
         return response()->json([
             'status' => true,
             'data' => [
-                 'BaiViet_HN' => Recipe::whereDate('created_at', Carbon::today())->count(),
-                 'TongND' =>  User::count(),
-                 'Tong_BL' => Comment::count(),
-                 'TongBaiViet' => Recipe::count(),
+                'BaiViet_HN' => Recipe::whereDate('created_at', Carbon::today())->count(),
+                'TongND' =>  User::count(),
+                'Tong_BL' => Comment::count(),
+                'TongBaiViet' => Recipe::count(),
             ]
         ]);
     }
-    public function dulieu_bieudo_baiviet(){
+    public function dulieu_bieudo_baiviet()
+    {
         $postsPerDay = Recipe::select(
             DB::raw('DATE(created_at) as day'),
             DB::raw('COUNT(*) as total')
@@ -235,5 +247,4 @@ class PostController extends Controller
             'data' => $postsPerDay
         ]);
     }
-  
 }

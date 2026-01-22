@@ -134,6 +134,14 @@ class RecipeController extends Controller
             'data' => $recipes // Laravel paginate trả về object có chứa mảng data bên trong
         ]);
     }
+    public function ThongTinBaiVietTheoID(Request $request){
+         $id = $request->query('id');
+         $recipes = Recipe::where('user_id', $id)->get();
+         return response()->json([
+            'status' => true,
+            'data' => $recipes
+         ]);
+    }
 
 public function show($id)
 {
