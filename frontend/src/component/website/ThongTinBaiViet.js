@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react'; // 1. Import Hooks
+import React, { useState, useEffect } from 'react'; 
 import { useNavigate } from "react-router-dom";
 import BaiViet from './BaiViet';
-import { CallAPI } from '../../JS/API/API'; // 2. Import hàm gọi API (đường dẫn tùy cấu trúc folder của bạn)
+import * as API  from '../../JS/API/API'; 
+import { useDangNhapContext } from '../../context/QuanLiDangNhap_NguoiDung';
+
 
 function ThongTinBaiViet() {
     const navigate = useNavigate();
+    const { GiaTri} = useDangNhapContext();
     
     // 3. Khởi tạo State để lưu trữ dữ liệu
     const [posts, setPosts] = useState([]); // Lưu danh sách bài viết
@@ -14,7 +17,7 @@ function ThongTinBaiViet() {
    useEffect(() => {
     const fetchData = async () => {
         try {
-            const res = await CallAPI(null, { url: 'recipes', PhuongThuc: 2 });
+            const res = await API.CallAPI(null, { url: 'recipes', PhuongThuc: 2 });
             
             // --- THÊM DÒNG NÀY ĐỂ DEBUG ---
             console.log("Dữ liệu API trả về:", res); 
@@ -43,7 +46,10 @@ function ThongTinBaiViet() {
                 
                 {/* Khu vực đăng bài */}
                 <div className="bg-white rounded-xl shadow-sm p-4">
-                    <div className="flex gap-3 mb-3">
+                    {
+                        GiaTri.id ? (
+                            <>
+                             <div className="flex gap-3 mb-3">
                         {/* Avatar người dùng đang đăng nhập (tạm thời để cứng hoặc lấy từ LocalStorage) */}
                         <img src="https://ui-avatars.com/api/?name=Me" className="w-10 h-10 rounded-full border border-gray-200" alt="Avatar" />
                         <button 
@@ -61,6 +67,39 @@ function ThongTinBaiViet() {
                             <i className="fa-solid fa-face-smile text-yellow-500"></i> Cảm xúc
                         </button>
                     </div>
+                            </>
+                        ):(
+                            <>
+                            <div className="text-center py-2">
+                                <div className="flex flex-col items-center justify-center">
+                                    {/* Icon Lock nhỏ */}
+                                    <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center mb-2">
+                                        <i className="fa-solid fa-lock text-orange-500 text-lg"></i>
+                                    </div>
+                                    
+                                    <h3 className="font-bold text-gray-800 text-sm">
+                                        Bạn muốn đăng công thức mới?
+                                    </h3>
+                                    <p className="text-xs text-gray-500 mb-3 max-w-xs mx-auto mt-1">
+                                        Vui lòng đăng nhập để chia sẻ món ngon cùng cộng đồng Bếp Việt.
+                                    </p>
+
+                                    {/* Các nút hành động */}
+                                    <div className="flex gap-2 w-full max-w-xs mx-auto">
+                                        <button 
+                                            onClick={() => navigate('/DangNhap')}
+                                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold py-1.5 px-3 rounded-lg transition shadow-sm"
+                                        >
+                                            Đăng nhập
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            </>
+                        )
+                    }
+                   
+
                 </div>
 
                 {/* HIỂN THỊ DANH SÁCH BÀI VIẾT HOẶC LOADING */}

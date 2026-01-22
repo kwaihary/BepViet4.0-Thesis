@@ -29,13 +29,6 @@ class RecipeController extends Controller
             'steps.required'       => 'Cần ít nhất 1 bước thực hiện',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status'  => 422,
-                'message' => $validator->errors()->first(),
-                'errors'  => $validator->errors()
-            ], 422);
-        }
 
         $imagePath = null;
         $recipe = null;

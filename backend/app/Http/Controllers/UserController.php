@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Laravel\Sanctum\PersonalAccessToken;
+
 
 use Illuminate\Support\Facades\Hash; 
 use Illuminate\Support\Facades\Validator;
@@ -54,7 +56,6 @@ class UserController extends Controller
             ]);
         }
     }
-
     public function Login(Request $request)
     {
         $validated = $request->validate([
@@ -103,13 +104,31 @@ class UserController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Đăng nhập thành công',
-            'id' =>$users->id,
-            'rule' => $users->rule
+            'data' => $users
         ])->cookie($cookie);
 
     }
-
-    // đăng xuất
+    public function getUserProfile(Request $request)
+    {
+       if ($request->hasCookie('token_bepviet')) {
+            $accessToken = PersonalAccessToken::findToken( $request->cookie('token_bepviet'));
+            if (!$accessToken) {
+                 return response()->json([
+                    'status' => false,
+                    'message' => 'Token không hợp lệ hoặc đã hết hạn.'
+                ]);
+            }
+            $user = $accessToken->tokenable;
+            return response()->json([
+                'status' => true,
+                'data' => $user
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Cookie không tồn tại'
+        ]);
+    }
     public function Logout()
     {
         $cookie = cookie()->forget('token_bepviet');

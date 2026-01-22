@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as API from '../../JS/API/API';
 import * as fun from '../../JS/FUNCTION/function';
 import * as tb from '../../JS/FUNCTION/ThongBao';
 import { useDangNhapContext } from '../../context/QuanLiDangNhap_NguoiDung';
-
 
 function DangNhap() {
     const [err,seterr] = useState({})
@@ -13,9 +12,12 @@ function DangNhap() {
         password: '',
     });
     const [errHT,seterrHT] = useState('')
-    const { handleLogin } = useDangNhapContext();
+    const { handleLogin , kiemtra_dangnhap} = useDangNhapContext();
+    useEffect(()=>{
+        kiemtra_dangnhap('nguoidung_dangnhap');
+    },[kiemtra_dangnhap])
     const DangNhap = async()=>{
-        const ketqua= await handleLogin(login);
+        const ketqua= await handleLogin(login ,'user/login');
         if(ketqua.validate){
             seterr(ketqua.err);
             return;
@@ -31,67 +33,6 @@ function DangNhap() {
         }
 
     }
-    
-    //đã sửa phía trên
-    const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('login');
-    const [showLoginPassword, setShowLoginPassword] = useState(false);
-    const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [fieldError, setFieldError] = useState({}); 
-    
-    const [register, setRegister] = useState({
-        name: '',
-        phone: '',
-        password: '',
-        password_confirmation: ''
-    });
-
-    const switchTab = (tab) => {
-        setActiveTab(tab);
-        setFieldError({});
-        setShowLoginPassword(false);
-        setShowRegisterPassword(false);
-        setShowConfirmPassword(false);
-    };
-
-    // --- XỬ LÝ ĐĂNG NHẬP ---
-    const handlogin = async () => {
-        const kiemtra= fun.KiemTraRong(login);
-        if(kiemtra.Status){
-
-        }
-        alert(JSON.stringify(kiemtra))
-        try {
-            // 2. Gọi API
-            const formdata = fun.objectToFormData(login);
-            
-            const ketqua = await API.CallAPI(formdata, { 
-                url: 'user/login', 
-                PhuongThuc: 1 
-            });
-            // alert(JSON.stringify(ketqua))
-
-            // 3. Xử lý kết quả
-            if (ketqua.status === true) {
-                localStorage.setItem('user', JSON.stringify(ketqua.data));
-                
-                tb.ThongBao_ThanhCong("Đăng nhập thành công!");
-                
-                setTimeout(() => {
-                    navigate('/');
-                    window.location.reload(); 
-                }, 1000);
-            } else {
-                tb.ThongBao_Loi(ketqua.message || "Đăng nhập thất bại");
-            }
-        } catch (error) {
-            console.error(error);
-            tb.ThongBao_Loi("Không thể kết nối đến server");
-        }
-    };
-
-    // --- XỬ LÝ ĐĂNG KÝ ---
     const handleRegister = async () => {
         setFieldError({}); 
 
@@ -148,6 +89,33 @@ function DangNhap() {
             tb.ThongBao_Loi("Không thể kết nối đến server");
         }
     };
+    
+    //đã sửa phía trên
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState('login');
+    const [showLoginPassword, setShowLoginPassword] = useState(false);
+    const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [fieldError, setFieldError] = useState({}); 
+    
+    const [register, setRegister] = useState({
+        name: '',
+        phone: '',
+        password: '',
+        password_confirmation: ''
+    });
+
+    const switchTab = (tab) => {
+        setActiveTab(tab);
+        setFieldError({});
+        setShowLoginPassword(false);
+        setShowRegisterPassword(false);
+        setShowConfirmPassword(false);
+    };
+
+   
+
+    
 
     return (
         <div className="bg-gray-50 font-sans h-screen flex items-center justify-center p-4">
