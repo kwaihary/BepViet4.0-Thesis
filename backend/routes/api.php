@@ -31,6 +31,9 @@ Route::get('/admin/dulieu_bieudo_baiviet' , [PostController::class, 'dulieu_bieu
 Route::get('/admin/dulieu_bieudo_danhmuc' , [CategoryController::class ,'dulieu_bieudo_danhmuc']);
 Route::get('recipes/{id}', [RecipeController::class, 'show']);
 Route::get('recipes', [RecipeController::class, 'index']);
+Route::get('/recipes', [RecipeController::class, 'detail_recipe']);
+Route::get('/website/type_danhmuc' , [CategoryController::class , 'type_danhmuc']);
+Route::get('/website/Ten_danhmuc' , [CategoryController::class , 'Ten_danhmuc']);
 // II. ĐỊNH NGHĨA ROUTE POST
 Route::post('/admin/CapNhatTrangThai',[UserController::class,'QuanLiTaiKhoan']);
 Route::post('/admin/BoQua_ViPham',[PostController::class, 'BoQua_ViPham']);
@@ -40,7 +43,7 @@ Route::post('/admin/ThemDanhMuc', [CategoryController::class,'ThemDM']);
 Route::post('/admin/CapNhatTT_DM', [CategoryController::class,'CapNhatTT_DM']);
 Route::post('/admin/CapNhatDM', [CategoryController::class ,'CapNhatDM']);
 Route::post('/admin/CapNhatTT_BaiViet_by_admin', [PostController::class, 'CapNhatTT_BaiViet_by_admin']);
-
+Route::post('/nguoidung/kiemtra_dangnhap', [UserController::class , 'checkLogin']);
 
 Route::post('/user/login', [UserController::class, 'Login']);
 Route::post('/user/register', [UserController::class, 'Register']);
@@ -49,4 +52,6 @@ Route::post('user/logout', [UserController::class, 'Logout']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/recipes/create', [RecipeController::class, 'store']);
 });
-Route::get('/recipes', [RecipeController::class, 'detail_recipe']);
+
+
+Route::post('/nguoidung_dangnhap',[UserController::class, 'getUserProfile'])->middleware('Checklogin');

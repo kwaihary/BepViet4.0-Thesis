@@ -4,8 +4,7 @@ import Swal from 'sweetalert2';
 import moment from 'moment'; // Cần cài: npm install moment (hoặc dùng hàm tự viết bên dưới)
 import 'moment/locale/vi'; // Import tiếng Việt cho moment
 
-// Cấu hình đường dẫn ảnh (Giống bên ChiTietMonAn)
-const STORAGE_URL = "http://127.0.0.1:8000/storage/";
+
 
 // --- 1. HÀM FORMAT THỜI GIAN (Dùng thay moment nếu chưa cài) ---
 const formatTime = (dateString) => {
@@ -25,7 +24,7 @@ const formatTime = (dateString) => {
 const CommentItem = ({ comment }) => {
     // Xử lý avatar user bình luận
     const userAvatar = comment.user?.avatar 
-        ? STORAGE_URL + comment.user.avatar 
+        ? comment.user.avatar 
         : "https://via.placeholder.com/150";
 
     return (
@@ -128,12 +127,10 @@ function BaiViet({ data }) {
                 // Xử lý dữ liệu an toàn trước khi render
                 const authorName = recipe.author?.name || "Người dùng";
                 const authorAvatar = recipe.author?.avatar 
-                    ? STORAGE_URL + recipe.author.avatar 
-                    : "https://via.placeholder.com/150";
+            
                 
                 const recipeImage = recipe.image_url 
-                    ? STORAGE_URL + recipe.image_url 
-                    : "https://via.placeholder.com/600x400";
+                 
                 
                 const likesCount = recipe.interactions 
                     ? recipe.interactions.filter(i => i.type === 'like').length // Giả sử model Interaction có cột 'type'
